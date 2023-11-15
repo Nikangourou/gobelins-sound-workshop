@@ -4,6 +4,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js'
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
 import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js'
+import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
 
 export default class Resources extends EventEmitter
 {
@@ -66,6 +67,18 @@ export default class Resources extends EventEmitter
                     this.fileLoadEnd(_resource, _data)
 
                     DRACOLoader.releaseDecoderModule()
+                })
+            }
+        })
+
+        // OBJ
+
+        const objLoader = new OBJLoader()
+        this.loaders.push({
+            extensions: ['obj'],
+            action: (_resource) => {
+                objLoader.load(_resource.source, (_data) => {
+                    this.fileLoadEnd(_resource, _data)
                 })
             }
         })
