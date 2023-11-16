@@ -11,6 +11,7 @@ export default [
             { name: 'train', source: '/assets/train.glb' },
             { name: 'splineCamera', source: '/assets/spline.obj'},
             { name: 'intro', source: '/assets/intro_mockup.glb'},
+            { name: 'noiseTex', source: '/assets/noiseTex.png', type: 'texture'},
         ]
     }
 ]

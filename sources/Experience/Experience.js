@@ -108,7 +108,7 @@ export default class Experience
 
     setWorld()
     {
-        this.world = new World({camera : this.camera})
+        this.world = new World({camera : this.camera, renderer: this.renderer})
     }
 
     update()
