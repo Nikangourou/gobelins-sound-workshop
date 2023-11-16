@@ -29,6 +29,7 @@ export default class Time extends EventEmitter
         this.playing = false
     }
 
+
     /**
      * Tick
      */

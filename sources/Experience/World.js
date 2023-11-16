@@ -1,6 +1,8 @@
 import * as THREE from 'three'
 import Experience from './Experience.js'
 import { PositionalAudioHelper } from 'three/examples/jsm/helpers/PositionalAudioHelper.js'
+import Time from './Utils/Time.js'
+import Intro from "./Scenes/Intro.js"
 
 export default class World
 {
@@ -10,11 +12,15 @@ export default class World
         this.config = this.experience.config
         this.scene = this.experience.scene
         this.resources = this.experience.resources
-        this.camera = _options.camera
+        this.camera = _options.camera.instance
         this.audioListenner = new THREE.AudioListener();
         this.churchMesh = null
         this.trainMesh = null
         this.treesMesh = null
+        this.time = new Time()
+
+        // scenes 
+        // this.intro = new Intro({model : this.resources.intro})
 
         this.audioListenner.context.resume()
         
@@ -22,17 +28,40 @@ export default class World
         {
             if(_group.name === 'base')
             {
-                this.setDummy()
+                // this.setDummy()
+                this.init()
             }
         })
     }
 
+
+
     setDummy()
     {
-        console.log(this.resources.items.splineCamera.children[0].geometry)
+
+        //debug spline path
+        // console.log(this.resources.items.splineCamera.children[0].geometry)
         let material = new THREE.LineBasicMaterial({ color: 0x00ff00 });
         let circle = new THREE.Line(this.resources.items.splineCamera.children[0].geometry, material);
         this.scene.add(circle)
+
+        // attach camera / use blender camera as main
+
+        let testMesh = new THREE.Mesh(new THREE.SphereGeometry(1),new  THREE.MeshNormalMaterial())
+        this.scene.add(testMesh)
+        
+        this.mixer = new THREE.AnimationMixer(testMesh)
+        const animation = this.resources.items.testScene.animations[0]
+        const action = this.mixer.clipAction(animation);
+        action.play()
+
+        const geoCone = new THREE.ConeGeometry( 1, 3, 16 ); 
+        const testMesh2 = new THREE.Mesh(geoCone,new THREE.MeshNormalMaterial())
+        this.scene.add(testMesh2)
+        this.coneMixer = new THREE.AnimationMixer(testMesh2)
+        const animCone = this.resources.items.testScene.animations[1]
+        const coneAction = this.coneMixer.clipAction(animCone);
+        coneAction.play()
 
         var ambientLight = new THREE.AmbientLight( 0xcccccc, 0.4 );
         this.scene.add( ambientLight );
@@ -65,6 +94,8 @@ export default class World
             new THREE.BoxGeometry(0.01, 0.01, 0.01),
             new THREE.MeshNormalMaterial()
         )
+
+
         // audio
 
         this.camera.instance.add(this.audioListenner)
@@ -100,15 +131,30 @@ export default class World
 
     }
 
-    // const SoundControls = function () {
+    init()
+    {
+        console.log( this.resources.items.intro)
+        console.log(this.camera)
+        let testLight = new THREE.AmbientLight( 0xffffff );
+  
+        this.scene.add(testLight)
 
-    //     this.master = listener.getMasterVolume();
-    //     this.firstSphere = sound1.getVolume();
-    //     this.secondSphere = sound2.getVolume();
-    //     this.thirdSphere = sound3.getVolume();
-    //     this.Ambient = sound4.getVolume();
+        this.scene.add(this.resources.items.intro.scene)
+        // this.resources.items.intro.scene.traverse(child => {
+        // })
 
-    // };
+        let cameraMixer = new THREE.AnimationMixer(this.camera)
+        const cameraAnimation = this.resources.items.intro.animations[0]
+        const action = cameraMixer.clipAction(cameraAnimation);
+        // action.time = 0;
+        console.log(action)
+        // set action timeScale to 0
+        action.play()
+        
+        // set camera to frame on of animation clip
+        
+    }
+
 
   
 
@@ -118,6 +164,19 @@ export default class World
 
     update()
     {
+        // console.log(this.time)
+        if(this.mixer) {
+            this.mixer.update(this.time.delta*0.001)
+            // console.log(this.mixer.time)
+        }
+
+        if( this.coneMixer) {
+            this.coneMixer.update(this.time.delta*0.001)
+        }
+
+        if(this.cameraMixer) {
+            this.cameraMixer.update(this.time.delta*0.001)
+        }
         
     }
 
