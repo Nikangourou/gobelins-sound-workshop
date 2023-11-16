@@ -13,7 +13,8 @@ export default class World
         this.config = this.experience.config
         this.scene = this.experience.scene
         this.resources = this.experience.resources
-        this.camera = _options.camera.instance
+        this.cameraControls = _options.camera
+        this.camera = _options.camera.defaultCamera
         this.audioListenner = new THREE.AudioListener();
         this.churchMesh = null
         this.trainMesh = null
@@ -143,14 +144,18 @@ export default class World
     {
 
         //intro 
-        this.introScene = new Intro(this.resources.items.intro)
+        this.introScene = new Intro(this.resources.items.intro, this.renderer, this.cameraControls, this.scene)
+        
         this.introScene.init()
-        // this.scene.add(this.introScene.scene)
+        this.scene.add(this.introScene.scene)
+
+
 
         // test shader scene 1
+        console.log(this.resources.items.intro)
         this.scene1 = new Scene_1(this.resources.items.noiseTex, this.renderer)
-        this.scene.add(this.scene1.scene)
-        this.scene1.init()
+        // this.scene.add(this.scene1.scene)
+        // this.scene1.init()
         
         //helpers
         const axesHelper = new THREE.AxesHelper( 5 );

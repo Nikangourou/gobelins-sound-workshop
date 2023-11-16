@@ -162,7 +162,8 @@ export default class Renderer
         }
         else
         {
-            this.instance.render(this.scene, this.camera.instance)
+           
+            this.instance.render(this.scene, this.config.debug ? this.camera.debugCamera : this.camera.defaultCamera )
         }
 
         if(this.stats)

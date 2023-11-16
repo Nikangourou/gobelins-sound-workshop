@@ -14,21 +14,30 @@ export default class Camera
         this.sizes = this.experience.sizes
         this.targetElement = this.experience.targetElement
         this.scene = this.experience.scene
+        this.debugCamera = new THREE.PerspectiveCamera(25, this.config.width / this.config.height, 0.1, 150)
+        this.defaultCamera = new THREE.PerspectiveCamera(25, this.config.width / this.config.height, 0.1, 150)
 
         // Set up
-        this.mode = 'debug' // defaultCamera \ debugCamera
+        this.mode = 'default' 
 
         this.setInstance()
         this.setModes()
+       
+    }
+
+    setDefaultCamera( camera ) {
+        this.defaultCamera = camera
+        //this.defaultCamera.rotation.reorder('YXZ')
+
     }
 
     setInstance()
     {
-        // Set up
-        this.instance = new THREE.PerspectiveCamera(25, this.config.width / this.config.height, 0.1, 150)
-        this.instance.rotation.reorder('YXZ')
+        // // Set up
+        // this.instance = new THREE.PerspectiveCamera(25, this.config.width / this.config.height, 0.1, 150)
+        // this.instance.rotation.reorder('YXZ')
 
-        this.scene.add(this.instance)
+        // this.scene.add(this.instance)
     }
 
     setModes()
@@ -37,16 +46,17 @@ export default class Camera
 
         // Default
         this.modes.default = {}
-        this.modes.default.instance = this.instance.clone()
-        this.modes.default.instance.rotation.reorder('YXZ')
+        this.modes.default.camera = this.defaultCamera
+       
+        //this.modes.default.instance.rotation.reorder('YXZ')
 
         // Debug
         this.modes.debug = {}
-        this.modes.debug.instance = this.instance.clone()
-        this.modes.debug.instance.rotation.reorder('YXZ')
-        this.modes.debug.instance.position.set(5, 5, 5)
+        // this.debugCamera.rotation.reorder('YXZ')
+        this.debugCamera.position.set(5, 5, 5)
+        this.modes.debug.camera = this.debugCamera
         
-        this.modes.debug.orbitControls = new OrbitControls(this.modes.debug.instance, this.targetElement)
+        this.modes.debug.orbitControls = new OrbitControls(this.modes.debug.camera, this.targetElement)
         this.modes.debug.orbitControls.enabled = this.modes.debug.active
         this.modes.debug.orbitControls.screenSpacePanning = true
         this.modes.debug.orbitControls.enableKeys = false
@@ -58,14 +68,14 @@ export default class Camera
 
     resize()
     {
-        this.instance.aspect = this.config.width / this.config.height
-        this.instance.updateProjectionMatrix()
+        // this.instance.aspect = this.config.width / this.config.height
+        // this.instance.updateProjectionMatrix()
 
-        this.modes.default.instance.aspect = this.config.width / this.config.height
-        this.modes.default.instance.updateProjectionMatrix()
+        // this.modes.default.instance.aspect = this.config.width / this.config.height
+        // this.modes.default.instance.updateProjectionMatrix()
 
-        this.modes.debug.instance.aspect = this.config.width / this.config.height
-        this.modes.debug.instance.updateProjectionMatrix()
+        // this.modes.debug.instance.aspect = this.config.width / this.config.height
+        // this.modes.debug.instance.updateProjectionMatrix()
     }
 
     update()
@@ -74,9 +84,9 @@ export default class Camera
         this.modes.debug.orbitControls.update()
 
         // Apply coordinates
-        this.instance.position.copy(this.modes[this.mode].instance.position)
-        this.instance.quaternion.copy(this.modes[this.mode].instance.quaternion)
-        this.instance.updateMatrixWorld() // To be used in projection
+        // this.instance.position.copy(this.modes[this.mode].instance.position)
+        // this.instance.quaternion.copy(this.modes[this.mode].instance.quaternion)
+        // this.instance.updateMatrixWorld() // To be used in projection
     }
 
     destroy()
