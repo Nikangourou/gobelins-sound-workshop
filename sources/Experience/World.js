@@ -4,6 +4,7 @@ import { PositionalAudioHelper } from 'three/examples/jsm/helpers/PositionalAudi
 import Time from './Utils/Time.js'
 import Intro from "./Scenes/Intro.js"
 import Scene_1 from './Scenes/Scene_1.js'
+import Scene_interaction from './Scenes/Scene_interaction.js'
 
 export default class World
 {
@@ -143,14 +144,19 @@ export default class World
     {
 
         //intro 
-        this.introScene = new Intro(this.resources.items.intro)
-        this.introScene.init()
+        // this.introScene = new Intro(this.resources.items.intro)
+        // this.introScene.init()
         // this.scene.add(this.introScene.scene)
 
         // test shader scene 1
-        this.scene1 = new Scene_1(this.resources.items.noiseTex, this.renderer)
-        this.scene.add(this.scene1.scene)
-        this.scene1.init()
+        // this.scene1 = new Scene_1(this.resources.items.noiseTex, this.renderer)
+        // this.scene.add(this.scene1.scene)
+        // this.scene1.init()
+
+        // test interaction scene
+        this.sceneInteraction = new Scene_interaction(this.camera, this.renderer)
+        this.scene.add(this.sceneInteraction.scene)
+        this.sceneInteraction.init()
         
         //helpers
         const axesHelper = new THREE.AxesHelper( 5 );
@@ -166,6 +172,7 @@ export default class World
     {
         if(this.scene1) this.scene1.update()
         if(this.introScene && this.introScene.isActive) this.introScene.update()
+        if(this.sceneInteraction) this.sceneInteraction.update()
         
     }
 
