@@ -51,7 +51,7 @@ export default class Renderer
         // this.instance.gammaOutPut = true
         this.instance.outputEncoding = THREE.sRGBEncoding
         // this.instance.shadowMap.type = THREE.PCFSoftShadowMap
-        // this.instance.shadowMap.enabled = false
+        this.instance.shadowMap.enabled = true
         this.instance.toneMapping = THREE.NoToneMapping
         this.instance.toneMappingExposure = 1
 

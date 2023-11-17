@@ -34,8 +34,6 @@ export default class World
                 // this.setDummy()
                 this.init()
                 
-                
-                // 
             }
         })
         
@@ -157,12 +155,12 @@ export default class World
         this.scenes = [intro, scene1]
 
         //intro 
-        intro.init()
+        // intro.init()
 
         // test shader scene 1
-        // this.shaderTestScene = new ShaderTestScene(this.renderer, this.resources.items)
-        // this.scene.add(this.shaderTestScene.scene)
-        // this.shaderTestScene.init()
+        this.shaderTestScene = new ShaderTestScene(this.renderer, this.resources.items)
+        this.scene.add(this.shaderTestScene.scene)
+        this.shaderTestScene.init()
         
         //helpers
         const axesHelper = new THREE.AxesHelper( 5 );

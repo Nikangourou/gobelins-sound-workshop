@@ -17,7 +17,7 @@ export default class ShaderTestScene extends Scene {
        this.customUniforms = {
         uTime: { value: 0 },
         map: { value: assets.noiseTex },
-        lightDirection: { value: new THREE.Vector3(0.25, 2, - 2.25) },
+        lightDirection: { value: new THREE.Vector3(0, 0, 5) },
         outlineColor: { value: new THREE.Color('#000000') },
         outlineWidth: { value: 0.05 }, 
        }
@@ -57,19 +57,45 @@ export default class ShaderTestScene extends Scene {
         this.assets["5mat"].scene.traverse(child => {
             if(child.isMesh) {
                 child.material = materialLibrary[child.material.name]
+                child.castShadow = true
+                child.receiveShadow = true
             }
         })
 
         // create one gui per object
         this.scene.add(this.assets["5mat"].scene)
 
+        let testPlaneMat = new THREE.MeshStandardMaterial({color: 0xff0000})
+        testPlaneMat.side = THREE.DoubleSide
+        let testPlane = new THREE.Mesh(new THREE.PlaneGeometry(10, 10), testPlaneMat)
+        testPlane.receiveShadow = true;
+
+        this.scene.add(testPlane)
+
         this.setOutlineMat()
         // const testMesh = new THREE.Mesh(this.geo, this.mat ) 
         // this.scene.add(testMesh)
-        const directionalLight = new THREE.DirectionalLight('#ffffff', 3)
+        const directionalLight = new THREE.DirectionalLight('#ffffff', 5)
         directionalLight.position.set( this.customUniforms.lightDirection.value)
-        this.scene.add(directionalLight)
+        const helper = new THREE.DirectionalLightHelper( directionalLight, 5 );
+
+        const testShadowObj = new THREE.Mesh(new THREE.BoxGeometry(1, 1), new THREE.MeshStandardMaterial())
+        testShadowObj.position.z = 2;
+        testShadowObj.castShadow = true
+
+        this.scene.add(testShadowObj)
+        
+        const light = new THREE.PointLight( 0xff0000, 10, 100 );
+        light.position.set( 0, 0, 5 );
+        const helper1 = new THREE.PointLightHelper( light, 1 );
+        this.scene.add(directionalLight, helper, light, helper1)
+        console.log(this.scene)
+
+        light.castShadow = true;
+
+
         const lightFolder = this.gui.addFolder('light')
+
         lightFolder.add(this.customUniforms.lightDirection.value, 'x').min(- 5).max(5).step(0.001).name('lightX')
         lightFolder.add(this.customUniforms.lightDirection.value, 'y').min(- 5).max(5).step(0.001).name('lightY')
     }
