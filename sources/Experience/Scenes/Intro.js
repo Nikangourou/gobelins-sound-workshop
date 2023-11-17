@@ -25,19 +25,11 @@ export default class Intro extends Scene {
     }
 
     init() {
-
-        console.log(this.mainRenderer)
-    
         const helper = new THREE.CameraHelper( this.camera );
         this.scene.add(helper)
         
         let testLight = new THREE.AmbientLight( 0xffffff );
         this.scene.add(testLight)
-        
-        
-        // this.camera.rotation.x = Math.PI*2;
-        // console.log(this.animations[0])
-        // console.log("mixer", this.cameraMixer)
         
         const action = this.cameraMixer.clipAction(this.cameraMouvement);
         action.clampWhenFinished = true;
@@ -52,9 +44,6 @@ export default class Intro extends Scene {
     update() {
         if(this.cameraMixer && this.userStarted ) {
             this.cameraMixer.update(this.time.delta*0.001)
-            //console.log(this.camera.matrixWorld)
-            //console.log("action", this.cameraMixer.clipAction(this.cameraMouvement))
-            // console.log(this.cameraMixer.time)
         }
     }
 }

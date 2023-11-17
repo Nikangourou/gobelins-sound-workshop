@@ -52,9 +52,13 @@ export default class Camera
 
         // Debug
         this.modes.debug = {}
-        // this.debugCamera.rotation.reorder('YXZ')
+
+        // turn Y up
+        this.debugCamera.up.set(0,0,1);
         this.debugCamera.position.set(5, 5, 5)
+     
         this.modes.debug.camera = this.debugCamera
+
         
         this.modes.debug.orbitControls = new OrbitControls(this.modes.debug.camera, this.targetElement)
         this.modes.debug.orbitControls.enabled = this.modes.debug.active
