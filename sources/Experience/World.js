@@ -23,6 +23,9 @@ export default class World
         this.renderer = _options.renderer
 
         this.audioListenner.context.resume()
+
+        this.orbitControls = this.experience.camera.modes.debug.orbitControls
+   
         
         this.resources.on('groupEnd', (_group) =>
         {
@@ -154,7 +157,7 @@ export default class World
         // this.scene1.init()
 
         // test interaction scene
-        this.sceneInteraction = new Scene_interaction(this.camera, this.renderer)
+        this.sceneInteraction = new Scene_interaction(this.camera, this.renderer, this.orbitControls)
         this.scene.add(this.sceneInteraction.scene)
         this.sceneInteraction.init()
         

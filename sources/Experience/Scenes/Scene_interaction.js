@@ -4,7 +4,7 @@ import GUI from 'lil-gui'
 import { DragControls } from 'three/examples/jsm/controls/DragControls.js'
 
 export default class Scene_interaction extends Scene {
-    constructor(camera, renderer) {
+    constructor(camera, renderer, orbitControls) {
         super()
         this.renderer = renderer
         this.scene = new THREE.Group()
@@ -19,16 +19,17 @@ export default class Scene_interaction extends Scene {
         this.mouse = new THREE.Vector2()
         this.raycaster = new THREE.Raycaster()
         this.camera = camera
+        this.orbitControls = orbitControls
         this.guiSetup()
 
-        // window.addEventListener('mousemove', (e) => {
-        //     this.mouse.x = (e.clientX / window.innerWidth) * 2 - 1
-        //     this.mouse.y = - (e.clientY / window.innerHeight) * 2 + 1
-        // })
+        window.addEventListener('mousemove', (e) => {
+            this.mouse.x = (e.clientX / window.innerWidth) * 2 - 1
+            this.mouse.y = - (e.clientY / window.innerHeight) * 2 + 1
+        })
 
-        // window.addEventListener('click', (e) => {
-        //     this.click(e)
-        // })
+        window.addEventListener('click', (e) => {
+            this.click(e)
+        })
     }
 
     init() {
@@ -60,13 +61,13 @@ export default class Scene_interaction extends Scene {
     }
 
     dragSetup() {
-
-        let container = document.createElement('div');
-        document.body.appendChild(container);
-        container.appendChild( this.renderer.instance.domElement );
-
-
         this.controls = new DragControls([this.cube, this.sphere, this.knot], this.camera, this.renderer.instance.domElement);
+        this.controls.addEventListener( 'dragstart',  () => { 
+            this.orbitControls.enabled = false;
+        });
+        this.controls.addEventListener( 'dragend',  () => { 
+            this.orbitControls.enabled = true;
+        });
     }
 
     click() {
@@ -79,39 +80,39 @@ export default class Scene_interaction extends Scene {
     }
 
     update() {
-        // if (this.cube) {
-        //     this.raycaster.setFromCamera(this.mouse, this.camera)
-        //     const modelIntersects = this.raycaster.intersectObject(this.cube)
+        if (this.cube) {
+            this.raycaster.setFromCamera(this.mouse, this.camera)
+            const modelIntersects = this.raycaster.intersectObject(this.cube)
 
-        //     if (modelIntersects.length) {
-        //         this.cube.scale.set(1.2, 1.2, 1.2)
-        //     }
-        //     else {
-        //         this.cube.scale.set(1, 1, 1)
-        //     }
-        // }
-        // if (this.sphere) {
-        //     this.raycaster.setFromCamera(this.mouse, this.camera)
-        //     const modelIntersects = this.raycaster.intersectObject(this.sphere)
+            if (modelIntersects.length) {
+                this.cube.scale.set(1.2, 1.2, 1.2)
+            }
+            else {
+                this.cube.scale.set(1, 1, 1)
+            }
+        }
+        if (this.sphere) {
+            this.raycaster.setFromCamera(this.mouse, this.camera)
+            const modelIntersects = this.raycaster.intersectObject(this.sphere)
 
-        //     if (modelIntersects.length) {
-        //         this.sphere.scale.y += 0.01
-        //     }
-        //     else {
-        //         this.sphere.scale.y = 1
-        //     }
-        // }
-        // if (this.knot) {
-        //     this.raycaster.setFromCamera(this.mouse, this.camera)
-        //     const modelIntersects = this.raycaster.intersectObject(this.knot)
+            if (modelIntersects.length) {
+                this.sphere.scale.y += 0.01
+            }
+            else {
+                this.sphere.scale.y = 1
+            }
+        }
+        if (this.knot) {
+            this.raycaster.setFromCamera(this.mouse, this.camera)
+            const modelIntersects = this.raycaster.intersectObject(this.knot)
 
-        //     if (modelIntersects.length) {
-        //         this.knot.rotation.x += 0.01
-        //     }
-        //     else {
-        //         this.knot.rotation.x = 0
-        //     }
-        // }
+            if (modelIntersects.length) {
+                this.knot.rotation.x += 0.01
+            }
+            else {
+                this.knot.rotation.x = 0
+            }
+        }
     }
 
 }
