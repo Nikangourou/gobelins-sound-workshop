@@ -117,11 +117,9 @@ export default class Scene_interaction extends Scene {
         if (this.cube && this.sphere) {
             const distance = this.cube.position.distanceTo(this.sphere.position)
             if (distance < 1.5) {
-                // this.cube.material.color.set(0xff0000)
                 this.sphere.material.color.set(0x00ff00)
             }
             else {
-                // this.cube.material.color.set(0x00ff00)
                 this.sphere.material.color.set(0xff0000)
             }
         }

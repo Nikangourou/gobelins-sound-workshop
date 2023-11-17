@@ -2,6 +2,8 @@ import * as THREE from 'three'
 import Experience from './Experience.js'
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js'
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js'
+import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js'
+
 
 export default class Renderer
 {
@@ -22,7 +24,7 @@ export default class Renderer
             this.debugFolder = this.debug.addFolder('renderer')
         }
         
-        this.usePostprocess = false
+        this.usePostprocess = true
 
         this.setInstance()
         this.setPostProcess()
@@ -136,6 +138,57 @@ export default class Renderer
         this.postProcess.composer.setPixelRatio(this.config.pixelRatio)
 
         this.postProcess.composer.addPass(this.postProcess.renderPass)
+
+           // noise pass
+           const NoiseShader = {
+            uniforms: {
+                tDiffuse: { value: null },
+                uTime: { value: 0 },
+                uNoiseDensity: { value: 0.5 },
+                uNoiseStrength: { value: 0.5 },
+                uNoiseSpeed: { value: 0.5 },
+            },
+            vertexShader: `
+                varying vec2 vUv;
+                void main() {
+                    vUv = uv;
+                    gl_Position = projectionMatrix 
+                        * modelViewMatrix 
+                        * vec4( position, 1.0 );
+                }
+            `,
+            fragmentShader: `
+                uniform float uTime;
+                uniform float uNoiseDensity;
+                uniform float uNoiseStrength;
+                uniform float uNoiseSpeed;
+                uniform sampler2D tDiffuse;
+                varying vec2 vUv;
+                float rand(vec2 seed) {
+                    return fract(sin(dot(seed.xy, vec2(12.9898, 78.233))) * 43758.5453);
+                }
+                void main() {
+                    vec4 texel = texture2D( tDiffuse, vUv );
+                    float noise  = rand(vUv + uTime * uNoiseSpeed) * uNoiseDensity; 
+                    vec3 color = texel.rgb + vec3(noise * uNoiseStrength);
+                    gl_FragColor = vec4( color, texel.a );
+                }
+            `
+        }
+
+        const noisePass = new ShaderPass(NoiseShader)
+        noisePass.uniforms['uNoiseDensity'].value = 0.5
+        noisePass.uniforms['uNoiseStrength'].value = 0.5
+        noisePass.uniforms['uNoiseSpeed'].value = 0.5
+        this.postProcess.composer.addPass(noisePass)
+
+        if(this.debug){
+            this.debugFolder.add(this, 'usePostprocess').name('use postprocess')
+            this.noiseFolder = this.debugFolder.addFolder('noise')
+            this.noiseFolder.add(noisePass.uniforms['uNoiseStrength'], 'value').min(0).max(1).step(0.001).name('noise strength')
+            this.noiseFolder.add(noisePass.uniforms['uNoiseSpeed'], 'value').min(0).max(1).step(0.001).name('noise speed')
+            this.noiseFolder.add(noisePass.uniforms['uNoiseDensity'], 'value').min(0).max(1).step(0.001).name('noise density')
+        }
     }
 
     resize()
@@ -169,6 +222,10 @@ export default class Renderer
         {
             this.stats.afterRender()
         }
+
+        this.postProcess.composer.passes[1].uniforms['uTime'].value = this.time.elapsed * 0.0005
+
+
     }
 
     destroy()
