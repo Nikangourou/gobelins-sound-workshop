@@ -72,14 +72,12 @@ export default class Camera
 
     resize()
     {
-        // this.instance.aspect = this.config.width / this.config.height
-        // this.instance.updateProjectionMatrix()
+        this.debugCamera.aspect = this.config.width / this.config.height
+        this.debugCamera.updateProjectionMatrix()
 
-        // this.modes.default.instance.aspect = this.config.width / this.config.height
-        // this.modes.default.instance.updateProjectionMatrix()
-
-        // this.modes.debug.instance.aspect = this.config.width / this.config.height
-        // this.modes.debug.instance.updateProjectionMatrix()
+        this.defaultCamera.aspect = this.config.width / this.config.height
+        this.defaultCamera.updateProjectionMatrix()
+       
     }
 
     update()

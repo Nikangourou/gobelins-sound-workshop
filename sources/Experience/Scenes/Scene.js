@@ -1,11 +1,11 @@
 import Time from "../Utils/Time";
 
 export default class Scene {
-    constructor() {
+    constructor(scene) {
         this.isActive = false;
         this.hasBeenCompleted = false;
         this.time = new Time()
-        this.scene;
+    
     }
 
     init() {

@@ -22,6 +22,8 @@ export default class World
         this.treesMesh = null
         this.time = new Time()
         this.renderer = _options.renderer
+        this.activeSceneIndex = 0
+        
 
         this.audioListenner.context.resume()
         
@@ -140,25 +142,27 @@ export default class World
             
             
     }
+
+    onActiveSceneIsDone (currContext) {
+        if( currContext.activeSceneIndex < this.scenes.length -1) {
+            currContext.activeSceneIndex += 1
+            currContext.scenes[currContext.activeSceneIndex].init()
+        }
+    }
         
     init()
     {
+        const intro = new Intro(this.resources.items.intro, this.renderer, this.cameraControls, this.scene,() => this.onActiveSceneIsDone(this))
+        const scene1 = new Scene_1(this.resources.items.scene1, this.renderer, this.cameraControls, this.scene,() => this.onActiveSceneIsDone(this))
+        this.scenes = [intro, scene1]
 
         //intro 
-        // this.introScene = new Intro(this.resources.items.intro, this.renderer, this.cameraControls, this.scene)
-        // this.introScene.init()
-        // this.scene.add(this.introScene.scene)
-
-
+        intro.init()
 
         // test shader scene 1
-        this.shaderTestScene = new ShaderTestScene(this.renderer, this.resources.items)
-        this.scene.add(this.shaderTestScene.scene)
-        this.shaderTestScene.init()
-
-        // this.scene1 = new Scene_1(this.resources.items.scene1, this.renderer, this.cameraControls, this.scene)
-        // this.scene.add(this.scene1.scene)
-        // this.scene1.init()
+        // this.shaderTestScene = new ShaderTestScene(this.renderer, this.resources.items)
+        // this.scene.add(this.shaderTestScene.scene)
+        // this.shaderTestScene.init()
         
         //helpers
         const axesHelper = new THREE.AxesHelper( 5 );
@@ -172,9 +176,7 @@ export default class World
 
     update()
     {
-        if(this.scene1) this.scene1.update()
-        if(this.introScene && this.introScene.isActive) this.introScene.update()
-        
+        if(this.scenes) this.scenes[this.activeSceneIndex].update()
     }
 
     destroy()
