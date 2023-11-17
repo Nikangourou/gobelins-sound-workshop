@@ -40,7 +40,7 @@ export default class Scene_interaction extends Scene {
         this.cube = new THREE.Mesh(cubeGeo, cubeMat)
 
         const sphereGeo = new THREE.SphereGeometry(1, 32, 32)
-        const sphereMat = new THREE.MeshNormalMaterial()
+        const sphereMat = new THREE.MeshBasicMaterial({ color: 0xff0000 })
         this.sphere = new THREE.Mesh(sphereGeo, sphereMat)
         this.sphere.position.x = 2
 
@@ -96,7 +96,7 @@ export default class Scene_interaction extends Scene {
             const modelIntersects = this.raycaster.intersectObject(this.sphere)
 
             if (modelIntersects.length) {
-                this.sphere.scale.y += 0.01
+                // this.sphere.scale.y += 0.01
             }
             else {
                 this.sphere.scale.y = 1
@@ -111,6 +111,18 @@ export default class Scene_interaction extends Scene {
             }
             else {
                 this.knot.rotation.x = 0
+            }
+        }
+        // check if cube collide with sphere
+        if (this.cube && this.sphere) {
+            const distance = this.cube.position.distanceTo(this.sphere.position)
+            if (distance < 1.5) {
+                // this.cube.material.color.set(0xff0000)
+                this.sphere.material.color.set(0x00ff00)
+            }
+            else {
+                // this.cube.material.color.set(0x00ff00)
+                this.sphere.material.color.set(0xff0000)
             }
         }
     }
