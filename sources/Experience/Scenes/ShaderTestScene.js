@@ -13,6 +13,7 @@ export default class ShaderTestScene extends Scene {
        this.outlineMat;
        this.gui = new GUI()
        this.assets = assets
+       this.name = "scene_1"
        
        this.customUniforms = {
         uTime: { value: 0 },
@@ -28,9 +29,9 @@ export default class ShaderTestScene extends Scene {
 
     init() {
         // test scene with 5 objects
-        console.log(this.assets["5mat"])
+        console.log(this.assets[this.name])
         let materials = []
-        this.assets["5mat"].scene.traverse(child => {
+        this.assets[this.name].scene.traverse(child => {
             console.log(child)
             if(child.isMesh) {
                 materials.push(child.material.name)
@@ -54,16 +55,16 @@ export default class ShaderTestScene extends Scene {
             materialLibrary[matName] = this.createCustomToonMat(matName)
         })
 
-        this.assets["5mat"].scene.traverse(child => {
+        this.assets[this.name].scene.traverse(child => {
             if(child.isMesh) {
                 child.material = materialLibrary[child.material.name]
-                child.castShadow = true
-                child.receiveShadow = true
+                // child.castShadow = true
+                // child.receiveShadow = true
             }
         })
 
         // create one gui per object
-        this.scene.add(this.assets["5mat"].scene)
+        this.scene.add(this.assets[this.name].scene)
 
         let testPlaneMat = new THREE.MeshStandardMaterial({color: 0xff0000})
         testPlaneMat.side = THREE.DoubleSide

@@ -10,11 +10,11 @@ export default [
             { name: 'church', source: '/assets/church.glb' },
             { name: 'train', source: '/assets/train.glb' },
             { name: 'splineCamera', source: '/assets/spline.obj'},
-            { name: 'intro', source: '/assets/intro_mockup.glb'},
-            { name: 'scene1', source: '/assets/scene_1_mockup.glb'},
             { name: 'noiseTex', source: '/assets/ScaleTexture.png', type: 'texture'},
             { name: 'monkey', source: '/assets/monkey.glb'},
             { name: '5mat', source: '/assets/test5Mat.glb'},
+            { name: 'scene_1', source: '/assets/DA_scene_1_with_cam.glb'},
+            {name: 'mockup_scene_2', source: '/assets/scene_1_mockup.glb'}
         ]
     }
 ]

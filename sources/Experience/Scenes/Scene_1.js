@@ -34,6 +34,7 @@ export default class Scene_1 extends Scene {
 
         this.scene.traverse(e => {
             if(e.isMesh) {
+                
                 console.log(e.name)
                 if(e.name === 'Cube') {
                     this.cubeMixer1 = new THREE.AnimationMixer(e)
