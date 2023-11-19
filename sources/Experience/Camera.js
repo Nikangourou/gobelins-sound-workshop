@@ -13,7 +13,11 @@ export default class Camera {
         this.targetElement = this.experience.targetElement
         this.scene = this.experience.scene
         this.mouse = new THREE.Vector2(0, 0)
-
+        this.easeMouse = new THREE.Vector2(0, 0)
+        this.mouseRotationH = 0.05
+        this.mouseRotationV = 0.05
+        this.mouseEaseRation = 0.08
+        
         // Set up
         this.mode = 'default' // defaultCamera \ debugCamera
 
@@ -70,8 +74,9 @@ export default class Camera {
         this.modes.debug.instance.updateProjectionMatrix()
     }
 
-    lerp(start, end, amt){
-        return (1 - amt) * start + amt * end
+    // RETURN VEC2 * RATIO
+    lerp(v1, ratio) {
+        return new THREE.Vector2(v1.x * ratio, v1.y * ratio)
     }
 
     update() {
@@ -84,13 +89,12 @@ export default class Camera {
         this.instance.updateMatrixWorld() // To be used in projection
 
         // Mise à jour de la position de la caméra
-        let targetPosX = this.lerp(this.instance.position.x, this.mouse.x, 0.1)
-        let targetPosY = this.lerp(this.instance.position.y, this.mouse.y, 0.1)
-    
-        this.instance.position.x = targetPosX
-        this.instance.position.y = targetPosY
+        this.easeMouse = this.lerp(this.mouse, this.mouseEaseRation)
 
-        // Mise à jour des coordonnées de la caméra pour appliquer le mouvement
+        this.instance.rotateY(this.easeMouse.x * -this.mouseRotationH)
+        this.instance.rotateX(this.easeMouse.y * this.mouseRotationV)
+        
+        // Update projection matrix
         this.instance.updateProjectionMatrix()
     }
 
