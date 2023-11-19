@@ -35,8 +35,30 @@ export default class Camera {
         // Set up
         this.instance = new THREE.PerspectiveCamera(25, this.config.width / this.config.height, 0.1, 150)
         this.instance.rotation.reorder('YXZ')
+        this.debugCamera = new THREE.PerspectiveCamera(25, this.config.width / this.config.height, 0.1, 150)
+        this.defaultCamera = new THREE.PerspectiveCamera(25, this.config.width / this.config.height, 0.1, 150)
 
-        this.scene.add(this.instance)
+        // Set up
+        this.mode = 'default' 
+
+        this.setInstance()
+        this.setModes()
+       
+    }
+
+    setDefaultCamera( camera ) {
+        this.defaultCamera = camera
+        //this.defaultCamera.rotation.reorder('YXZ')
+
+    }
+
+    setInstance()
+    {
+        // // Set up
+        // this.instance = new THREE.PerspectiveCamera(25, this.config.width / this.config.height, 0.1, 150)
+        // this.instance.rotation.reorder('YXZ')
+
+        // this.scene.add(this.instance)
     }
 
     setModes() {
@@ -55,6 +77,22 @@ export default class Camera {
         this.modes.debug.instance.position.set(5, 5, 5)
 
         this.modes.debug.orbitControls = new OrbitControls(this.modes.debug.instance, this.targetElement)
+
+        this.modes.default.camera = this.defaultCamera
+       
+        //this.modes.default.instance.rotation.reorder('YXZ')
+
+        // Debug
+        this.modes.debug = {}
+
+        // turn Y up
+        this.debugCamera.up.set(0,0,1);
+        this.debugCamera.position.set(5, 5, 5)
+     
+        this.modes.debug.camera = this.debugCamera
+
+        
+        this.modes.debug.orbitControls = new OrbitControls(this.modes.debug.camera, this.targetElement)
         this.modes.debug.orbitControls.enabled = this.modes.debug.active
         this.modes.debug.orbitControls.screenSpacePanning = true
         this.modes.debug.orbitControls.enableKeys = false
@@ -63,15 +101,18 @@ export default class Camera {
         this.modes.debug.orbitControls.update()
     }
 
-    resize() {
-        this.instance.aspect = this.config.width / this.config.height
-        this.instance.updateProjectionMatrix()
 
-        this.modes.default.instance.aspect = this.config.width / this.config.height
-        this.modes.default.instance.updateProjectionMatrix()
 
-        this.modes.debug.instance.aspect = this.config.width / this.config.height
-        this.modes.debug.instance.updateProjectionMatrix()
+
+    resize()
+    {
+        this.debugCamera.aspect = this.config.width / this.config.height
+        this.debugCamera.updateProjectionMatrix()
+
+
+        this.defaultCamera.aspect = this.config.width / this.config.height
+        this.defaultCamera.updateProjectionMatrix()
+       
     }
 
     // RETURN VEC2 * RATIO
@@ -84,6 +125,7 @@ export default class Camera {
         this.modes.debug.orbitControls.update()
 
         // Apply coordinates
+
         this.instance.position.copy(this.modes[this.mode].instance.position)
         this.instance.quaternion.copy(this.modes[this.mode].instance.quaternion)
         this.instance.updateMatrixWorld() // To be used in projection
@@ -96,6 +138,10 @@ export default class Camera {
         
         // Update projection matrix
         this.instance.updateProjectionMatrix()
+        // this.instance.position.copy(this.modes[this.mode].instance.position)
+        // this.instance.quaternion.copy(this.modes[this.mode].instance.quaternion)
+        // this.instance.updateMatrixWorld() // To be used in projection
+
     }
 
     destroy() {

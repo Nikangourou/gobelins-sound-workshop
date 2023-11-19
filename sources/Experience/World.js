@@ -5,6 +5,7 @@ import Time from './Utils/Time.js'
 import Intro from "./Scenes/Intro.js"
 import Scene_1 from './Scenes/Scene_1.js'
 import Scene_interaction from './Scenes/Scene_interaction.js'
+import ShaderTestScene from './Scenes/ShaderTestScene.js'
 
 export default class World
 {
@@ -14,13 +15,16 @@ export default class World
         this.config = this.experience.config
         this.scene = this.experience.scene
         this.resources = this.experience.resources
-        this.camera = _options.camera.instance
+        this.cameraControls = _options.camera
+        this.camera = _options.camera.defaultCamera
         this.audioListenner = new THREE.AudioListener();
         this.churchMesh = null
         this.trainMesh = null
         this.treesMesh = null
         this.time = new Time()
         this.renderer = _options.renderer
+        this.activeSceneIndex = 0
+        
 
         this.audioListenner.context.resume()
 
@@ -34,8 +38,6 @@ export default class World
                 // this.setDummy()
                 this.init()
                 
-                
-                // 
             }
         })
         
@@ -142,11 +144,22 @@ export default class World
             
             
     }
+
+    onActiveSceneIsDone (currContext) {
+        if( currContext.activeSceneIndex < currContext.scenes.length -1) {
+            currContext.activeSceneIndex += 1
+            currContext.scenes[currContext.activeSceneIndex].init()
+        }
+    }
         
     init()
     {
+        const intro = new Intro(this.resources.items.scene_1, this.renderer, this.cameraControls, this.scene,() => this.onActiveSceneIsDone(this))
+        const scene1 = new Scene_1(this.resources.items.mockup_scene_2, this.renderer, this.cameraControls, this.scene,() => this.onActiveSceneIsDone(this))
+        this.scenes = [intro, scene1]
 
         //intro 
+
         // this.introScene = new Intro(this.resources.items.intro)
         // this.introScene.init()
         // this.scene.add(this.introScene.scene)
@@ -160,6 +173,13 @@ export default class World
         this.sceneInteraction = new Scene_interaction(this.camera, this.renderer, this.orbitControls)
         this.scene.add(this.sceneInteraction.scene)
         this.sceneInteraction.init()
+
+        intro.init()
+
+        // test shader scene 1
+        // this.shaderTestScene = new ShaderTestScene(this.renderer, this.resources.items)
+        // this.scene.add(this.shaderTestScene.scene)
+        // this.shaderTestScene.init()
         
         //helpers
         const axesHelper = new THREE.AxesHelper( 5 );
@@ -173,10 +193,9 @@ export default class World
 
     update()
     {
-        if(this.scene1) this.scene1.update()
-        if(this.introScene && this.introScene.isActive) this.introScene.update()
-        if(this.sceneInteraction) this.sceneInteraction.update()
-        
+
+        if(this.scenes) this.scenes[this.activeSceneIndex].update()
+
     }
 
     destroy()

@@ -8,6 +8,7 @@
 html,
 body {
     overflow: hidden;
+    background-color: #cbd5e1;
 }
 
 .experience {
@@ -43,9 +44,10 @@ ul {
 .ui {
     position: fixed;
     height: 100vh;
+    padding: 64px;
     /* width: 5vw; */
     background-color: black;
-    transform: translateX(-100%);
+    /* transform: translateX(-100%); */
 }
 
 
