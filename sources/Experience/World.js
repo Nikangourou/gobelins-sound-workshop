@@ -4,6 +4,7 @@ import { PositionalAudioHelper } from 'three/examples/jsm/helpers/PositionalAudi
 import Time from './Utils/Time.js'
 import Intro from "./Scenes/Intro.js"
 import Scene_1 from './Scenes/Scene_1.js'
+import Scene_interaction from './Scenes/Scene_interaction.js'
 import ShaderTestScene from './Scenes/ShaderTestScene.js'
 
 export default class World
@@ -26,6 +27,9 @@ export default class World
         
 
         this.audioListenner.context.resume()
+
+        this.orbitControls = this.experience.camera.modes.debug.orbitControls
+   
         
         this.resources.on('groupEnd', (_group) =>
         {
@@ -155,6 +159,21 @@ export default class World
         this.scenes = [intro, scene1]
 
         //intro 
+
+        // this.introScene = new Intro(this.resources.items.intro)
+        // this.introScene.init()
+        // this.scene.add(this.introScene.scene)
+
+        // test shader scene 1
+        // this.scene1 = new Scene_1(this.resources.items.noiseTex, this.renderer)
+        // this.scene.add(this.scene1.scene)
+        // this.scene1.init()
+
+        // test interaction scene
+        this.sceneInteraction = new Scene_interaction(this.camera, this.renderer, this.orbitControls)
+        this.scene.add(this.sceneInteraction.scene)
+        this.sceneInteraction.init()
+
         intro.init()
 
         // test shader scene 1
@@ -174,7 +193,9 @@ export default class World
 
     update()
     {
+
         if(this.scenes) this.scenes[this.activeSceneIndex].update()
+
     }
 
     destroy()
