@@ -38,6 +38,7 @@ export default class World
                 
             }
         })
+
         
         
     }
@@ -157,6 +158,7 @@ export default class World
     }
 
     onSceneSelect(sceneIndex) {
+        
         // goTo 
         const targetScene = this.scenes[sceneIndex]
         this.activeSceneIndex = sceneIndex
@@ -166,12 +168,30 @@ export default class World
         //enter desired scene
         targetScene.init()
     }
+
+    getSceneIdFromUrl() {
+        const urlParts = document.URL.split('#');
+        let sceneId = 0
+        if(urlParts.length > 1) {
+            const sceneName = urlParts[1].split('')
+            sceneId = sceneName[sceneName.length - 1] - 1
+        }
+
+        return sceneId
+    }
         
     init()
     {
         const intro = new Scene_1(this.resources.items.scene_1, this.renderer, this.cameraControls, this.scene,() => this.onActiveSceneIsDone(this))
         const scene1 = new Scene_2(this.resources.items.scene_2, this.renderer, this.cameraControls, this.scene,() => this.onActiveSceneIsDone(this))
         this.scenes = [intro, scene1]
+
+        this.activeSceneIndex = this.getSceneIdFromUrl()
+        this.scenes[this.activeSceneIndex].init()
+
+
+
+        // if root -> intro.init() else scenes[sceneId].init()
 
         //intro 
 
@@ -189,7 +209,7 @@ export default class World
         // this.scene.add(this.sceneInteraction.scene)
         // this.sceneInteraction.init()
 
-        intro.init()
+        // intro.init()
 
         // test shader scene 1
         // this.shaderTestScene = new ShaderTestScene(this.renderer, this.resources.items)

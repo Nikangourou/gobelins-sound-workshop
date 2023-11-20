@@ -40,8 +40,6 @@ export default class Scene_2 extends Scene {
         })
 
 
-
-
         this.rugAnimation = scene.animations[0]
         this.boxFalling = scene.animations[1]
       
