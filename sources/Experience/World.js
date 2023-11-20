@@ -172,6 +172,7 @@ export default class World
     getSceneIdFromUrl() {
         const urlParts = document.URL.split('#');
         let sceneId = 0
+        if(urlParts[1] ===  "debug")  return sceneId
         if(urlParts.length > 1) {
             const sceneName = urlParts[1].split('')
             sceneId = sceneName[sceneName.length - 1] - 1
@@ -183,7 +184,7 @@ export default class World
     init()
     {
         const scene_1 = new Scene_1(this.resources.items.scene_1, this.renderer, this.cameraControls, this.scene,() => this.onActiveSceneIsDone(this))
-        const scene_2 = new Scene_2(this.resources.items.scene_2, this.renderer, this.cameraControls, this.scene,() => this.onActiveSceneIsDone(this))
+        const scene_2 = new Scene_2(this.resources.items.scene_2, this.renderer, this.cameraControls, this.scene,() => this.onActiveSceneIsDone(this), this.resources.items.dotTex)
         this.scenes = [scene_1, scene_2]
 
         this.activeSceneIndex = this.getSceneIdFromUrl()

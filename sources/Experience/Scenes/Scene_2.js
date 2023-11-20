@@ -2,35 +2,40 @@ import * as THREE from 'three'
 import Scene from './Scene'
 import CustomMat from './CustomMat'
 import GUI from 'lil-gui'
+import Particles from './../Particles.js'
 
 export default class Scene_2 extends Scene {
-    constructor(scene, renderer, cameraControls, mainScene, callback) {
+    constructor(scene, renderer, cameraControls, mainScene, callback, pointTex) {
         super()
         this.name = "scene2"
+        this.gui = new GUI()
         this.renderer = renderer
-        this.animations = scene.animations
         this.cameraControls = cameraControls
         this.mainScene = mainScene
+        this.animations = scene.animations
         this.scene = scene.scene
         this.camera = scene.cameras[0]
         this.cameraMixer = new THREE.AnimationMixer(this.camera)
         this.cameraMouvement = scene.animations[3]
         this.cameraMixer.addEventListener( 'finished', function( e ) {
-            console.log("finised")
+            console.log("scene 2 finished")
             // transition UI in 
             curr.onSceneIsDone()
             callback()
             
         } )
+        this.dotTex = pointTex
+        this.particles = new Particles("#ef4444", this.scene)
+
         this.cardColors = ["#ef4444", "#f97316", "#eab308", "#0d9488", "#2563eb", "#d946ef"]
-        this.gui = new GUI()
+        
+        // State / UI
         this.nextBtn = document.getElementById('next')
         this.nextBtn.addEventListener('click', e => {
             this.nextBtn.style.display = 'none'
             this.hasBeenCompleted = true
             this.cameraMixer.clipAction(this.cameraMouvement).paused = false;
         })
-
         this.userHasClickedBox = false
         
         this.userClickedBox = document.getElementById('userClickedBox')
@@ -38,9 +43,6 @@ export default class Scene_2 extends Scene {
             this.userClickedBox.style.display = 'none'
             this.userClickedBox = true
             this.boxMixer.clipAction(this.boxFalling).paused = false
-    
-            // trigger box falling anim
-
         })
 
         this.namesToBeOutlines = ["plane_box_1", "plane_box_2", "box_drag_drop"]
@@ -64,6 +66,13 @@ export default class Scene_2 extends Scene {
         this.cameraControls.setDefaultCamera(this.camera)
         const helper = new THREE.CameraHelper( this.camera );
         this.scene.add(helper)
+
+        this.particles.init()
+        this.scene.add(this.particles.group)
+        this.particles.group.position.x = 10
+        this.particles.group.position.z = -1
+        this.particles.group.position.y = 2
+        // this.particles.setPosition(15, 3, 0)
        
         this.userClickedBox.style.display = "block"
 
@@ -182,16 +191,12 @@ export default class Scene_2 extends Scene {
         boxAction.play()
         boxAction.paused = true
 
-       
-        
     }
 
     getRandomColor() {
         let colorIndex = Math.floor(Math.random() * this.cardColors.length)
         return this.cardColors[colorIndex]
     }
-
-
 
     onSceneIsDone() {
         this.isActive = false
@@ -207,6 +212,11 @@ export default class Scene_2 extends Scene {
         this.mainScene.remove(toBeRemoved)
        
     }
+
+    setSceneMaterials() {
+        
+    }
+
     
     update() {
         if(this.cameraMixer ) {
@@ -215,8 +225,11 @@ export default class Scene_2 extends Scene {
 
         if(this.boxMixer && !this.boxMixer.clipAction(this.boxFalling).paused) {
             this.boxMixer.update(this.time.delta*0.001)
-
         }
+        this.particles.update()
+
+        
+        // this.updateParticles();
 
     }
 }

@@ -48,7 +48,7 @@ ul {
     padding: 64px;
     /* width: 5vw; */
     background-color: black;
-    transform: translateX(-100%);
+    /* transform: translateX(-100%); */
 }
 
 #sceneList>li {
