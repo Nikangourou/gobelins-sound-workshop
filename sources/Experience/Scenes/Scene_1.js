@@ -73,6 +73,7 @@ export default class Scene_1 extends Scene {
     
     init() {
         this.mainScene.add(this.scene)
+        this.startBtn.style.display = "block"
         this.cameraControls.setDefaultCamera(this.camera)
         const helper = new THREE.CameraHelper( this.camera );
         this.scene.add(helper)

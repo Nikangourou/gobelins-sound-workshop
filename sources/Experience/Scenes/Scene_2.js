@@ -60,17 +60,16 @@ export default class Scene_2 extends Scene {
         this.userClickedBox.style.display = "block"
 
         this.isActive = true
-
         this.scene.traverse(e => {
             if(e.isMesh) {
                 console.log("name", e.name)
                 if(e.name === "box_drag_drop") {
                     console.log("found box drag and drop")
                     this.boxMixer = new THREE.AnimationMixer(e)
+                    const nextBtn = this.nextBtn
                     this.boxMixer.addEventListener( 'finished', function( e ) {
-                        this.nextBtn.style.display = "block"
-                        
-                        
+                        nextBtn.style.display = "block"
+                           
                     } )
                 }
             } 
