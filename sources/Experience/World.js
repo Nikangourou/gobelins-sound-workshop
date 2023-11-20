@@ -185,9 +185,9 @@ export default class World
         // this.scene1.init()
 
         // test interaction scene
-        this.sceneInteraction = new Scene_interaction(this.camera, this.renderer, this.orbitControls)
-        this.scene.add(this.sceneInteraction.scene)
-        this.sceneInteraction.init()
+        // this.sceneInteraction = new Scene_interaction(this.camera, this.renderer, this.orbitControls)
+        // this.scene.add(this.sceneInteraction.scene)
+        // this.sceneInteraction.init()
 
         intro.init()
 

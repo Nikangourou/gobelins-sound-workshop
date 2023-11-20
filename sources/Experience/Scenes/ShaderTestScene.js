@@ -33,7 +33,6 @@ export default class ShaderTestScene extends Scene {
         this.assets[this.name].scene.traverse(child => {
             if(child.isMesh) {
                 if(child.material.name.includes("dynamic")) {
-                    console.log()
                     materials.push(child.material.name)
                 }
             }
