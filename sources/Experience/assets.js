@@ -15,6 +15,7 @@ export default [
             { name: 'monkey', source: '/assets/monkey.glb'},
             { name: '5mat', source: '/assets/test5Mat.glb'},
             { name: 'scene_1', source: '/assets/DA_scene_1_with_cam.glb'},
+            { name: 'scene_2', source: '/assets/scene_2.glb'},
             {name: 'mockup_scene_2', source: '/assets/scene_1_mockup.glb'}
         ]
     }

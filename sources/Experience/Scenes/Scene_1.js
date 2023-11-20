@@ -102,7 +102,6 @@ export default class Scene_1 extends Scene {
         let toBeAdded = []
         this.scene.traverse(e => {
             if(e.isMesh) {
-                console.log("name", e.name)
                 if(e.name === 'door') {
                     this.doorMixer = new THREE.AnimationMixer(e)
                     let mat = new CustomMat({renderer: this.renderer, uniforms: {

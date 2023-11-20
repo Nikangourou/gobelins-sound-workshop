@@ -170,7 +170,7 @@ export default class World
     init()
     {
         const intro = new Scene_1(this.resources.items.scene_1, this.renderer, this.cameraControls, this.scene,() => this.onActiveSceneIsDone(this))
-        const scene1 = new Scene_2(this.resources.items.mockup_scene_2, this.renderer, this.cameraControls, this.scene,() => this.onActiveSceneIsDone(this))
+        const scene1 = new Scene_2(this.resources.items.scene_2, this.renderer, this.cameraControls, this.scene,() => this.onActiveSceneIsDone(this))
         this.scenes = [intro, scene1]
 
         //intro 

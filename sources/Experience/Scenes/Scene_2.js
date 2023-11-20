@@ -12,10 +12,39 @@ export default class Scene_2 extends Scene {
         this.scene = scene.scene
         this.camera = scene.cameras[0]
         this.cameraMixer = new THREE.AnimationMixer(this.camera)
-        this.cameraMouvement = scene.animations[1]
-        this.cubeAnim1 = scene.animations[0]
-        this.cubeAnim2 = scene.animations[2]
-        this.cubeAnim3 = scene.animations[3]
+        this.cameraMouvement = scene.animations[3]
+        this.cameraMixer.addEventListener( 'finished', function( e ) {
+            console.log("finised")
+            // transition UI in 
+            curr.onSceneIsDone()
+            callback()
+            
+        } )
+        this.nextBtn = document.getElementById('next')
+        this.nextBtn.addEventListener('click', e => {
+            this.nextBtn.style.display = 'none'
+            this.hasBeenCompleted = true
+            this.cameraMixer.clipAction(this.cameraMouvement).paused = false;
+        })
+
+        this.userHasClickedBox = false
+        
+        this.userClickedBox = document.getElementById('userClickedBox')
+        this.userClickedBox.addEventListener('click', e => {
+            this.userClickedBox.style.display = 'none'
+            this.userClickedBox = true
+            this.boxMixer.clipAction(this.boxFalling).paused = false
+    
+            // trigger box falling anim
+
+        })
+
+
+
+
+        this.rugAnimation = scene.animations[0]
+        this.boxFalling = scene.animations[1]
+      
         let curr = this
         this.cameraMixer.addEventListener( 'finished', function( e ) {
             console.log("scene 2 is finised")
@@ -29,21 +58,22 @@ export default class Scene_2 extends Scene {
         this.cameraControls.setDefaultCamera(this.camera)
         const helper = new THREE.CameraHelper( this.camera );
         this.scene.add(helper)
+       
+        this.userClickedBox.style.display = "block"
+
+        this.isActive = true
 
         this.scene.traverse(e => {
             if(e.isMesh) {
-                
-                console.log(e.name)
-                if(e.name === 'Cube') {
-                    this.cubeMixer1 = new THREE.AnimationMixer(e)
-                }
-
-                if(e.name === 'Cube001') {
-                    this.cubeMixer2 = new THREE.AnimationMixer(e)
-                }
-
-                if(e.name === 'Cube004') {
-                    this.cubeMixer3 = new THREE.AnimationMixer(e)
+                console.log("name", e.name)
+                if(e.name === "box_drag_drop") {
+                    console.log("found box drag and drop")
+                    this.boxMixer = new THREE.AnimationMixer(e)
+                    this.boxMixer.addEventListener( 'finished', function( e ) {
+                        this.nextBtn.style.display = "block"
+                        
+                        
+                    } )
                 }
             } 
            
@@ -51,20 +81,20 @@ export default class Scene_2 extends Scene {
         
         let testLight = new THREE.AmbientLight( 0xffffff );
         this.scene.add(testLight)
-        const cubeAction1 = this.cubeMixer1.clipAction(this.cubeAnim1); 
-        cubeAction1.play()
-
-        const cubeAction2 = this.cubeMixer2.clipAction(this.cubeAnim2); 
-        cubeAction2.play()
-
-        const cubeAction3 = this.cubeMixer3.clipAction(this.cubeAnim3); 
-        cubeAction3.play()
         
         const action = this.cameraMixer.clipAction(this.cameraMouvement);
         action.clampWhenFinished = true;
         action.loop = THREE.LoopOnce
         action.play()
-        this.isActive = true
+        action.paused = true
+
+        const boxAction = this.boxMixer.clipAction(this.boxFalling)
+        boxAction.clampWhenFinished = true;
+        boxAction.loop = THREE.LoopOnce
+        boxAction.play()
+        boxAction.paused = true
+
+       
         
     }
 
@@ -86,19 +116,12 @@ export default class Scene_2 extends Scene {
     update() {
         if(this.cameraMixer ) {
             this.cameraMixer.update(this.time.delta*0.001)
-            //console.log(this.camera.rotation)
         }
 
-        if(this.cubeMixer1) {
-            this.cubeMixer1.update(this.time.delta*0.001)
+        if(this.boxMixer && !this.boxMixer.clipAction(this.boxFalling).paused) {
+            this.boxMixer.update(this.time.delta*0.001)
+
         }
 
-        if(this.cubeMixer2) {
-            this.cubeMixer2.update(this.time.delta*0.001)
-        }
-
-        if(this.cubeMixer3) {
-            this.cubeMixer3.update(this.time.delta*0.001)
-        }
     }
 }
