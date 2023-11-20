@@ -1,11 +1,13 @@
 import * as THREE from 'three'
 import Scene from './Scene'
+import CustomMat from './CustomMat'
+import GUI from 'lil-gui'
 
 export default class Scene_2 extends Scene {
     constructor(scene, renderer, cameraControls, mainScene, callback) {
         super()
         this.name = "scene2"
-        this.mainRenderer = renderer
+        this.renderer = renderer
         this.animations = scene.animations
         this.cameraControls = cameraControls
         this.mainScene = mainScene
@@ -20,6 +22,8 @@ export default class Scene_2 extends Scene {
             callback()
             
         } )
+        this.cardColors = ["#ef4444", "#f97316", "#eab308", "#0d9488", "#2563eb", "#d946ef"]
+        this.gui = new GUI()
         this.nextBtn = document.getElementById('next')
         this.nextBtn.addEventListener('click', e => {
             this.nextBtn.style.display = 'none'
@@ -39,6 +43,9 @@ export default class Scene_2 extends Scene {
 
         })
 
+        this.namesToBeOutlines = ["plane_box_1", "plane_box_2", "box_drag_drop"]
+        this.lightPos = new THREE.Vector3(2, 5, 3)
+
 
         this.rugAnimation = scene.animations[0]
         this.boxFalling = scene.animations[1]
@@ -49,6 +56,7 @@ export default class Scene_2 extends Scene {
             curr.onSceneIsDone()
             callback()
         } )
+        
     }
     
     init() {
@@ -59,7 +67,30 @@ export default class Scene_2 extends Scene {
        
         this.userClickedBox.style.display = "block"
 
+        const light = new THREE.PointLight( 0xff0000, 10, 100 );
+        light.position.set( 10, 0.76, 2.6 );
+        const helper1 = new THREE.PointLightHelper( light, 0.1 );
+        this.scene.add(light, helper1)
+
+        const light2 = new THREE.PointLight( 0xff0000, 10, 100 );
+        light2.position.set( 1.04, 8.32, 2 );
+        const helper2 = new THREE.PointLightHelper( light2, 0.1 );
+        this.scene.add(light2, helper2)
+
+        const matFolder = this.gui.addFolder("toon settings")
+        const lightFolder = matFolder.addFolder('light')
+        const light1 = lightFolder.addFolder("light1")
+        light1.add(light.position, 'x').min(-10).max(10).name('light x')
+        light1.add(light.position, 'y').min(-10).max(10).name('light y')
+        light1.add(light.position, 'z').min(-10).max(10).name('light z')
+       
+        const light2Folder = lightFolder.addFolder("light2")
+        light2Folder.add(light2.position, 'x').min(-10).max(10).name('light x')
+        light2Folder.add(light2.position, 'y').min(-10).max(10).name('light y')
+        light2Folder.add(light2.position, 'z').min(-10).max(10).name('light z')
+
         this.isActive = true
+        let toBeAdded = []
         this.scene.traverse(e => {
             if(e.isMesh) {
                 console.log("name", e.name)
@@ -71,10 +102,70 @@ export default class Scene_2 extends Scene {
                         nextBtn.style.display = "block"
                            
                     } )
+                    let mat = new CustomMat({renderer: this.renderer, uniforms: {
+                        color1: { value:  new THREE.Color('#18181b') }, // darker
+                        color2: { value: new THREE.Color('#fdba74') },
+                        color3: { value: e.material.color },
+                        color4: { value: new THREE.Color('#94a3b8') },
+                        color5: { value: new THREE.Color('#e2e8f0') },// lighter
+                        noiseStep : {value : 1.0},
+                        nbColors : { value: 3},
+                        lightDirection : { value : light.position},
+                        lightDirection2 : {value : light2.position}
+                    }})
+                    mat.init()
+                    e.material = mat.get()
+                }else if (e.name.includes("button")) {
+                    e.material = new THREE.MeshBasicMaterial({color: 0xff0000})
+                    let mesh = e.clone()
+                    mesh.material = this.outlineMat
+                    toBeAdded.push(mesh)
+
+                } else if(e.name.includes("box")) {
+                    let mat = new CustomMat({renderer: this.renderer, uniforms: {
+                        color1: { value:  new THREE.Color('#18181b') }, // darker
+                        color2: { value: new THREE.Color('#fdba74') },
+                        color3: { value: e.material.color },
+                        color4: { value: new THREE.Color('#94a3b8') },
+                        color5: { value: new THREE.Color('#e2e8f0') },// lighter
+                        noiseStep : {value : 1.0},
+                        nbColors : { value: 3},
+                        lightDirection : { value : light.position},
+                        lightDirection2 : {value : light2.position}
+                    }})
+                    mat.init()
+                    e.material = mat.get()
+                    
+                    let mesh = e.clone()
+                    mesh.material = this.outlineMat
+                    toBeAdded.push(mesh)
+                } else if(e.name.toLowerCase().includes('plane')){
+                    console.log(e.name)
+                    let color = this.getRandomColor()
+                    console.log(color)
+                    e.material = new THREE.MeshBasicMaterial({color : new THREE.Color(this.getRandomColor())})
+                    e.material.side = THREE.DoubleSide
                 }
-            } 
+
+                } else {
+                    let mat = new CustomMat({renderer: this.renderer, uniforms: {
+                        color1: { value:  new THREE.Color('#18181b') }, // darker
+                        color2: { value: new THREE.Color('#374151') },
+                        color3: { value: new THREE.Color('#475569') },
+                        color4: { value: new THREE.Color('#94a3b8') },
+                        color5: { value: new THREE.Color('#e2e8f0') },// lighter
+                        noiseStep : {value : 1.0},
+                        nbColors : { value: 3},
+                        lightDirection : { value : light.position},
+                        lightDirection2 : {value : light2.position}
+                    }})
+                    mat.init()
+                    e.material = mat.get()
+                }
+             
            
         })
+        toBeAdded.forEach(e => this.scene.add(e))
         
         let testLight = new THREE.AmbientLight( 0xffffff );
         this.scene.add(testLight)
@@ -94,6 +185,13 @@ export default class Scene_2 extends Scene {
        
         
     }
+
+    getRandomColor() {
+        let colorIndex = Math.floor(Math.random() * this.cardColors.length)
+        return this.cardColors[colorIndex]
+    }
+
+
 
     onSceneIsDone() {
         this.isActive = false

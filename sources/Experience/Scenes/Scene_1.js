@@ -29,27 +29,7 @@ export default class Scene_1 extends Scene {
         } )
 
         this.namesToBeOutlines = ["desk", "bag", "radio", "commode", "tabletop_high", 'library', "lamp", "box", "old_chair", "Flame", "Chair"]
-        this.outlineMat = new THREE.ShaderMaterial({
-            uniforms: {
-                outlineColor: { value: new THREE.Color('#000000') },
-                outlineWidth: {value : 0.005}
-            },
-            side: THREE.BackSide,
-            vertexShader: `
-            uniform float outlineWidth;
-            void main() {
-                vec3 pos = position;
-                pos += normal * outlineWidth;
-                gl_Position = projectionMatrix * modelViewMatrix * vec4( pos, 1.0 );
-            }`,
-            fragmentShader: `
         
-            uniform vec3 outlineColor;
-        
-            void main() {
-                gl_FragColor = vec4( outlineColor, 1.0 );
-            }`
-        })
 
         this.lightPos = new THREE.Vector3(2, 5, 3)
         this.userStarted = false;
@@ -138,6 +118,10 @@ export default class Scene_1 extends Scene {
                     let mesh = e.clone()
                     mesh.material = this.outlineMat
                     toBeAdded.push(mesh)
+
+                } else if (e.name.includes("contain")) {
+                   
+                    e.material = new THREE.MeshBasicMaterial({color: 0x00ff00})
 
                 }
                 else {
