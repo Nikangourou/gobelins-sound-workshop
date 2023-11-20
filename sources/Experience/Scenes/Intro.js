@@ -75,8 +75,11 @@ export default class Intro extends Scene {
         this.actionLampe = this.lampeMixer.clipAction(this.lampeMouvement);
         this.actionLampe.loop = THREE.LoopOnce
 
+        // Toggling the openining of the drawer
         this.actionTiroir = this.tiroirMixer.clipAction(this.tiroirMouvement);
         this.actionTiroir.loop = THREE.LoopOnce
+        this.actionTiroir.clampWhenFinished = true
+        this.tiroirOpen = false
     }
 
     init() {
@@ -136,7 +139,7 @@ export default class Intro extends Scene {
         this.cubeRadio.position.set(1.2, 0.6, 7.8)
         this.cubeRadio.add(this.radioSound)
         this.cubeRadio.visible = false
-        
+
         this.scene.add(this.cubeRadio)
     }
 
@@ -146,16 +149,28 @@ export default class Intro extends Scene {
 
         if (modelIntersects.length) {
             if (modelIntersects[0].object.name === 'desk_lamp') {
-                               
+
                 this.actionLampe.stop()
                 this.actionLampe.play()
-                                
+
                 this.lampLight.visible = !this.lampLight.visible
             }
             if (modelIntersects[0].object.name === 'radio') {
                 this.radioSound.play()
             }
-            if(modelIntersects[0].object.name === 'tiroir_desk') {
+            if (modelIntersects[0].object.name === 'tiroir_desk') {
+
+                
+          
+                if (this.tiroirOpen) {
+                    this.actionTiroir.timeScale = -1
+                    this.tiroirOpen = false
+                    console.log("tiroir open")
+                }else {
+                    this.actionTiroir.timeScale = 1
+                    this.tiroirOpen = true
+                }
+
                 this.actionTiroir.stop()
                 this.actionTiroir.play()
             }
@@ -192,10 +207,10 @@ export default class Intro extends Scene {
                 this.doorMixer.update(this.time.delta * 0.001)
                 // if(this.doorMixer.clipAction(this.doorMovement).time > 
             }
-            if(this.lampeMixer && this.userStarted) {
+            if (this.lampeMixer && this.userStarted) {
                 this.lampeMixer.update(this.time.delta * 0.001)
             }
-            if(this.tiroirMixer && this.userStarted) {
+            if (this.tiroirMixer && this.userStarted) {
                 this.tiroirMixer.update(this.time.delta * 0.001)
             }
         }
