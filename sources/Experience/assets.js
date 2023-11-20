@@ -14,7 +14,7 @@ export default [
             { name: 'paperTex', source: '/assets/paperTex.jpg', type: 'texture'},
             { name: 'monkey', source: '/assets/monkey.glb'},
             { name: '5mat', source: '/assets/test5Mat.glb'},
-            { name: 'scene_1', source: '/assets/SceneT.glb'},
+            { name: 'scene_1', source: '/assets/SceneTT.glb'},
             { name: 'scene_2', source: '/assets/scene_2.glb'},
             {name: 'mockup_scene_2', source: '/assets/scene_1_mockup.glb'}
         ]

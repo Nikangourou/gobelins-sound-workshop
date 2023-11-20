@@ -33,8 +33,8 @@ export default class World
         {
             if(_group.name === 'base')
             {
-                // this.setDummy()
                 this.init()
+                // this.setDummy()
                 
             }
         })
@@ -111,7 +111,7 @@ export default class World
             
             // audio
             
-            this.camera.instance.add(this.audioListenner)
+            this.camera.add(this.audioListenner)
             
             const birdSound = new THREE.PositionalAudio( this.audioListenner );
             const trainSound = new THREE.PositionalAudio( this.audioListenner );
