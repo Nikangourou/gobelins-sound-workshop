@@ -2,8 +2,8 @@ import * as THREE from 'three'
 import Experience from './Experience.js'
 import { PositionalAudioHelper } from 'three/examples/jsm/helpers/PositionalAudioHelper.js'
 import Time from './Utils/Time.js'
-import Intro from "./Scenes/Intro.js"
 import Scene_1 from './Scenes/Scene_1.js'
+import Scene_2 from './Scenes/Scene_2.js'
 import ShaderTestScene from './Scenes/ShaderTestScene.js'
 
 export default class World
@@ -23,8 +23,6 @@ export default class World
         this.time = new Time()
         this.renderer = _options.renderer
         this.activeSceneIndex = 0
-        
-
         this.audioListenner.context.resume()
         
         this.resources.on('groupEnd', (_group) =>
@@ -142,16 +140,33 @@ export default class World
     }
 
     onActiveSceneIsDone (currContext) {
+        let prevScene = currContext.scenes[currContext.activeSceneIndex]
+        let nextScene = currContext.scenes[currContext.activeSceneIndex+1]
         if( currContext.activeSceneIndex < currContext.scenes.length -1) {
+            // update UI on completed
+            if(prevScene.hasBeenCompleted) {
+                document.getElementById(prevScene.name).classList.remove('beforeComplete')
+            }
             currContext.activeSceneIndex += 1
-            currContext.scenes[currContext.activeSceneIndex].init()
+            nextScene.init()
         }
+    }
+
+    onSceneSelect(sceneIndex) {
+        // goTo 
+        const targetScene = this.scenes[sceneIndex]
+        this.activeSceneIndex = sceneIndex
+
+        // quit prev scene
+
+        //enter desired scene
+        targetScene.init()
     }
         
     init()
     {
-        const intro = new Intro(this.resources.items.scene_1, this.renderer, this.cameraControls, this.scene,() => this.onActiveSceneIsDone(this))
-        const scene1 = new Scene_1(this.resources.items.mockup_scene_2, this.renderer, this.cameraControls, this.scene,() => this.onActiveSceneIsDone(this))
+        const intro = new Scene_1(this.resources.items.scene_1, this.renderer, this.cameraControls, this.scene,() => this.onActiveSceneIsDone(this))
+        const scene1 = new Scene_2(this.resources.items.mockup_scene_2, this.renderer, this.cameraControls, this.scene,() => this.onActiveSceneIsDone(this))
         this.scenes = [intro, scene1]
 
         //intro 
@@ -165,7 +180,6 @@ export default class World
         //helpers
         const axesHelper = new THREE.AxesHelper( 5 );
         this.scene.add( axesHelper );
-    
     }
 
     resize()

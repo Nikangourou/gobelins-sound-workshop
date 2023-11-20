@@ -1,10 +1,10 @@
 import * as THREE from 'three'
 import Scene from './Scene'
 
-
 export default class Scene_1 extends Scene {
     constructor(scene, renderer, cameraControls, mainScene, callback) {
         super()
+        this.name = "scene1"
         this.mainRenderer = renderer
         this.animations = scene.animations
         this.cameraControls = cameraControls
@@ -12,19 +12,35 @@ export default class Scene_1 extends Scene {
         this.scene = scene.scene
         this.camera = scene.cameras[0]
         this.cameraMixer = new THREE.AnimationMixer(this.camera)
-        this.cameraMouvement = scene.animations[1]
-        this.cubeAnim1 = scene.animations[0]
-        this.cubeAnim2 = scene.animations[2]
-        this.cubeAnim3 = scene.animations[3]
+        this.cameraMouvement = scene.animations[2]
+        this.doorMovement = scene.animations[0]
         let curr = this
+        this.nextBtn = document.getElementById('next')
         this.cameraMixer.addEventListener( 'finished', function( e ) {
-            console.log("scene 2 is finised")
+            console.log("finised")
+            // transition UI in 
             curr.onSceneIsDone()
             callback()
             
         } )
+        this.userStarted = false;
+        this.startBtn = document.querySelector('button')
+        this.startBtn.addEventListener('click', e => {
+            this.userStarted = true;
+            this.doorMixer.clipAction(this.doorMovement).paused = false;
+            this.cameraMixer.clipAction(this.cameraMouvement).paused = false;
+            e.target.style.display = 'none';
+        })
 
-    }
+        this.nextBtn.addEventListener('click', e => {
+            this.nextBtn.style.display = 'none'
+            this.hasBeenCompleted = true
+            this.cameraMixer.clipAction(this.cameraMouvement).isPaused = false;
+        })
+
+        this.cameraEnterMovementIsDone = false
+        
+    } 
     
     init() {
         this.mainScene.add(this.scene)
@@ -32,42 +48,35 @@ export default class Scene_1 extends Scene {
         const helper = new THREE.CameraHelper( this.camera );
         this.scene.add(helper)
 
+        this.isActive = true
+
         this.scene.traverse(e => {
             if(e.isMesh) {
-                
-                console.log(e.name)
-                if(e.name === 'Cube') {
-                    this.cubeMixer1 = new THREE.AnimationMixer(e)
+                e.material = new THREE.MeshNormalMaterial()
+                if(e.name === 'door') {
+                    this.doorMixer = new THREE.AnimationMixer(e)
                 }
-
-                if(e.name === 'Cube001') {
-                    this.cubeMixer2 = new THREE.AnimationMixer(e)
-                }
-
-                if(e.name === 'Cube004') {
-                    this.cubeMixer3 = new THREE.AnimationMixer(e)
-                }
-            } 
-           
+            }
         })
         
         let testLight = new THREE.AmbientLight( 0xffffff );
         this.scene.add(testLight)
-        const cubeAction1 = this.cubeMixer1.clipAction(this.cubeAnim1); 
-        cubeAction1.play()
-
-        const cubeAction2 = this.cubeMixer2.clipAction(this.cubeAnim2); 
-        cubeAction2.play()
-
-        const cubeAction3 = this.cubeMixer3.clipAction(this.cubeAnim3); 
-        cubeAction3.play()
         
         const action = this.cameraMixer.clipAction(this.cameraMouvement);
         action.clampWhenFinished = true;
         action.loop = THREE.LoopOnce
         action.play()
-        this.isActive = true
+        action.paused = true
         
+
+        // door
+        const openingDoorAnimation = this.doorMixer.clipAction(this.doorMovement)
+        openingDoorAnimation.clampWhenFinished = true;
+        openingDoorAnimation.loop = THREE.LoopOnce
+        openingDoorAnimation.play()
+        openingDoorAnimation.paused = true
+
+
     }
 
     onSceneIsDone() {
@@ -86,21 +95,20 @@ export default class Scene_1 extends Scene {
     }
     
     update() {
-        if(this.cameraMixer ) {
-            this.cameraMixer.update(this.time.delta*0.001)
-            //console.log(this.camera.rotation)
-        }
+        if(this.isActive) {
+            if(this.cameraMixer && this.userStarted && !this.cameraMixer.clipAction(this.cameraMouvement).isPaused) {
+                this.cameraMixer.update(this.time.delta*0.001)
+                if(this.cameraMixer.clipAction(this.cameraMouvement).time > 8.4 && !this.cameraEnterMovementIsDone) {
+                    this.cameraEnterMovementIsDone = true;
+                    this.cameraMixer.clipAction(this.cameraMouvement).isPaused = true
+                    this.nextBtn.style.display = 'block'
+                }
+            }
 
-        if(this.cubeMixer1) {
-            this.cubeMixer1.update(this.time.delta*0.001)
-        }
-
-        if(this.cubeMixer2) {
-            this.cubeMixer2.update(this.time.delta*0.001)
-        }
-
-        if(this.cubeMixer3) {
-            this.cubeMixer3.update(this.time.delta*0.001)
+            if(this.doorMixer && this.userStarted  ) {
+                this.doorMixer.update(this.time.delta*0.001)
+                // if(this.doorMixer.clipAction(this.doorMovement).time > 
+            }
         }
     }
 }

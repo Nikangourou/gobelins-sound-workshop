@@ -17,7 +17,7 @@ export default class ShaderTestScene extends Scene {
        
        this.customUniforms = {
         uTime: { value: 0 },
-        map: { value: assets.noiseTex },
+        map: { value: assets.paperTex },
         lightDirection: { value: new THREE.Vector3(0, 0, 5) },
         outlineColor: { value: new THREE.Color('#000000') },
         outlineWidth: { value: 0.05 }, 
@@ -29,12 +29,13 @@ export default class ShaderTestScene extends Scene {
 
     init() {
         // test scene with 5 objects
-        console.log(this.assets[this.name])
         let materials = []
         this.assets[this.name].scene.traverse(child => {
-            console.log(child)
             if(child.isMesh) {
-                materials.push(child.material.name)
+                if(child.material.name.includes("dynamic")) {
+                    console.log()
+                    materials.push(child.material.name)
+                }
             }
         })
 
@@ -47,7 +48,7 @@ export default class ShaderTestScene extends Scene {
             this.customUniforms[matName].color3 = { value: new THREE.Color('#00ff00') }
             this.customUniforms[matName].color4 = { value: new THREE.Color('#ffff00') }
             this.customUniforms[matName].color5 = { value: new THREE.Color('#00ffff') }
-            this.customUniforms[matName].noiseStep = {value : 0.2}
+            this.customUniforms[matName].noiseStep = {value : 1.0}
             this.customUniforms[matName].nbColors = { value: 4 },
             
             this.createMatGui(matName)
@@ -57,7 +58,9 @@ export default class ShaderTestScene extends Scene {
 
         this.assets[this.name].scene.traverse(child => {
             if(child.isMesh) {
-                child.material = materialLibrary[child.material.name]
+                if(child.material.name.includes("dynamic")) {
+                    child.material = materialLibrary[child.material.name]
+                }
                 // child.castShadow = true
                 // child.receiveShadow = true
             }
@@ -65,16 +68,17 @@ export default class ShaderTestScene extends Scene {
 
         // create one gui per object
         this.scene.add(this.assets[this.name].scene)
+    
 
         let testPlaneMat = new THREE.MeshStandardMaterial({color: 0xff0000})
         testPlaneMat.side = THREE.DoubleSide
         let testPlane = new THREE.Mesh(new THREE.PlaneGeometry(10, 10), testPlaneMat)
         testPlane.receiveShadow = true;
 
-        this.scene.add(testPlane)
+        //this.scene.add(testPlane)
 
         this.setOutlineMat()
-        // const testMesh = new THREE.Mesh(this.geo, this.mat ) 
+        // const testMesh = new THREE.Mesh(this.geo, this.createCustomToonMat("testMat") ) 
         // this.scene.add(testMesh)
         const directionalLight = new THREE.DirectionalLight('#ffffff', 5)
         directionalLight.position.set( this.customUniforms.lightDirection.value)
@@ -90,7 +94,6 @@ export default class ShaderTestScene extends Scene {
         light.position.set( 0, 0, 5 );
         const helper1 = new THREE.PointLightHelper( light, 1 );
         this.scene.add(directionalLight, helper, light, helper1)
-        console.log(this.scene)
 
         light.castShadow = true;
 
@@ -125,6 +128,7 @@ export default class ShaderTestScene extends Scene {
                 varying vec3 vNormal2;
                 varying vec2 vUv; 
                 varying vec3 vPosition;
+                varying vec3 vViewDir;
                 `
             )
 
@@ -132,7 +136,10 @@ export default class ShaderTestScene extends Scene {
                 'void main() {',
                 'vNormal2 = normal;',
                 'vUv = uv;',
-                'vPosition = position;'
+                'vPosition = position;',
+                'vec4 modelPosition = modelMatrix * vec4(position, 1.0);',
+                'vec4 viewPosition = viewMatrix * modelPosition;',
+                'vViewDir = normalize(-viewPosition.xyz);'
 
         
             ].join('\n'));
@@ -155,6 +162,7 @@ export default class ShaderTestScene extends Scene {
                 varying vec3 vNormal2;
                 varying vec2 vUv; 
                 varying vec3 vPosition;
+                varying vec3 vViewDir;
 
                 float map(float value, float inMin, float inMax, float outMin, float outMax) {
                     return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);
@@ -178,21 +186,9 @@ export default class ShaderTestScene extends Scene {
                 
                 float intensity = max(0.0, dot(norm, lightDir));
                 float stepVal = 1. / float(nbColors);
+
+                float rimDot = step(0.5,dot(vViewDir, vNormal2));
                 
-                vec3 toonColor = color1 * step(0.0, intensity) * (1.0 - step(1.0 * stepVal, intensity)) 
-                + color2 * step(1.0 * stepVal, intensity) * (1.0 - step(2.0 * stepVal, intensity))
-                + color3 * step(2.0 * stepVal, intensity) * (1.0 - step(3.0 * stepVal, intensity))
-                + color4 * step(3.0 * stepVal, intensity) * (1.0 - step(4.0 * stepVal, intensity))
-                + color5 * step(4.0 * stepVal, intensity);
-
-                // pour chaque step du toon
-                //float map(float value, float inMin, float inMax, float outMin, float outMax)
-                // outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);
-                // value = vUv.x, inMin = 0.0, inMax = 1.0; outMin = stepLowerBound; outMax= stepUpperBound
-
-                // uv1 -> mappedVal = map(vUv.x, 0.0, 1.0, step(0.0, intensity), (1.0 - step(1.0 * stepVal, intensity))
-                //uv2 -> mappedVal = map(vUv.x, 0.0, 1.0, step(1.0 * stepVal, intensity), (1.0 - step(2.0 * stepVal, intensity))
-                // uv3 -> mappedVal = map(vUv.x, 0.0, 1.0, step(2.0 * stepVal, intensity), (1.0 - step(3.0 * stepVal, intensity))
                 
                 vec2 uv1 = vec2( map(vUv.x, 0.0, 1.0, 0., stepVal), 0.5);
                 vec2 noiseScale1 = vec2(noiseStep);
@@ -205,22 +201,33 @@ export default class ShaderTestScene extends Scene {
                 vec2 uv5 = vec2(map(vUv.x, 0.0, 1.0, 0., stepVal*float(nbColors)), 0.5);
                 vec2 noiseScale5 = vec2(noiseStep*5.0);
                 
-                vec2 grainCoord = uv1 * step(0.0, intensity) * (1.0 - step(1.0 * stepVal, intensity)) 
-                + uv2 * step(1.0 * stepVal, intensity) * (1.0 - step(2.0 * stepVal, intensity))
-                + uv3 * step(2.0 * stepVal, intensity) * (1.0 - step(3.0 * stepVal, intensity))
-                + uv4 * step(3.0 * stepVal, intensity) * (1.0 - step(4.0 * stepVal, intensity))
-                + uv5 * step(4.0 * stepVal, intensity);
-
+                // vec2 grainCoord = uv1 * step(0.0, intensity) * (1.0 - step(1.0 * stepVal, intensity)) 
+                // + uv2 * step(1.0 * stepVal, intensity) * (1.0 - step(2.0 * stepVal, intensity))
+                // + uv3 * step(2.0 * stepVal, intensity) * (1.0 - step(3.0 * stepVal, intensity))
+                // + uv4 * step(3.0 * stepVal, intensity) * (1.0 - step(4.0 * stepVal, intensity))
+                // + uv5 * step(4.0 * stepVal, intensity);
+                
                 vec2 noiseScale = noiseScale1 * step(0.0, intensity) * (1.0 - step(1.0 * stepVal, intensity)) 
                 + noiseScale2 * step(1.0 * stepVal, intensity) * (1.0 - step(2.0 * stepVal, intensity))
                 + noiseScale3 * step(2.0 * stepVal, intensity) * (1.0 - step(3.0 * stepVal, intensity))
                 + noiseScale4 * step(3.0 * stepVal, intensity) * (1.0 - step(4.0 * stepVal, intensity))
                 + noiseScale5 * step(4.0 * stepVal, intensity);
                 
-                vec4 texColor = texture2D(tex, grainCoord);  // read in tex
-                float noise = noise((vPosition.xy + gl_FragCoord.xy) * noiseScale );  
+                // float noise = noise((vNormal2.xy + gl_FragCoord.xy) * noiseScale );  
+
+                float noise1 = noise((vNormal2.xy + gl_FragCoord.xy) * noiseScale1 );  
+                float noise2 = noise((vNormal2.xy + gl_FragCoord.xy) * noiseScale2 );  
+
+                vec3 toonColor = color1 * step(0.0, intensity) * (1.0 - step(1.0 * stepVal, intensity))
+                + color2 * step(1.0 * stepVal, intensity) * (1.0 - step(2.0 * stepVal, intensity))
+                + color3 * step(2.0 * stepVal, intensity) * (1.0 - step(3.0 * stepVal, intensity))
+                + color4 * step(3.0 * stepVal, intensity) * (1.0 - step(4.0 * stepVal, intensity))*noise2
+                + color5 * step(4.0 * stepVal, intensity*noise1);
+
+                //vec4 texColor = texture2D(tex, grainCoord);  // read in tex
                 //float noise = noise((vNormal2.xy + vPosition.xy) * noiseScale );  
-                gl_FragColor = vec4(toonColor, 1.0)*noise;
+                //gl_FragColor = vec4(toonColor*rimDot, 1.0);
+                gl_FragColor = vec4(toonColor, 1.0);
                 `
             ) 
 
@@ -275,8 +282,21 @@ export default class ShaderTestScene extends Scene {
                 gl_FragColor = vec4( outlineColor, 1.0 );
             }`
         })
-        // const meshOutline = new THREE.Mesh(this.geo, this.outlineMat)
-        // this.scene.add(meshOutline)
+
+        // let outlined = []
+        // this.assets[this.name].scene.traverse(child => {
+        //     if(child.isMesh) {
+        //         console.log("child", child)
+        //         const meshCopy = child.clone()
+        //         meshCopy.material = this.outlineMat
+               
+        //         outlined.push(meshCopy)
+        //     }
+        // })
+
+        // console.log(outlined)
+
+        // outlined.forEach(e => this.scene.add(e))
     }
 
     getSceneMaterials() {
