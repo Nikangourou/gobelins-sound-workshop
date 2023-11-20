@@ -132,7 +132,7 @@ export default class World
                 trainSound.setRefDistance( 2 );
                 trainSound.play();
             }); 
-            
+
             birdSound.add( helperBirds );
             trainSound.add( helperTrain );
             
