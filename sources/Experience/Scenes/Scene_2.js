@@ -31,31 +31,12 @@ export default class Scene_2 extends Scene {
         this.shouldPlayTransition = false
         // State / UI
         this.nextBtn = document.getElementById('next')
-        this.nextBtn.addEventListener('click', e => {
-            this.nextBtn.style.display = 'none'
-            this.hasBeenCompleted = true
-            this.cameraMixer.clipAction(this.cameraMouvement).paused = false;
-            this.transition.init()
-            setTimeout(() => {this.shouldPlayTransition = true}, this.delayAnimationTransition);
-        })
         this.userHasClickedBox = false
-
-        this.userClickedBox = document.getElementById('userClickedBox')
-        this.userClickedBox.addEventListener('click', e => {
-            this.userClickedBox.style.display = 'none'
-            this.userClickedBox = true
-            this.boxMixer.clipAction(this.boxFalling).paused = false
-        })
 
 
         //objects 
         this.boxToBeRemoved= this.scene.getObjectByName('box_drag_drop')
         this.boxMixer = new THREE.AnimationMixer(this.boxToBeRemoved)
-        const nextBtn = this.nextBtn
-        this.boxMixer.addEventListener('finished', function (e) {
-            nextBtn.style.display = "block"
-
-        })
 
         let curr = this
         this.cameraMixer.addEventListener('finished', function (e) {
@@ -82,7 +63,7 @@ export default class Scene_2 extends Scene {
         this.particles.group.position.z = -1
         this.particles.group.position.y = 2
 
-        this.userClickedBox.style.display = "block"
+        // this.userClickedBox.style.display = "block"
 
         this.light.position.set(10, 0.76, 2.6);
         const helper1 = new THREE.PointLightHelper(this.light, 0.1);
@@ -149,10 +130,19 @@ export default class Scene_2 extends Scene {
         this.cameraControls.raycaster.setFromCamera(this.cameraControls.mouse, this.camera);
         let intersects = this.cameraControls.raycaster.intersectObject(this.scene, true)
         let filteredByMat = intersects.filter(e => e.object.material.type === "MeshBasicMaterial")
-        if (filteredByMat[0].object) {
+
+       if(filteredByMat.length === 0) return
+        if( filteredByMat[0].object.name === "box_drag_drop" ) {
+            this.userClickedBox = true
+            this.boxMixer.clipAction(this.boxFalling).paused = false
+        }  else if(filteredByMat[0].object.name.includes("button")) {
+            this.hasBeenCompleted = true
+            this.cameraMixer.clipAction(this.cameraMouvement).paused = false;
+            this.transition.init()
+            setTimeout(() => {this.shouldPlayTransition = true}, this.delayAnimationTransition);
+        } else if (filteredByMat[0].object) {
             this.particles.updateMatColor(filteredByMat[0].object.material.color)
             this.particles.updatePosition(filteredByMat[0].object.position)
-
         }
 
     }
@@ -172,6 +162,8 @@ export default class Scene_2 extends Scene {
 
     }
 
+    
+
     setSceneMaterials() {
         let toBeAdded = []
         this.scene.traverse(e => {
@@ -179,6 +171,7 @@ export default class Scene_2 extends Scene {
                 console.log(e.name)
        
                  if (e.name.includes("button")) {
+                   
                     e.material = new THREE.MeshBasicMaterial({ color: 0xff0000 })
                     let mesh = e.clone()
                     mesh.material = this.outlineMat

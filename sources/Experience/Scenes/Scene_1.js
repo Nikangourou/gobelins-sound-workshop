@@ -93,10 +93,10 @@ export default class Scene_1 extends Scene {
         this.mainScene.add(this.scene)
         this.startBtn.style.display = "block"
         this.cameraControls.setDefaultCamera(this.camera)
-        this.setupGui()
         this.isActive = true
-       
+        
         this.setLights(this.deskLight)
+        this.setupGui()
         const helper1 = new THREE.PointLightHelper(this.light, 0.1);
         this.scene.add(this.light, helper1)
 
@@ -108,7 +108,6 @@ export default class Scene_1 extends Scene {
 
         let testLight = new THREE.AmbientLight(0xffffff);
         this.scene.add(testLight)
-
 
         const action = this.cameraMixer.clipAction(this.cameraMouvement);
         action.clampWhenFinished = true;
@@ -144,7 +143,6 @@ export default class Scene_1 extends Scene {
         this.cubeRadio.visible = false
 
         this.scene.add(this.cubeRadio)
-
         this.dragSetup()
     }
 
@@ -164,9 +162,11 @@ export default class Scene_1 extends Scene {
     }
 
     setSceneMaterial() {
+
         let toBeAdded = []
         this.scene.traverse(e => {
             if (e.isMesh) {
+                console.log(e.name)
                 if (e.name === 'door') {
                     this.doorMixer = new THREE.AnimationMixer(e)
                     let mat = new CustomMat({
@@ -185,8 +185,9 @@ export default class Scene_1 extends Scene {
                     })
                     mat.init()
                     e.material = mat.get()
-                    // console.log("mat", e.material)
 
+                } else if (e.name.includes('timbre')) {
+                    e.material = new THREE.MeshBasicMaterial({ color: 0xff0000 })
                 } else if (this.namesToBeOutlines.includes(e.name)) {
                     let mat = new CustomMat({
                         renderer: this.renderer, uniforms: {
@@ -203,15 +204,12 @@ export default class Scene_1 extends Scene {
                     })
                     mat.init()
                     e.material = mat.get()
-
                     let mesh = e.clone()
                     mesh.material = this.outlineMat
                     toBeAdded.push(mesh)
 
                 } else if (e.name.includes("contain")) {
-
                     e.material = new THREE.MeshBasicMaterial({ color: 0x00ff00 })
-
                 }
                 else {
                     let mat = new CustomMat({
