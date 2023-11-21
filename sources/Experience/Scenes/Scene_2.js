@@ -33,6 +33,9 @@ export default class Scene_2 extends Scene {
         // State / UI
         this.nextBtn = document.getElementById('next')
         this.userHasClickedBox = false
+        this.ambientSound = new THREE.Audio( this.cameraControls.audioListener );
+        this.buttonSound = new THREE.Audio( this.cameraControls.audioListener );
+        this.boxFallingSound = new THREE.Audio( this.cameraControls.audioListener );
 
 
         //objects 
@@ -96,29 +99,31 @@ export default class Scene_2 extends Scene {
 
         document.querySelector('.experience').addEventListener('click', (e) => {this.click(e)})
 
+        this.setSounds()
     }
 
     setSounds() {
-        // audioLoader.load( 'assets/birds.wav', function( buffer ) {
-        //     birdSound.setBuffer( buffer );
-        //     birdSound.setRefDistance( 10 );
-        //     birdSound.play();
-        // }); 
-        // this.audioListenner.context.resume()
-        // this.audioListenner = new THREE.AudioListener();
-        // const birdSound = new THREE.PositionalAudio( this.audioListenner );
-        // const birdSound = new THREE.PositionalAudio( this.audioListenner );
-        //     const trainSound = new THREE.PositionalAudio( this.audioListenner );
-            
-        //     const helperBirds = new PositionalAudioHelper( birdSound )
-        //     const helperTrain = new PositionalAudioHelper( trainSound )
-            
-        //     const audioLoader = new THREE.AudioLoader();
-        //     birdSound.add( helperBirds );
-        //     trainSound.add( helperTrain );
-        //     this.treesMesh.add(birdSound)
-        //     this.trainMesh.add(trainSound)
+        console.log(this.cameraControls.audioListener)
+        const audioLoader = new THREE.AudioLoader();
+        audioLoader.load('/assets/sounds/scene2/ambient.mp3', (buffer) => {
+            this.ambientSound.setBuffer( buffer );
+            this.ambientSound.setLoop( true );
+            this.ambientSound.setVolume( 0.5 );
+            this.ambientSound.play();
+        })
+
+        audioLoader.load('/assets/sounds/scene2/bouton.wav', (buffer) => {
+            this.buttonSound.setBuffer( buffer );
+            this.buttonSound.setLoop( false );
+            this.buttonSound.setVolume( 1 );
+        })
         
+        audioLoader.load('/assets/sounds/scene2/colis1.mp3', (buffer) => {
+            this.boxFallingSound.setBuffer( buffer );
+            this.boxFallingSound.setLoop( false );
+            this.boxFallingSound.setVolume( 1 );
+        })   
+
     }
 
     setupGui() {
@@ -157,9 +162,11 @@ export default class Scene_2 extends Scene {
 
        if(filteredByMat.length === 0) return
         if( filteredByMat[0].object.name === "box_drag_drop" ) {
+            this.boxFallingSound.play()
             this.userClickedBox = true
             this.boxMixer.clipAction(this.boxFalling).paused = false
         }  else if(filteredByMat[0].object.name.includes("button")) {
+            this.buttonSound.play();
             this.hasBeenCompleted = true
             this.cameraMixer.clipAction(this.cameraMouvement).paused = false;
             this.transition.init()
@@ -172,6 +179,7 @@ export default class Scene_2 extends Scene {
     }
 
     onSceneIsDone() {
+        this.ambientSound.stop();
         this.isActive = false
         this.hasBeenCompleted = true
 
@@ -186,14 +194,11 @@ export default class Scene_2 extends Scene {
 
     }
 
-    
 
     setSceneMaterials() {
         let toBeAdded = []
         this.scene.traverse(e => {
             if (e.isMesh) {
-                console.log(e.name)
-       
                  if (e.name.includes("button")) {
                    
                     e.material = new THREE.MeshBasicMaterial({ color: 0xff0000 })

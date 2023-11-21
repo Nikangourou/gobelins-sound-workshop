@@ -12,7 +12,7 @@ export default class Camera {
         this.sizes = this.experience.sizes
         this.targetElement = this.experience.targetElement
         this.scene = this.experience.scene
-        
+        this.audioListener = new THREE.AudioListener();
         this.mouse = new THREE.Vector2(0, 0)
         this.mouseEaseRation = 0.008
         this.mouseRotationH = 0.02
@@ -42,6 +42,7 @@ export default class Camera {
 
 
     setDefaultCamera( camera ) {
+        camera.add(this.audioListener)
         this.defaultCamera = camera
         //this.defaultCamera.rotation.reorder('YXZ')
 
