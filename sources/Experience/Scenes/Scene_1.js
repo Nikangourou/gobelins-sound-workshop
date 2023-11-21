@@ -4,6 +4,7 @@ import CustomMat from './CustomMat'
 import GUI from 'lil-gui'
 import { PositionalAudioHelper } from 'three/examples/jsm/helpers/PositionalAudioHelper.js'
 import { DragControls } from 'three/examples/jsm/controls/DragControls.js'
+import Pin from '../Pin'
 
 export default class Scene_1 extends Scene {
     constructor(scene, renderer, cameraControls, mainScene, callback) {
@@ -82,6 +83,7 @@ export default class Scene_1 extends Scene {
         this.actionTiroir = this.tiroirMixer.clipAction(this.tiroirMouvement);
         this.actionTiroir.loop = THREE.LoopOnce
         this.tiroirOpen = false
+
     }
 
     init() {
@@ -193,14 +195,7 @@ export default class Scene_1 extends Scene {
         this.scene.add(testLight)
 
         this.lampe.add(this.lampLight)
-        // add green cube to lampe for debug
-        this.testo = new THREE.Mesh(
-            new THREE.BoxGeometry(0.2, 0.2, 0.2),
-            new THREE.MeshBasicMaterial({ color: 0x00ff00 })
-        )
-        this.lampe.add(this.testo)
-
-
+       
         const action = this.cameraMixer.clipAction(this.cameraMouvement);
         action.clampWhenFinished = true;
         action.loop = THREE.LoopOnce
@@ -236,6 +231,12 @@ export default class Scene_1 extends Scene {
         this.cubeRadio.visible = false
 
         this.scene.add(this.cubeRadio)
+
+          // Pin
+          this.pinTiroir = new Pin(this.tiroir.position, true)
+          this.pinTiroir.init()
+          
+          this.scene.add(this.pinTiroir.pin)
 
         this.dragSetup()
     }
