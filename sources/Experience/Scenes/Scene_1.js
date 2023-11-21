@@ -24,7 +24,6 @@ export default class Scene_1 extends Scene {
         this.timbre = this.scene.getObjectByName('timbre1')
         this.timbre2 = this.scene.getObjectByName('timbre2')
         this.camera = scene.cameras[0]
-
         this.tiroir.add(this.timbre, this.timbre2)
 
         // Mixer 
@@ -47,7 +46,7 @@ export default class Scene_1 extends Scene {
         this.audioListenner.context.resume()
         this.radioSound = new THREE.PositionalAudio(this.audioListenner);
         this.cameraMixer.addEventListener('finished', function (e) {
-            console.log("finised")
+            console.log("finished")
             // transition UI in 
             curr.onSceneIsDone()
             callback()
@@ -58,8 +57,6 @@ export default class Scene_1 extends Scene {
         this.delayAnimationTransition = 1000
 
         this.namesToBeOutlines = ["desk", "bag", "radio", "commode", "tabletop_high", 'library', "lamp", "box", "old_chair", "Flame", "Chair"]
-
-
         this.lightPos = new THREE.Vector3(2, 5, 3)
         this.userStarted = false;
         this.startBtn = document.querySelector('button')
@@ -72,67 +69,45 @@ export default class Scene_1 extends Scene {
         })
 
         this.cameraEnterMovementIsDone = false
-
-        // Action
-        this.actionLampe = this.lampeMixer.clipAction(this.lampeMouvement);
-        this.actionLampe.loop = THREE.LoopOnce
-        this.lampeMixer.addEventListener('finished', (e) => {
-            curr.changeLights()
-        })
-
+        
         // Toggling the openining of the drawer
         this.actionTiroir = this.tiroirMixer.clipAction(this.tiroirMouvement);
         this.actionTiroir.loop = THREE.LoopOnce
         this.tiroirOpen = false
-
+        
         // lights 
         this.light = new THREE.PointLight(0xff0000, 10, 100);
         this.lampLight = new THREE.PointLight(0xffffff, 2, 100)
-
-
+        this.deskLight = false
+        
+        // Action
+        this.actionLampe = this.lampeMixer.clipAction(this.lampeMouvement);
+        this.actionLampe.loop = THREE.LoopOnce
+        this.lampeMixer.addEventListener('finished', (e) => {
+            this.deskLight = !this.deskLight
+            curr.setLights()
+        })
     }
 
     init() {
         this.mainScene.add(this.scene)
         this.startBtn.style.display = "block"
         this.cameraControls.setDefaultCamera(this.camera)
+        this.setupGui()
         this.isActive = true
        
-        this.light.position.set(10, 0.76, 2.6);
+        this.setLights(this.deskLight)
         const helper1 = new THREE.PointLightHelper(this.light, 0.1);
         this.scene.add(this.light, helper1)
 
-        
-        this.lampLight.position.set(1.04, 8.32, 2);
         const helper2 = new THREE.PointLightHelper(this.lampLight, 0.1);
         this.scene.add(this.lampLight, helper2)
 
-        const matFolder = this.gui.addFolder("toon settings")
-        const lightFolder = matFolder.addFolder('light')
-        const light1 = lightFolder.addFolder("light1")
-        light1.add(this.light.position, 'x').min(-10).max(10).name('light x')
-        light1.add(this.light.position, 'y').min(-10).max(10).name('light y')
-        light1.add(this.light.position, 'z').min(-10).max(10).name('light z')
-
-        const light2Folder = lightFolder.addFolder("light2")
-        light2Folder.add(this.lampLight.position, 'x').min(-10).max(10).name('light x')
-        light2Folder.add(this.lampLight.position, 'y').min(-10).max(10).name('light y')
-        light2Folder.add(this.lampLight.position, 'z').min(-10).max(10).name('light z')
-
         document.querySelector('.experience').addEventListener('click', (e) => {this.click(e)})
-   
         this.setSceneMaterial()
 
         let testLight = new THREE.AmbientLight(0xffffff);
         this.scene.add(testLight)
-
-        this.lampe.add(this.lampLight)
-        // add green cube to lampe for debug
-        this.testo = new THREE.Mesh(
-            new THREE.BoxGeometry(0.2, 0.2, 0.2),
-            new THREE.MeshBasicMaterial({ color: 0x00ff00 })
-        )
-        this.lampe.add(this.testo)
 
 
         const action = this.cameraMixer.clipAction(this.cameraMouvement);
@@ -140,7 +115,6 @@ export default class Scene_1 extends Scene {
         action.loop = THREE.LoopOnce
         action.play()
         action.paused = true
-
 
         // door
         const openingDoorAnimation = this.doorMixer.clipAction(this.doorMovement)
@@ -172,6 +146,21 @@ export default class Scene_1 extends Scene {
         this.scene.add(this.cubeRadio)
 
         this.dragSetup()
+    }
+
+    setupGui() {
+        const matFolder = this.gui.addFolder("toon settings")
+        const lightFolder = matFolder.addFolder('light')
+        const light1 = lightFolder.addFolder("light1")
+        light1.add(this.light.position, 'x').min(-10).max(10).name('light x')
+        light1.add(this.light.position, 'y').min(-10).max(10).name('light y')
+        light1.add(this.light.position, 'z').min(-10).max(10).name('light z')
+
+        const light2Folder = lightFolder.addFolder("light2")
+        light2Folder.add(this.lampLight.position, 'x').min(-10).max(10).name('light x')
+        light2Folder.add(this.lampLight.position, 'y').min(-10).max(10).name('light y')
+        light2Folder.add(this.lampLight.position, 'z').min(-10).max(10).name('light z')
+
     }
 
     setSceneMaterial() {
@@ -274,10 +263,15 @@ export default class Scene_1 extends Scene {
         });
     }
 
-    changeLights() {
+    setLights() {
         // simulate lighting on/off by moving position
-        this.light.position.set(3, 0.76, -0.92)
-        this.lampLight.position.set(-5.68, 8.32, 2)
+        if(this.deskLight) {
+            this.light.position.set(3, 0.76, -0.92)
+            this.lampLight.position.set(-5.68, 8.32, 2)
+        } else {
+            this.light.position.set(10, 0.76, 2.6)
+            this.lampLight.position.set(1.04, 8.32, 2)
+        }
     }
 
     click() {

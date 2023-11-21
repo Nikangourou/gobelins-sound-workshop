@@ -20,7 +20,6 @@ export default class Scene_2 extends Scene {
         this.dotTex = pointTex
         this.particles = new Particles("#ef4444", this.scene)
         this.cardColors = ["#ef4444", "#f97316", "#eab308", "#0d9488", "#2563eb", "#d946ef"]
-
         
         this.namesToBeOutlines = ["plane_box_1", "plane_box_2", "box_drag_drop"]
         this.lightPos = new THREE.Vector3(2, 5, 3)
@@ -47,7 +46,17 @@ export default class Scene_2 extends Scene {
             this.userClickedBox = true
             this.boxMixer.clipAction(this.boxFalling).paused = false
         })
-        
+
+
+        //objects 
+        this.boxToBeRemoved= this.scene.getObjectByName('box_drag_drop')
+        this.boxMixer = new THREE.AnimationMixer(this.boxToBeRemoved)
+        const nextBtn = this.nextBtn
+        this.boxMixer.addEventListener('finished', function (e) {
+            nextBtn.style.display = "block"
+
+        })
+
         let curr = this
         this.cameraMixer.addEventListener('finished', function (e) {
             console.log("scene 2 is finised")
@@ -55,6 +64,9 @@ export default class Scene_2 extends Scene {
            
             callback()
         })
+
+       this.light = new THREE.PointLight(0xff0000, 5, 100);
+       this.light2 = new THREE.PointLight(0xff0000, 5, 100);
 
     }
 
@@ -64,119 +76,26 @@ export default class Scene_2 extends Scene {
         // const helper = new THREE.CameraHelper( this.camera );
         // this.scene.add(helper)
 
+        this.setSceneMaterials()
 
         this.particles.group.position.x = 10
         this.particles.group.position.z = -1
         this.particles.group.position.y = 2
-        // this.particles.setPosition(15, 3, 0)
 
         this.userClickedBox.style.display = "block"
 
-        const light = new THREE.PointLight(0xff0000, 10, 100);
-        light.position.set(10, 0.76, 2.6);
-        const helper1 = new THREE.PointLightHelper(light, 0.1);
-        this.scene.add(light, helper1)
+        this.light.position.set(10, 0.76, 2.6);
+        const helper1 = new THREE.PointLightHelper(this.light, 0.1);
+        this.scene.add(this.light, helper1)
 
-        const light2 = new THREE.PointLight(0xff0000, 10, 100);
-        light2.position.set(1.04, 8.32, 2);
-        const helper2 = new THREE.PointLightHelper(light2, 0.1);
-        this.scene.add(light2, helper2)
+       
+        this.light2.position.set(1.04, 8.32, 2);
+        const helper2 = new THREE.PointLightHelper(this.light2, 0.1);
+        this.scene.add(this.light2, helper2)
 
-        const matFolder = this.gui.addFolder("toon settings")
-        const lightFolder = matFolder.addFolder('light')
-        const light1 = lightFolder.addFolder("light1")
-        light1.add(light.position, 'x').min(-10).max(10).name('light x')
-        light1.add(light.position, 'y').min(-10).max(10).name('light y')
-        light1.add(light.position, 'z').min(-10).max(10).name('light z')
-
-        const light2Folder = lightFolder.addFolder("light2")
-        light2Folder.add(light2.position, 'x').min(-10).max(10).name('light x')
-        light2Folder.add(light2.position, 'y').min(-10).max(10).name('light y')
-        light2Folder.add(light2.position, 'z').min(-10).max(10).name('light z')
+        this.setupGui()
 
         this.isActive = true
-        let toBeAdded = []
-        this.scene.traverse(e => {
-            if (e.isMesh) {
-                // console.log("name", e.name)
-                if (e.name === "box_drag_drop") {
-                    console.log("found box drag and drop")
-                    this.boxMixer = new THREE.AnimationMixer(e)
-                    const nextBtn = this.nextBtn
-                    this.boxMixer.addEventListener('finished', function (e) {
-                        nextBtn.style.display = "block"
-
-                    })
-                    let mat = new CustomMat({
-                        renderer: this.renderer, uniforms: {
-                            color1: { value: new THREE.Color('#18181b') }, // darker
-                            color2: { value: new THREE.Color('#fdba74') },
-                            color3: { value: e.material.color },
-                            color4: { value: new THREE.Color('#94a3b8') },
-                            color5: { value: new THREE.Color('#e2e8f0') },// lighter
-                            noiseStep: { value: 1.0 },
-                            nbColors: { value: 3 },
-                            lightDirection: { value: light.position },
-                            lightDirection2: { value: light2.position }
-                        }
-                    })
-                    mat.init()
-                    e.material = mat.get()
-                } else if (e.name.includes("button")) {
-                    e.material = new THREE.MeshBasicMaterial({ color: 0xff0000 })
-                    let mesh = e.clone()
-                    mesh.material = this.outlineMat
-                    toBeAdded.push(mesh)
-
-                } else if (e.name.includes("box")) {
-                    let mat = new CustomMat({
-                        renderer: this.renderer, uniforms: {
-                            color1: { value: new THREE.Color('#18181b') }, // darker
-                            color2: { value: new THREE.Color('#fdba74') },
-                            color3: { value: e.material.color },
-                            color4: { value: new THREE.Color('#94a3b8') },
-                            color5: { value: new THREE.Color('#e2e8f0') },// lighter
-                            noiseStep: { value: 1.0 },
-                            nbColors: { value: 3 },
-                            lightDirection: { value: light.position },
-                            lightDirection2: { value: light2.position }
-                        }
-                    })
-                    mat.init()
-                    e.material = mat.get()
-
-                    let mesh = e.clone()
-                    mesh.material = this.outlineMat
-                    toBeAdded.push(mesh)
-                } else if (e.name.toLowerCase().includes('plane')) {
-                    // console.log(e.name)
-                    let color = this.getRandomColor()
-
-                    e.material = new THREE.MeshBasicMaterial({ color: new THREE.Color(this.getRandomColor()) })
-                    e.material.side = THREE.DoubleSide
-                }
-
-            } else {
-                let mat = new CustomMat({
-                    renderer: this.renderer, uniforms: {
-                        color1: { value: new THREE.Color('#18181b') }, // darker
-                        color2: { value: new THREE.Color('#374151') },
-                        color3: { value: new THREE.Color('#475569') },
-                        color4: { value: new THREE.Color('#94a3b8') },
-                        color5: { value: new THREE.Color('#e2e8f0') },// lighter
-                        noiseStep: { value: 1.0 },
-                        nbColors: { value: 3 },
-                        lightDirection: { value: light.position },
-                        lightDirection2: { value: light2.position }
-                    }
-                })
-                mat.init()
-                e.material = mat.get()
-            }
-
-
-        })
-        toBeAdded.forEach(e => this.scene.add(e))
 
         let testLight = new THREE.AmbientLight(0xffffff);
         this.scene.add(testLight)
@@ -193,33 +112,49 @@ export default class Scene_2 extends Scene {
         boxAction.play()
         boxAction.paused = true
 
-        document.querySelector('.experience').addEventListener('click', (e) => {
-            if (!this.particles.particlesHasBeenInit) {
-                this.scene.add(this.particles.group)
-                this.particles.init()
-                this.particles.particlesHasBeenInit = true
-            }
+        document.querySelector('.experience').addEventListener('click', (e) => {this.click(e)})
 
-            this.cameraControls.mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
-            this.cameraControls.mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+    }
 
-            if (!this.cameraControls.defaultCamera || !this.cameraControls.raycaster) return
-            this.cameraControls.raycaster.setFromCamera(this.cameraControls.mouse, this.camera);
-            let intersects = this.cameraControls.raycaster.intersectObject(this.scene, true)
-            let filteredByMat = intersects.filter(e => e.object.material.type === "MeshBasicMaterial")
-            if (filteredByMat[0].object) {
-                this.particles.updateMatColor(filteredByMat[0].object.material.color)
-                this.particles.updatePosition(filteredByMat[0].object.position)
+    setupGui() {
+        const matFolder = this.gui.addFolder("toon settings")
+        const lightFolder = matFolder.addFolder('light')
+        const light1 = lightFolder.addFolder("light1")
+        light1.add(this.light.position, 'x').min(-10).max(10).name('light x')
+        light1.add(this.light.position, 'y').min(-10).max(10).name('light y')
+        light1.add(this.light.position, 'z').min(-10).max(10).name('light z')
 
-            }
-            // update particle color
-        })
-
+        const light2Folder = lightFolder.addFolder("light2")
+        light2Folder.add(this.light2.position, 'x').min(-10).max(10).name('light x')
+        light2Folder.add(this.light2.position, 'y').min(-10).max(10).name('light y')
+        light2Folder.add(this.light2.position, 'z').min(-10).max(10).name('light z')
     }
 
     getRandomColor() {
         let colorIndex = Math.floor(Math.random() * this.cardColors.length)
         return this.cardColors[colorIndex]
+    }
+
+    click(e) {
+        if (!this.particles.particlesHasBeenInit) {
+            this.scene.add(this.particles.group)
+            this.particles.init()
+            this.particles.particlesHasBeenInit = true
+        }
+
+        this.cameraControls.mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+        this.cameraControls.mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+
+        if (!this.cameraControls.defaultCamera || !this.cameraControls.raycaster) return
+        this.cameraControls.raycaster.setFromCamera(this.cameraControls.mouse, this.camera);
+        let intersects = this.cameraControls.raycaster.intersectObject(this.scene, true)
+        let filteredByMat = intersects.filter(e => e.object.material.type === "MeshBasicMaterial")
+        if (filteredByMat[0].object) {
+            this.particles.updateMatColor(filteredByMat[0].object.material.color)
+            this.particles.updatePosition(filteredByMat[0].object.position)
+
+        }
+
     }
 
     onSceneIsDone() {
@@ -238,6 +173,63 @@ export default class Scene_2 extends Scene {
     }
 
     setSceneMaterials() {
+        let toBeAdded = []
+        this.scene.traverse(e => {
+            if (e.isMesh) {
+                console.log(e.name)
+       
+                 if (e.name.includes("button")) {
+                    e.material = new THREE.MeshBasicMaterial({ color: 0xff0000 })
+                    let mesh = e.clone()
+                    mesh.material = this.outlineMat
+                    toBeAdded.push(mesh)
+                 }else if(e.name === "box_drag_drop") {
+                    e.material = new THREE.MeshBasicMaterial({ color: e.material.color })
+                } else if (e.name.includes("box")) {
+                    let mat = new CustomMat({
+                        renderer: this.renderer, uniforms: {
+                            color1: { value: new THREE.Color('#18181b') }, // darker
+                            color2: { value: new THREE.Color('#fdba74') },
+                            color3: { value: e.material.color },
+                            color4: { value: new THREE.Color('#94a3b8') },
+                            color5: { value: new THREE.Color('#e2e8f0') },// lighter
+                            noiseStep: { value: 1.0 },
+                            nbColors: { value: 3 },
+                            lightDirection: { value: this.light.position },
+                            lightDirection2: { value: this.light2.position }
+                        }
+                    })
+                    mat.init()
+                    e.material = mat.get()
+                    let mesh = e.clone()
+                    mesh.material = this.outlineMat
+                    toBeAdded.push(mesh)
+                } else if (e.name.toLowerCase().includes('plane')) {
+                    e.material = new THREE.MeshBasicMaterial({ color: new THREE.Color(this.getRandomColor()) })
+                    e.material.side = THREE.DoubleSide
+                }
+
+            } else {
+                let mat = new CustomMat({
+                    renderer: this.renderer, uniforms: {
+                        color1: { value: new THREE.Color('#18181b') }, // darker
+                        color2: { value: new THREE.Color('#374151') },
+                        color3: { value: new THREE.Color('#475569') },
+                        color4: { value: new THREE.Color('#94a3b8') },
+                        color5: { value: new THREE.Color('#e2e8f0') },// lighter
+                        noiseStep: { value: 1.0 },
+                        nbColors: { value: 3 },
+                        lightDirection: { value: this.light.position },
+                        lightDirection2: { value: this.light2.position }
+                    }
+                })
+                mat.init()
+                e.material = mat.get()
+            }
+
+
+        })
+        toBeAdded.forEach(e => this.scene.add(e))
 
     }
 
@@ -252,7 +244,5 @@ export default class Scene_2 extends Scene {
         }
         if (this.particles.particlesHasBeenInit) this.particles.update()
         if(this.shouldPlayTransition)  this.transition.play()
-
-
     }
 }
