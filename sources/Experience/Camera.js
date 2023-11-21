@@ -85,9 +85,6 @@ export default class Camera {
         this.modes.debug.orbitControls.update()
     }
 
-
-
-
     resize()
     {
         this.debugCamera.aspect = this.config.width / this.config.height

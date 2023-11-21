@@ -47,7 +47,6 @@ export default class Scene_1 extends Scene {
         this.audioListenner = new THREE.AudioListener();
         this.audioListenner.context.resume()
         this.radioSound = new THREE.PositionalAudio(this.audioListenner);
-        this.nextBtn = document.getElementById('next')
         this.cameraMixer.addEventListener('finished', function (e) {
             console.log("finised")
             // transition UI in 
@@ -73,17 +72,7 @@ export default class Scene_1 extends Scene {
             e.target.style.display = 'none';
         })
 
-        this.nextBtn.addEventListener('click', e => {
-            this.nextBtn.style.display = 'none'
-            this.hasBeenCompleted = true
-            this.cameraMixer.clipAction(this.cameraMouvement).isPaused = false;
-            this.transition.init()
-            setTimeout(() => {this.shouldPlayTransition = true}, this.delayAnimationTransition);
-            
-        })
-
         this.cameraEnterMovementIsDone = false
-
 
         // Action
         this.actionLampe = this.lampeMixer.clipAction(this.lampeMouvement);
@@ -264,6 +253,10 @@ export default class Scene_1 extends Scene {
                 if (distance < .15) {
                     this.card.material.color.set(0xff0000)
                     this.tiroir.remove(this.timbre2)
+                    this.hasBeenCompleted = true
+                    this.cameraMixer.clipAction(this.cameraMouvement).isPaused = false;
+                    this.transition.init()
+                    setTimeout(() => {this.shouldPlayTransition = true}, this.delayAnimationTransition);
                 }
                 else {
                     this.card.material.color.set(0x00ff00)
@@ -275,8 +268,6 @@ export default class Scene_1 extends Scene {
     click() {
         this.raycaster.setFromCamera(this.mouse, this.camera)
         const modelIntersects = this.raycaster.intersectObjects([this.lampe, this.radio, this.tiroir])
-
-        console.log(this.lampLight.visible)
 
         if (modelIntersects.length) {
             if (modelIntersects[0].object.name === 'desk_lamp') {
@@ -333,7 +324,6 @@ export default class Scene_1 extends Scene {
                 if (this.cameraMixer.clipAction(this.cameraMouvement).time > 8.4 && !this.cameraEnterMovementIsDone) {
                     this.cameraEnterMovementIsDone = true;
                     this.cameraMixer.clipAction(this.cameraMouvement).isPaused = true
-                    this.nextBtn.style.display = 'block'
                 }
             }
 
