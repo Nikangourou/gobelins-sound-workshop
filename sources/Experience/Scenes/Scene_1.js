@@ -19,7 +19,6 @@ export default class Scene_1 extends Scene {
         this.radio = this.scene.getObjectByName('radio')
         this.lampe = this.scene.getObjectByName('desk_lamp')
         this.lamp_switch = this.scene.getObjectByName('desk_lamp_switch')
-        this.lampLight = new THREE.PointLight(0xffffff, 2, 100)
         this.tiroir = this.scene.getObjectByName('tiroir_desk')
         this.card = this.scene.getObjectByName('card')
         this.timbre = this.scene.getObjectByName('timbre1')
@@ -77,117 +76,52 @@ export default class Scene_1 extends Scene {
         // Action
         this.actionLampe = this.lampeMixer.clipAction(this.lampeMouvement);
         this.actionLampe.loop = THREE.LoopOnce
+        this.lampeMixer.addEventListener('finished', (e) => {
+            curr.changeLights()
+        })
 
         // Toggling the openining of the drawer
         this.actionTiroir = this.tiroirMixer.clipAction(this.tiroirMouvement);
         this.actionTiroir.loop = THREE.LoopOnce
         this.tiroirOpen = false
+
+        // lights 
+        this.light = new THREE.PointLight(0xff0000, 10, 100);
+        this.lampLight = new THREE.PointLight(0xffffff, 2, 100)
+
+
     }
 
     init() {
         this.mainScene.add(this.scene)
         this.startBtn.style.display = "block"
         this.cameraControls.setDefaultCamera(this.camera)
-        // const helper = new THREE.CameraHelper( this.camera );
-        // this.scene.add(helper)
         this.isActive = true
-        const light = new THREE.PointLight(0xff0000, 10, 100);
-        light.position.set(10, 0.76, 2.6);
-        const helper1 = new THREE.PointLightHelper(light, 0.1);
-        this.scene.add(light, helper1)
+       
+        this.light.position.set(10, 0.76, 2.6);
+        const helper1 = new THREE.PointLightHelper(this.light, 0.1);
+        this.scene.add(this.light, helper1)
 
-        const light2 = new THREE.PointLight(0xff0000, 10, 100);
-        light2.position.set(1.04, 8.32, 2);
-        const helper2 = new THREE.PointLightHelper(light2, 0.1);
-        this.scene.add(light2, helper2)
+        
+        this.lampLight.position.set(1.04, 8.32, 2);
+        const helper2 = new THREE.PointLightHelper(this.lampLight, 0.1);
+        this.scene.add(this.lampLight, helper2)
 
         const matFolder = this.gui.addFolder("toon settings")
         const lightFolder = matFolder.addFolder('light')
         const light1 = lightFolder.addFolder("light1")
-        light1.add(light.position, 'x').min(-10).max(10).name('light x')
-        light1.add(light.position, 'y').min(-10).max(10).name('light y')
-        light1.add(light.position, 'z').min(-10).max(10).name('light z')
+        light1.add(this.light.position, 'x').min(-10).max(10).name('light x')
+        light1.add(this.light.position, 'y').min(-10).max(10).name('light y')
+        light1.add(this.light.position, 'z').min(-10).max(10).name('light z')
 
         const light2Folder = lightFolder.addFolder("light2")
-        light2Folder.add(light2.position, 'x').min(-10).max(10).name('light x')
-        light2Folder.add(light2.position, 'y').min(-10).max(10).name('light y')
-        light2Folder.add(light2.position, 'z').min(-10).max(10).name('light z')
+        light2Folder.add(this.lampLight.position, 'x').min(-10).max(10).name('light x')
+        light2Folder.add(this.lampLight.position, 'y').min(-10).max(10).name('light y')
+        light2Folder.add(this.lampLight.position, 'z').min(-10).max(10).name('light z')
 
         document.querySelector('.experience').addEventListener('click', (e) => {this.click(e)})
    
-        let toBeAdded = []
-        this.scene.traverse(e => {
-            if (e.isMesh) {
-                if (e.name === 'door') {
-                    this.doorMixer = new THREE.AnimationMixer(e)
-                    let mat = new CustomMat({
-                        renderer: this.renderer, uniforms: {
-                            color1: { value: e.material.color },
-                            color2: { value: new THREE.Color('#991b1b') },
-                            color3: { value: new THREE.Color('#18181b') },
-                            color4: { value: new THREE.Color('#ffff00') },
-                            color5: { value: new THREE.Color('#00ffff') },
-                            noiseStep: { value: 1.0 },
-                            nbColors: { value: 3 },
-                            lightDirection: { value: light.position },
-                            lightDirection2: { value: light2.position },
-                            lightDirection3: {value: this.lampLight.position},
-                        }
-                    })
-                    mat.init()
-                    e.material = mat.get()
-                    // console.log("mat", e.material)
-
-                } else if (this.namesToBeOutlines.includes(e.name)) {
-                    let mat = new CustomMat({
-                        renderer: this.renderer, uniforms: {
-                            color1: { value: e.material.color }, // darker
-                            color2: { value: new THREE.Color('#ea580c') },
-                            color3: { value: new THREE.Color('#f59e0b') },
-                            color4: { value: new THREE.Color('#c2410c') },
-                            color5: { value: new THREE.Color('#bae6fd') },// lighter
-                            noiseStep: { value: 1.0 },
-                            nbColors: { value: 3 },
-                            lightDirection: { value: light.position },
-                            lightDirection2: { value: light2.position },
-                            lightDirection3: {value: this.lampLight.position},
-                        }
-                    })
-                    mat.init()
-                    e.material = mat.get()
-
-                    let mesh = e.clone()
-                    mesh.material = this.outlineMat
-                    toBeAdded.push(mesh)
-
-                } else if (e.name.includes("contain")) {
-
-                    e.material = new THREE.MeshBasicMaterial({ color: 0x00ff00 })
-
-                }
-                else {
-                    let mat = new CustomMat({
-                        renderer: this.renderer, uniforms: {
-                            color1: { value: new THREE.Color('#1e293b') }, // darker
-                            color2: { value: new THREE.Color('#eab308') },
-                            color3: { value: new THREE.Color('#3b82f6') },
-                            color4: { value: new THREE.Color('#2563eb') },
-                            color5: { value: new THREE.Color('#1d4ed8') },// lighter
-                            noiseStep: { value: 1.0 },
-                            nbColors: { value: 5 },
-                            lightDirection: { value: light.position },
-                            lightDirection2: { value: light2.position},
-                            lightDirection3: {value: this.lampLight.position},
-                        }
-                    })
-                    mat.init()
-                    e.material = mat.get()
-
-                }
-            }
-        })
-
-        toBeAdded.forEach(e => this.scene.add(e))
+        this.setSceneMaterial()
 
         let testLight = new THREE.AmbientLight(0xffffff);
         this.scene.add(testLight)
@@ -240,6 +174,81 @@ export default class Scene_1 extends Scene {
         this.dragSetup()
     }
 
+    setSceneMaterial() {
+        let toBeAdded = []
+        this.scene.traverse(e => {
+            if (e.isMesh) {
+                if (e.name === 'door') {
+                    this.doorMixer = new THREE.AnimationMixer(e)
+                    let mat = new CustomMat({
+                        renderer: this.renderer, uniforms: {
+                            color1: { value: e.material.color },
+                            color2: { value: new THREE.Color('#991b1b') },
+                            color3: { value: new THREE.Color('#18181b') },
+                            color4: { value: new THREE.Color('#ffff00') },
+                            color5: { value: new THREE.Color('#00ffff') },
+                            noiseStep: { value: 1.0 },
+                            nbColors: { value: 3 },
+                            lightDirection: { value: this.light.position },
+                            lightDirection2: { value: this.lampLight.position },
+                           
+                        }
+                    })
+                    mat.init()
+                    e.material = mat.get()
+                    // console.log("mat", e.material)
+
+                } else if (this.namesToBeOutlines.includes(e.name)) {
+                    let mat = new CustomMat({
+                        renderer: this.renderer, uniforms: {
+                            color1: { value: e.material.color }, // darker
+                            color2: { value: new THREE.Color('#ea580c') },
+                            color3: { value: new THREE.Color('#f59e0b') },
+                            color4: { value: new THREE.Color('#c2410c') },
+                            color5: { value: new THREE.Color('#bae6fd') },// lighter
+                            noiseStep: { value: 1.0 },
+                            nbColors: { value: 3 },
+                            lightDirection: { value: this.light.position },
+                            lightDirection2: { value: this.lampLight.position },
+                        }
+                    })
+                    mat.init()
+                    e.material = mat.get()
+
+                    let mesh = e.clone()
+                    mesh.material = this.outlineMat
+                    toBeAdded.push(mesh)
+
+                } else if (e.name.includes("contain")) {
+
+                    e.material = new THREE.MeshBasicMaterial({ color: 0x00ff00 })
+
+                }
+                else {
+                    let mat = new CustomMat({
+                        renderer: this.renderer, uniforms: {
+                            color1: { value: new THREE.Color('#1e293b') }, // darker
+                            color2: { value: new THREE.Color('#eab308') },
+                            color3: { value: new THREE.Color('#3b82f6') },
+                            color4: { value: new THREE.Color('#2563eb') },
+                            color5: { value: new THREE.Color('#1d4ed8') },// lighter
+                            noiseStep: { value: 1.0 },
+                            nbColors: { value: 5 },
+                            lightDirection: { value: this.light.position },
+                            lightDirection2: { value: this.lampLight.position },
+                        }
+                    })
+                    mat.init()
+                    e.material = mat.get()
+
+                }
+            }
+        })
+
+        toBeAdded.forEach(e => this.scene.add(e))
+
+    }
+
     dragSetup() {
         this.controls = new DragControls([this.card, this.timbre2], this.camera, this.mainRenderer.instance.domElement);
         this.controls.addEventListener('dragstart', () => {
@@ -265,6 +274,12 @@ export default class Scene_1 extends Scene {
         });
     }
 
+    changeLights() {
+        // simulate lighting on/off by moving position
+        this.light.position.set(3, 0.76, -0.92)
+        this.lampLight.position.set(-5.68, 8.32, 2)
+    }
+
     click() {
         this.raycaster.setFromCamera(this.mouse, this.camera)
         const modelIntersects = this.raycaster.intersectObjects([this.lampe, this.radio, this.tiroir])
@@ -276,6 +291,8 @@ export default class Scene_1 extends Scene {
                 this.actionLampe.play()
 
                 this.lampLight.visible = !this.lampLight.visible
+                
+
             }
             if (modelIntersects[0].object.name === 'radio') {
                 this.radioSound.play()

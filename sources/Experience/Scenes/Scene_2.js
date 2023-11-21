@@ -17,23 +17,27 @@ export default class Scene_2 extends Scene {
         this.camera = scene.cameras[0]
         this.cameraMixer = new THREE.AnimationMixer(this.camera)
         this.cameraMouvement = scene.animations[3]
-        this.cameraMixer.addEventListener('finished', function (e) {
-            console.log("scene 2 finished")
-            // transition UI in 
-            curr.onSceneIsDone()
-            callback()
-
-        })
         this.dotTex = pointTex
         this.particles = new Particles("#ef4444", this.scene)
         this.cardColors = ["#ef4444", "#f97316", "#eab308", "#0d9488", "#2563eb", "#d946ef"]
 
+        
+        this.namesToBeOutlines = ["plane_box_1", "plane_box_2", "box_drag_drop"]
+        this.lightPos = new THREE.Vector3(2, 5, 3)
+        
+        this.rugAnimation = scene.animations[0]
+        this.boxFalling = scene.animations[1]
+        
+        this.delayAnimationTransition = 22000
+        this.shouldPlayTransition = false
         // State / UI
         this.nextBtn = document.getElementById('next')
         this.nextBtn.addEventListener('click', e => {
             this.nextBtn.style.display = 'none'
             this.hasBeenCompleted = true
             this.cameraMixer.clipAction(this.cameraMouvement).paused = false;
+            this.transition.init()
+            setTimeout(() => {this.shouldPlayTransition = true}, this.delayAnimationTransition);
         })
         this.userHasClickedBox = false
 
@@ -43,17 +47,12 @@ export default class Scene_2 extends Scene {
             this.userClickedBox = true
             this.boxMixer.clipAction(this.boxFalling).paused = false
         })
-
-        this.namesToBeOutlines = ["plane_box_1", "plane_box_2", "box_drag_drop"]
-        this.lightPos = new THREE.Vector3(2, 5, 3)
-
-        this.rugAnimation = scene.animations[0]
-        this.boxFalling = scene.animations[1]
-
+        
         let curr = this
         this.cameraMixer.addEventListener('finished', function (e) {
             console.log("scene 2 is finised")
             curr.onSceneIsDone()
+           
             callback()
         })
 
@@ -252,6 +251,7 @@ export default class Scene_2 extends Scene {
             this.boxMixer.update(this.time.delta * 0.001)
         }
         if (this.particles.particlesHasBeenInit) this.particles.update()
+        if(this.shouldPlayTransition)  this.transition.play()
 
 
     }
