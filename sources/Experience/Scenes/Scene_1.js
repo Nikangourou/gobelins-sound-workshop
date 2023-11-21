@@ -275,8 +275,6 @@ export default class Scene_1 extends Scene {
         this.raycaster.setFromCamera(this.mouse, this.camera)
         const modelIntersects = this.raycaster.intersectObjects([this.lampe, this.radio, this.tiroir])
 
-        console.log(this.lampLight.visible)
-
         if (modelIntersects.length) {
             if (modelIntersects[0].object.name === 'desk_lamp') {
 
