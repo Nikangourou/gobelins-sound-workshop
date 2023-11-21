@@ -42,8 +42,8 @@ export default class Scene_1 extends Scene {
         let curr = this
         this.gui = new GUI()
         this.renderer = renderer
-        this.raycaster = new THREE.Raycaster()
-        this.mouse = new THREE.Vector2()
+        this.raycaster = this.cameraControls.raycaster
+        this.mouse = this.cameraControls.mouse
         this.audioListenner = new THREE.AudioListener();
         this.audioListenner.context.resume()
         this.radioSound = new THREE.PositionalAudio(this.audioListenner);
@@ -55,12 +55,16 @@ export default class Scene_1 extends Scene {
 
         })
 
+        this.shouldPlayTransition = false
+        this.delayAnimationTransition = 1000
+
         this.namesToBeOutlines = ["desk", "bag", "radio", "commode", "tabletop_high", 'library', "lamp", "box", "old_chair", "Flame", "Chair"]
 
 
         this.lightPos = new THREE.Vector3(2, 5, 3)
         this.userStarted = false;
         this.startBtn = document.querySelector('button')
+        
         this.startBtn.addEventListener('click', e => {
             this.userStarted = true;
             this.doorMixer.clipAction(this.doorMovement).paused = false;
@@ -69,15 +73,6 @@ export default class Scene_1 extends Scene {
         })
 
         this.cameraEnterMovementIsDone = false
-
-        window.addEventListener('click', (e) => {
-            this.click(e)
-        })
-
-        window.addEventListener('mousemove', (e) => {
-            this.mouse.x = (e.clientX / window.innerWidth) * 2 - 1
-            this.mouse.y = - (e.clientY / window.innerHeight) * 2 + 1
-        })
 
         // Action
         this.actionLampe = this.lampeMixer.clipAction(this.lampeMouvement);
@@ -93,8 +88,8 @@ export default class Scene_1 extends Scene {
         this.mainScene.add(this.scene)
         this.startBtn.style.display = "block"
         this.cameraControls.setDefaultCamera(this.camera)
-        const helper = new THREE.CameraHelper(this.camera);
-        this.scene.add(helper)
+        // const helper = new THREE.CameraHelper( this.camera );
+        // this.scene.add(helper)
         this.isActive = true
         const light = new THREE.PointLight(0xff0000, 10, 100);
         light.position.set(10, 0.76, 2.6);
@@ -117,6 +112,8 @@ export default class Scene_1 extends Scene {
         light2Folder.add(light2.position, 'x').min(-10).max(10).name('light x')
         light2Folder.add(light2.position, 'y').min(-10).max(10).name('light y')
         light2Folder.add(light2.position, 'z').min(-10).max(10).name('light z')
+
+        document.querySelector('.experience').addEventListener('click', (e) => {this.click(e)})
    
         let toBeAdded = []
         this.scene.traverse(e => {
@@ -258,6 +255,8 @@ export default class Scene_1 extends Scene {
                     this.tiroir.remove(this.timbre2)
                     this.hasBeenCompleted = true
                     this.cameraMixer.clipAction(this.cameraMouvement).isPaused = false;
+                    this.transition.init()
+                    setTimeout(() => {this.shouldPlayTransition = true}, this.delayAnimationTransition);
                 }
                 else {
                     this.card.material.color.set(0x00ff00)
@@ -304,6 +303,8 @@ export default class Scene_1 extends Scene {
     onSceneIsDone() {
         this.isActive = false
         this.hasBeenCompleted = true
+        document.querySelector('.experience').removeEventListener('click', (e) => {this.click(e)})
+
 
         // remove scene from main scene
         let toBeRemoved = null
@@ -337,5 +338,7 @@ export default class Scene_1 extends Scene {
                 this.tiroirMixer.update(this.time.delta * 0.001)
             }
         }
+
+        if(this.shouldPlayTransition)  this.transition.play()
     }
 }

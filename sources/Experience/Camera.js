@@ -12,11 +12,15 @@ export default class Camera {
         this.sizes = this.experience.sizes
         this.targetElement = this.experience.targetElement
         this.scene = this.experience.scene
+        
         this.mouse = new THREE.Vector2(0, 0)
-        this.easeMouse = new THREE.Vector2(0, 0)
+        this.mouseEaseRation = 0.008
         this.mouseRotationH = 0.02
         this.mouseRotationV = 0.02
-        this.mouseEaseRation = 0.08
+        this.easedMouse = new THREE.Vector2(0, 0)
+        this.mouseEaseRatio = 0.08
+        this.raycaster = new THREE.Raycaster()
+        
         
         // Set up
         this.mode = 'default' // defaultCamera \ debugCamera
@@ -28,12 +32,12 @@ export default class Camera {
 
         this.setModes()
 
-        // Listeners
-        window.addEventListener('mousemove', (event) => {
-            this.mouse.x = (event.clientX / window.innerWidth) * 2 - 1
-            this.mouse.y = -(event.clientY / window.innerHeight) * 2 + 1
+        window.addEventListener('mousemove', (e) => {
+            this.mouse.x = (e.clientX / window.innerWidth) * 2 - 1
+            this.mouse.y = - (e.clientY / window.innerHeight) * 2 + 1
         })
     }
+
 
     setDefaultCamera( camera ) {
         this.defaultCamera = camera
@@ -99,6 +103,9 @@ export default class Camera {
     update() {
         // Update debug orbit controls
         this.modes.debug.orbitControls.update()
+        // this.defaultCamera.position.x += ( this.mouse.x - this.defaultCamera.position.x ) * .005;
+       // this.defaultCamera.position.z += ( - this.mouse.y - this.defaultCamera.position.z ) * .005;
+        // this.defaultCamera.lookAt( new THREE.Vector3(0, -5, 0) );
 
         // Apply coordinates
 
@@ -107,7 +114,7 @@ export default class Camera {
         // this.instance.updateMatrixWorld() // To be used in projection
 
         // Mise à jour de la position de la caméra
-        this.easeMouse = this.lerp(this.mouse, this.mouseEaseRation)
+        //this.easeMouse = this.lerp(this.mouse, this.mouseEaseRation)
 
         // this.defaultCamera.rotateY(this.easeMouse.x * -this.mouseRotationH)
         // this.defaultCamera.rotateX(this.easeMouse.y * this.mouseRotationV)
