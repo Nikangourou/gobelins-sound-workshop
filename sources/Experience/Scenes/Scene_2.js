@@ -3,6 +3,7 @@ import Scene from './Scene'
 import CustomMat from './CustomMat'
 import GUI from 'lil-gui'
 import Particles from './../Particles.js'
+import { PositionalAudioHelper } from 'three/examples/jsm/helpers/PositionalAudioHelper.js'
 
 export default class Scene_2 extends Scene {
     constructor(scene, renderer, cameraControls, mainScene, callback, pointTex) {
@@ -95,6 +96,29 @@ export default class Scene_2 extends Scene {
 
         document.querySelector('.experience').addEventListener('click', (e) => {this.click(e)})
 
+    }
+
+    setSounds() {
+        // audioLoader.load( 'assets/birds.wav', function( buffer ) {
+        //     birdSound.setBuffer( buffer );
+        //     birdSound.setRefDistance( 10 );
+        //     birdSound.play();
+        // }); 
+        // this.audioListenner.context.resume()
+        // this.audioListenner = new THREE.AudioListener();
+        // const birdSound = new THREE.PositionalAudio( this.audioListenner );
+        // const birdSound = new THREE.PositionalAudio( this.audioListenner );
+        //     const trainSound = new THREE.PositionalAudio( this.audioListenner );
+            
+        //     const helperBirds = new PositionalAudioHelper( birdSound )
+        //     const helperTrain = new PositionalAudioHelper( trainSound )
+            
+        //     const audioLoader = new THREE.AudioLoader();
+        //     birdSound.add( helperBirds );
+        //     trainSound.add( helperTrain );
+        //     this.treesMesh.add(birdSound)
+        //     this.trainMesh.add(trainSound)
+        
     }
 
     setupGui() {
