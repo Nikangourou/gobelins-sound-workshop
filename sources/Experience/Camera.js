@@ -12,10 +12,11 @@ export default class Camera {
         this.sizes = this.experience.sizes
         this.targetElement = this.experience.targetElement
         this.scene = this.experience.scene
+        
         this.mouse = new THREE.Vector2(0, 0)
-        this.mouseRotationH = 0.05
-        this.mouseRotationV = 0.05
         this.mouseEaseRation = 0.008
+        this.mouseRotationH = 0.02
+        this.mouseRotationV = 0.02
         this.easedMouse = new THREE.Vector2(0, 0)
         this.mouseEaseRatio = 0.08
         this.raycaster = new THREE.Raycaster()

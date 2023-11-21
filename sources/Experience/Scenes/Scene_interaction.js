@@ -49,7 +49,9 @@ export default class Scene_interaction extends Scene {
         this.knot = new THREE.Mesh(knotGeo, knotMat)
         this.knot.position.x = - 2
 
-        this.scene.add(this.cube, this.sphere, this.knot)
+    
+        // this.scene.add(this.cube, this.sphere, this.knot)
+
         this.dragSetup()
 
 
