@@ -26,7 +26,6 @@ export default class Scene_2 extends Scene {
         } )
         this.dotTex = pointTex
         this.particles = new Particles("#ef4444", this.scene)
-        // this.intersects = this.cameraControls.raycaster.intersectObject(this.scene, true);
         this.cardColors = ["#ef4444", "#f97316", "#eab308", "#0d9488", "#2563eb", "#d946ef"]
         
         // State / UI
@@ -57,7 +56,7 @@ export default class Scene_2 extends Scene {
             curr.onSceneIsDone()
             callback()
         } )
-        console.log(this.renderer)
+
         document.querySelector('.experience').addEventListener('click', (e) => {
          console.log(e.target)
             if(!this.particles.particlesHasBeenInit) {
