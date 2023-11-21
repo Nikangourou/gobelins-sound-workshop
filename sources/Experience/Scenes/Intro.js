@@ -104,6 +104,13 @@ export default class Intro extends Scene {
                 if(e.name === 'card') {
                     e.material = new THREE.MeshBasicMaterial({color: 0x00ff00})
                 }
+                if(e.name === 'timbre1') {
+                    e.material = new THREE.MeshBasicMaterial({color: 0xff00ff})
+                }
+                if(e.name === 'timbre2') {
+                    e.material = new THREE.MeshBasicMaterial({color: 0x00ffff})
+                }
+
             }
         })
 
@@ -154,12 +161,23 @@ export default class Intro extends Scene {
     }
 
     dragSetup() {
-        this.controls = new DragControls([this.card, this.timbre], this.camera, this.mainRenderer.instance.domElement);
+        this.controls = new DragControls([this.card, this.timbre2], this.camera, this.mainRenderer.instance.domElement);
         this.controls.addEventListener( 'dragstart',  () => { 
             this.cameraControls.modes.debug.orbitControls.enabled = false
         });
         this.controls.addEventListener( 'dragend',  () => { 
             this.cameraControls.modes.debug.orbitControls.enabled = true
+
+            if (this.card && this.timbre2) {
+                const distance = this.card.position.distanceTo(this.timbre2.position)
+                if (distance < .15) {
+                    this.card.material.color.set(0xff0000)
+                    this.tiroir.remove(this.timbre2)
+                }
+                else {
+                   this.card.material.color.set(0x00ff00)
+                }
+            }
         });
     }
 
@@ -233,16 +251,6 @@ export default class Intro extends Scene {
             }
             if (this.tiroirMixer && this.userStarted) {
                 this.tiroirMixer.update(this.time.delta * 0.001)
-            }
-
-            if (this.card && this.timbre) {
-                const distance = this.card.position.distanceTo(this.timbre.position)
-                if (distance < .2) {
-                    this.card.material.color.set(0xff0000)
-                }
-                else {
-                   this.card.material.color.set(0x00ff00)
-                }
             }
         }
     }
