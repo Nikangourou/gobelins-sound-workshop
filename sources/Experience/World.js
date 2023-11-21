@@ -4,6 +4,7 @@ import Time from './Utils/Time.js'
 import Scene_1 from './Scenes/Scene_1.js'
 import Scene_2 from './Scenes/Scene_2.js'
 import Scene_3 from './Scenes/Scene_3.js'
+import Scene_4 from './Scenes/Scene_4.js'
 import ShaderTestScene from './Scenes/ShaderTestScene.js'
 
 export default class World
@@ -75,16 +76,12 @@ export default class World
     {
         const scene_1 = new Scene_1(this.resources.items.scene_1, this.renderer, this.cameraControls, this.scene,() => this.onActiveSceneIsDone(this))
         const scene_2 = new Scene_2(this.resources.items.scene_2, this.renderer, this.cameraControls, this.scene,() => this.onActiveSceneIsDone(this), this.resources.items.dotTex)
-        const scene_3 = new Scene_3(this.resources.items.scene_3, this.renderer, this.cameraControls, this.scene,() => this.onActiveSceneIsDone(this))
-        this.scenes = [scene_1, scene_2, scene_3]
+        const scene_3 = new Scene_3(this.resources.items.scene_3, this.renderer, this.cameraControls, this.scene, () => this.onActiveSceneIsDone(this))
+        const scene_4 = new Scene_4(this.resources.items.scene_4, this.renderer, this.cameraControls, this.scene,() => this.onActiveSceneIsDone(this))
+        this.scenes = [scene_1, scene_2, scene_3, scene_4]
 
         this.activeSceneIndex = this.getSceneIdFromUrl()
         this.scenes[this.activeSceneIndex].init()
-
-        // test shader scene 1
-        // this.scene1 = new Scene_1(this.resources.items.noiseTex, this.renderer)
-        // this.scene.add(this.scene1.scene)
-        // this.scene1.init()
 
         // test shader scene 1
         // this.shaderTestScene = new ShaderTestScene(this.renderer, this.resources.items)

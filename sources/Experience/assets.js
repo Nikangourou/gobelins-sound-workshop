@@ -10,6 +10,7 @@ export default [
             { name: 'scene_1', source: '/assets/SceneTT.glb'},
             { name: 'scene_2', source: '/assets/scene_2.glb'},
             { name: 'scene_3', source: '/assets/scene_3.glb'},
+            { name: 'scene_4', source: '/assets/scene_4.glb'},
             { name : 'dotTex', source: '/assets/dot.png', type: 'texture'},
         ]
     }

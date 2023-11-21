@@ -1,7 +1,6 @@
 import * as THREE from 'three'
 import Scene from './Scene'
 import CustomMat from './CustomMat'
-import GUI from 'lil-gui'
 import { PositionalAudioHelper } from 'three/examples/jsm/helpers/PositionalAudioHelper.js'
 import { DragControls } from 'three/examples/jsm/controls/DragControls.js'
 
@@ -38,8 +37,8 @@ export default class Scene_1 extends Scene {
         this.tiroirMouvement = scene.animations[2]
 
         let curr = this
-        this.gui = new GUI()
         this.renderer = renderer
+        this.gui = this.renderer.debug
         this.raycaster = this.cameraControls.raycaster
         this.mouse = this.cameraControls.mouse
         this.audioListenner = new THREE.AudioListener();
@@ -147,7 +146,8 @@ export default class Scene_1 extends Scene {
     }
 
     setupGui() {
-        const matFolder = this.gui.addFolder("toon settings")
+        const sceneFolder = this.gui.addFolder("scene 1")
+        const matFolder = sceneFolder.addFolder("toon settings")
         const lightFolder = matFolder.addFolder('light')
         const light1 = lightFolder.addFolder("light1")
         light1.add(this.light.position, 'x').min(-10).max(10).name('light x')

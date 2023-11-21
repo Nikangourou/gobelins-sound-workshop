@@ -17,17 +17,20 @@ export default class Renderer
         this.sizes = this.experience.sizes
         this.scene = this.experience.scene
         this.camera = this.experience.camera
+        this.useDebugCamera = false
+       
 
         // Debug
-        if(this.debug)
-        {
-            this.debugFolder = this.debug.addFolder('renderer')
-        }
+        this.debugFolder = this.debug.addFolder('renderer')
+   
         
         this.usePostprocess = false
 
         this.setInstance()
         this.setPostProcess()
+
+       
+        this.debugFolder.add(this, 'useDebugCamera').name('use debugCamera')
     }
 
     setInstance()
@@ -66,8 +69,7 @@ export default class Renderer
         }
         
         // Debug
-        if(this.debug)
-        {
+       
             this.debugFolder
                 .addColor(
                     this,
@@ -106,7 +108,7 @@ export default class Renderer
                 )
                 .min(0)
                 .max(10)
-        }
+   
     }
 
     setPostProcess()
@@ -116,7 +118,7 @@ export default class Renderer
         /**
          * Render pass
          */
-        this.postProcess.renderPass = new RenderPass(this.scene, this.camera.instance)
+        this.postProcess.renderPass = new RenderPass(this.scene, this.useDebugCamera ? this.camera.debugCamera : this.camera.defaultCamera)
 
         /**
          * Effect composer
@@ -204,6 +206,7 @@ export default class Renderer
 
     update()
     {
+
         if(this.stats)
         {
             this.stats.beforeRender()
@@ -215,8 +218,7 @@ export default class Renderer
         }
         else
         {
-           
-            this.instance.render(this.scene, this.config.debug ? this.camera.debugCamera : this.camera.defaultCamera )
+            this.instance.render(this.scene, this.useDebugCamera ? this.camera.debugCamera : this.camera.defaultCamera )
         }
 
         if(this.stats)
@@ -225,8 +227,6 @@ export default class Renderer
         }
 
         this.postProcess.composer.passes[1].uniforms['uTime'].value = this.time.elapsed * 0.0005
-
-
     }
 
     destroy()

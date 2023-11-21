@@ -9,7 +9,7 @@ export default class Particles {
     this.mat = new THREE.MeshBasicMaterial({color: color})
     this.mat.needsUpdate = true
     this.obj = new THREE.Object3D()
-    this.particleCount = 1500;
+    this.particleCount = 100;
     this.group = new THREE.Group()
     this.particlesData = []
     this.particlesHasBeenInit
@@ -21,11 +21,7 @@ export default class Particles {
     this.generateParticlesData()
     
     for(let i = 0; i < this.particleCount; i++){
-    
-
-        this.obj.position.set(this.particlesData[i].x, this.particlesData[i].y, this.particlesData[i].z)
-       
-    
+        this.obj.position.set(0, 0, 0)
         this.obj.updateMatrix()
         this.particleSystem.setMatrixAt(i, this.obj.matrix)
     }
@@ -37,11 +33,11 @@ export default class Particles {
   generateParticlesData() {
     for (let i = 0; i < this.particleCount; i++) {
         const time = getRandomFloat(0, 50);
-        const factor = getRandomFloat(5, 15);
+        const factor = getRandomFloat(1, 6);
         const speed = getRandomFloat(0.001, 0.0015) / 2;
-        const x = getRandomFloat(0, 1);
-        const y = getRandomFloat(0,0.1);
-        const z = getRandomFloat(0, 1);
+        const x = getRandomFloat(-1, 1);
+        const y = getRandomFloat(-1, 1);
+        const z = 0;
 
         this.particlesData.push({ time, factor, speed, x, y, z });
     }
@@ -65,7 +61,7 @@ export default class Particles {
         // Update the particle position based on the time
         this.obj.position.set(
           x + Math.cos((t / 30) * factor) + (Math.sin(t * 1) * factor) / 30,
-          y + Math.sin((t / 30) * factor) + (Math.cos(t * 2) * factor) / 30,
+          0,
           z + Math.cos((t / 30) * factor) + (Math.sin(t * 3) * factor) / 30
         );
     

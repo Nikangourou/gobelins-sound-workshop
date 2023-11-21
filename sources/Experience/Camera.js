@@ -23,6 +23,7 @@ export default class Camera {
         this.groupToAnimateOnMousemove = new THREE.Group()
         
         
+        
         // Set up
         this.mode = 'default' // defaultCamera \ debugCamera
 

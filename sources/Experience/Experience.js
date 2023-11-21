@@ -34,6 +34,7 @@ export default class Experience
         }
 
         this.time = new Time()
+        this.config = {}
         this.sizes = new Sizes()
         this.setConfig()
         this.setDebug()
@@ -54,10 +55,10 @@ export default class Experience
 
     setConfig()
     {
-        this.config = {}
+        
     
         // Debug
-        this.config.debug = window.location.hash === '#debug'
+       // this.config.debug = window.location.hash === '#debug'
 
         // Pixel ratio
         this.config.pixelRatio = Math.min(Math.max(window.devicePixelRatio, 1), 2)
@@ -70,10 +71,10 @@ export default class Experience
 
     setDebug()
     {
-        if(this.config.debug)
-        {
-            this.debug = new GUI()
-        }
+        this.debug = new GUI()
+        // if(this.config.debug)
+        // {
+        // }
     }
 
     setStats()

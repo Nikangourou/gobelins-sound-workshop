@@ -6,8 +6,8 @@ export default class Scene_3 extends Scene {
     constructor(scene, renderer, cameraControls, mainScene, callback) {
         super()
         this.name = "scene3"
-        this.gui = new GUI()
         this.renderer = renderer
+        this.gui = this.renderer.debug
         this.cameraControls = cameraControls
         this.mainScene = mainScene
         this.animations = scene.animations
@@ -54,6 +54,21 @@ export default class Scene_3 extends Scene {
         const helper2 = new THREE.PointLightHelper(light2, 0.1);
         this.scene.add(light2, helper2)
 
+    }
+
+    setupGui() {
+        const scene3Folder = this.gui.addFolder("scene 3")
+        // const matFolder = scene2Folder.addFolder("toon settings")
+        // const lightFolder = matFolder.addFolder('light')
+        // const light1 = lightFolder.addFolder("light1")
+        // light1.add(this.light.position, 'x').min(-10).max(10).name('light x')
+        // light1.add(this.light.position, 'y').min(-10).max(10).name('light y')
+        // light1.add(this.light.position, 'z').min(-10).max(10).name('light z')
+
+        // const light2Folder = lightFolder.addFolder("light2")
+        // light2Folder.add(this.light2.position, 'x').min(-10).max(10).name('light x')
+        // light2Folder.add(this.light2.position, 'y').min(-10).max(10).name('light y')
+        // light2Folder.add(this.light2.position, 'z').min(-10).max(10).name('light z')
     }
 
     onSceneIsDone() {

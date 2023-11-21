@@ -1,7 +1,7 @@
 import * as THREE from 'three'
 import Scene from './Scene'
 import CustomMat from './CustomMat'
-import GUI from 'lil-gui'
+
 import Particles from './../Particles.js'
 import { PositionalAudioHelper } from 'three/examples/jsm/helpers/PositionalAudioHelper.js'
 
@@ -9,8 +9,8 @@ export default class Scene_2 extends Scene {
     constructor(scene, renderer, cameraControls, mainScene, callback, pointTex) {
         super()
         this.name = "scene2"
-        this.gui = new GUI()
         this.renderer = renderer
+        this.gui = this.renderer.debug
         this.cameraControls = cameraControls
         this.mainScene = mainScene
         this.animations = scene.animations
@@ -127,7 +127,8 @@ export default class Scene_2 extends Scene {
     }
 
     setupGui() {
-        const matFolder = this.gui.addFolder("toon settings")
+        const scene2Folder = this.gui.addFolder("scene 2")
+        const matFolder = scene2Folder.addFolder("toon settings")
         const lightFolder = matFolder.addFolder('light')
         const light1 = lightFolder.addFolder("light1")
         light1.add(this.light.position, 'x').min(-10).max(10).name('light x')
