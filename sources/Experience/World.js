@@ -190,16 +190,6 @@ export default class World
         this.activeSceneIndex = this.getSceneIdFromUrl()
         this.scenes[this.activeSceneIndex].init()
 
-
-
-        // if root -> intro.init() else scenes[sceneId].init()
-
-        //intro 
-
-        // this.introScene = new Intro(this.resources.items.intro)
-        // this.introScene.init()
-        // this.scene.add(this.introScene.scene)
-
         // test shader scene 1
         // this.scene1 = new Scene_1(this.resources.items.noiseTex, this.renderer)
         // this.scene.add(this.scene1.scene)
@@ -209,8 +199,6 @@ export default class World
         // this.sceneInteraction = new Scene_interaction(this.camera, this.renderer, this.orbitControls)
         // this.scene.add(this.sceneInteraction.scene)
         // this.sceneInteraction.init()
-
-        // intro.init()
 
         // test shader scene 1
         // this.shaderTestScene = new ShaderTestScene(this.renderer, this.resources.items)

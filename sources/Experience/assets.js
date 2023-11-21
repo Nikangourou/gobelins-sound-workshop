@@ -4,7 +4,6 @@ export default [
         data: {},
         items:
         [
-            { name: 'lennaTexture', source: '/assets/lenna.png', type: 'texture' },
             { name: 'testScene', source: '/assets/test-objects.glb' },
             { name: 'trees', source: '/assets/treeGroup.glb' },
             { name: 'church', source: '/assets/church.glb' },
@@ -12,12 +11,10 @@ export default [
             { name: 'splineCamera', source: '/assets/spline.obj'},
             { name: 'noiseTex', source: '/assets/ScaleTexture.png', type: 'texture'},
             { name: 'paperTex', source: '/assets/paperTex.jpg', type: 'texture'},
-            { name: 'monkey', source: '/assets/monkey.glb'},
             { name: '5mat', source: '/assets/test5Mat.glb'},
             { name: 'scene_1', source: '/assets/SceneTT.glb'},
             { name: 'scene_2', source: '/assets/scene_2.glb'},
             { name : 'dotTex', source: '/assets/dot.png', type: 'texture'},
-            {name: 'mockup_scene_2', source: '/assets/scene_1_mockup.glb'}
         ]
     }
 ]
