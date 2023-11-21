@@ -4,7 +4,6 @@ import { PositionalAudioHelper } from 'three/examples/jsm/helpers/PositionalAudi
 import Time from './Utils/Time.js'
 import Scene_1 from './Scenes/Scene_1.js'
 import Scene_2 from './Scenes/Scene_2.js'
-import Scene_interaction from './Scenes/Scene_interaction.js'
 import ShaderTestScene from './Scenes/ShaderTestScene.js'
 
 export default class World
@@ -204,11 +203,6 @@ export default class World
         // this.scene1 = new Scene_1(this.resources.items.noiseTex, this.renderer)
         // this.scene.add(this.scene1.scene)
         // this.scene1.init()
-
-        // test interaction scene
-        // this.sceneInteraction = new Scene_interaction(this.camera, this.renderer, this.orbitControls)
-        // this.scene.add(this.sceneInteraction.scene)
-        // this.sceneInteraction.init()
 
         // intro.init()
 

@@ -10,7 +10,6 @@ export default class Scene_2 extends Scene {
         this.name = "scene2"
         this.gui = new GUI()
         this.renderer = renderer
-        this.onclick = cameraControls.onclick
         this.cameraControls = cameraControls
         this.mainScene = mainScene
         this.animations = scene.animations
@@ -250,17 +249,6 @@ export default class Scene_2 extends Scene {
         }
         if(this.particles.particlesHasBeenInit) this.particles.update()
 
-        // if (this.intersects.length > 0) {
-	
-        //     var object = this.intersects[0].object;
-        //     console.log(object)
-    
-        //     object.material.color.set( Math.random() * 0xffffff );
-    
-        // }
-
-        
-        // this.updateParticles();
 
     }
 }

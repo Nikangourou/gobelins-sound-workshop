@@ -32,19 +32,10 @@ export default class Camera {
 
         this.setModes()
 
-        // Listeners
-        // window.addEventListener('mousemove', (event) => {
-        //     this.mouse.x = (event.clientX - window.innerWidth/2) /100
-        //     this.mouse.y = (event.clientY - window.innerHeight/2) /100
-
-        //    // this.easedMouse.lerp(this.mouse, this.mouseEaseRatio )
-        //     // this.defaultCamera.rotateY(this.easedMouse.x * - 0.002)
-        //     // this.defaultCamera.rotateX(this.easedMouse.y * - 0.002)
-        //     // this.defaultCamera.rotateY(this.mouse.x * - 0.002)
-        //     // this.defaultCamera.rotateX(this.mouse.y * - 0.002)
-        
-            
-        // })
+        window.addEventListener('mousemove', (e) => {
+            this.mouse.x = (e.clientX / window.innerWidth) * 2 - 1
+            this.mouse.y = - (e.clientY / window.innerHeight) * 2 + 1
+        })
     }
 
 

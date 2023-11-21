@@ -5,7 +5,6 @@ import GUI from 'lil-gui'
 import { PositionalAudioHelper } from 'three/examples/jsm/helpers/PositionalAudioHelper.js'
 import { DragControls } from 'three/examples/jsm/controls/DragControls.js'
 
-
 export default class Scene_1 extends Scene {
     constructor(scene, renderer, cameraControls, mainScene, callback) {
         super()
@@ -43,8 +42,8 @@ export default class Scene_1 extends Scene {
         let curr = this
         this.gui = new GUI()
         this.renderer = renderer
-        this.raycaster = new THREE.Raycaster()
-        this.mouse = new THREE.Vector2()
+        this.raycaster = this.cameraControls.raycaster
+        this.mouse = this.cameraControls.mouse
         this.audioListenner = new THREE.AudioListener();
         this.audioListenner.context.resume()
         this.radioSound = new THREE.PositionalAudio(this.audioListenner);
@@ -66,6 +65,7 @@ export default class Scene_1 extends Scene {
         this.lightPos = new THREE.Vector3(2, 5, 3)
         this.userStarted = false;
         this.startBtn = document.querySelector('button')
+        
         this.startBtn.addEventListener('click', e => {
             this.userStarted = true;
             this.doorMixer.clipAction(this.doorMovement).paused = false;
@@ -80,19 +80,10 @@ export default class Scene_1 extends Scene {
             this.transition.init()
             setTimeout(() => {this.shouldPlayTransition = true}, this.delayAnimationTransition);
             
-           
         })
 
         this.cameraEnterMovementIsDone = false
 
-        // window.addEventListener('click', (e) => {
-        //     this.click(e)
-        // })
-
-        window.addEventListener('mousemove', (e) => {
-            this.mouse.x = (e.clientX / window.innerWidth) * 2 - 1
-            this.mouse.y = - (e.clientY / window.innerHeight) * 2 + 1
-        })
 
         // Action
         this.actionLampe = this.lampeMixer.clipAction(this.lampeMouvement);
@@ -132,6 +123,8 @@ export default class Scene_1 extends Scene {
         light2Folder.add(light2.position, 'x').min(-10).max(10).name('light x')
         light2Folder.add(light2.position, 'y').min(-10).max(10).name('light y')
         light2Folder.add(light2.position, 'z').min(-10).max(10).name('light z')
+
+        document.querySelector('.experience').addEventListener('click', (e) => {this.click(e)})
    
         let toBeAdded = []
         this.scene.traverse(e => {
@@ -319,6 +312,8 @@ export default class Scene_1 extends Scene {
     onSceneIsDone() {
         this.isActive = false
         this.hasBeenCompleted = true
+        document.querySelector('.experience').removeEventListener('click', (e) => {this.click(e)})
+
 
         // remove scene from main scene
         let toBeRemoved = null
