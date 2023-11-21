@@ -1,6 +1,7 @@
 import * as THREE from 'three'
 import Scene from './Scene'
 import { PositionalAudioHelper } from 'three/examples/jsm/helpers/PositionalAudioHelper.js'
+import { DragControls } from 'three/examples/jsm/controls/DragControls.js'
 
 
 export default class Intro extends Scene {
@@ -18,7 +19,12 @@ export default class Intro extends Scene {
         this.lamp_switch = this.scene.getObjectByName('desk_lamp_switch')
         this.lampLight = new THREE.PointLight(0xffffff, 2, 100)
         this.tiroir = this.scene.getObjectByName('tiroir_desk')
+        this.card = this.scene.getObjectByName('card')
+        this.timbre = this.scene.getObjectByName('timbre1')
+        this.timbre2 = this.scene.getObjectByName('timbre2')
         this.camera = scene.cameras[0]
+
+        this.tiroir.add(this.timbre, this.timbre2)
 
         // Mixer 
         this.lampeMixer = new THREE.AnimationMixer(this.lamp_switch)
@@ -78,7 +84,6 @@ export default class Intro extends Scene {
         // Toggling the openining of the drawer
         this.actionTiroir = this.tiroirMixer.clipAction(this.tiroirMouvement);
         this.actionTiroir.loop = THREE.LoopOnce
-        this.actionTiroir.clampWhenFinished = true
         this.tiroirOpen = false
     }
 
@@ -95,6 +100,9 @@ export default class Intro extends Scene {
                 e.material = new THREE.MeshNormalMaterial()
                 if (e.name === 'door') {
                     this.doorMixer = new THREE.AnimationMixer(e)
+                }
+                if(e.name === 'card') {
+                    e.material = new THREE.MeshBasicMaterial({color: 0x00ff00})
                 }
             }
         })
@@ -141,6 +149,18 @@ export default class Intro extends Scene {
         this.cubeRadio.visible = false
 
         this.scene.add(this.cubeRadio)
+
+        this.dragSetup()
+    }
+
+    dragSetup() {
+        this.controls = new DragControls([this.card, this.timbre], this.camera, this.mainRenderer.instance.domElement);
+        this.controls.addEventListener( 'dragstart',  () => { 
+            this.cameraControls.modes.debug.orbitControls.enabled = false
+        });
+        this.controls.addEventListener( 'dragend',  () => { 
+            this.cameraControls.modes.debug.orbitControls.enabled = true
+        });
     }
 
     click() {
@@ -160,18 +180,19 @@ export default class Intro extends Scene {
             }
             if (modelIntersects[0].object.name === 'tiroir_desk') {
 
-                
-          
                 if (this.tiroirOpen) {
-                    this.actionTiroir.timeScale = -1
-                    this.tiroirOpen = false
-                    console.log("tiroir open")
-                }else {
-                    this.actionTiroir.timeScale = 1
-                    this.tiroirOpen = true
+                    this.actionTiroir.paused = false;
+                    this.actionTiroir.timeScale = -1; // Reverse the animation
+                    this.actionTiroir.play();
+                    this.tiroirOpen = false;
+                } else {
+                    this.actionTiroir.reset()
+                    this.actionTiroir.timeScale = 1; // Play the animation as is
+                    this.actionTiroir.clampWhenFinished = true
+                    this.actionTiroir.play();
+                    this.tiroirOpen = true;
                 }
 
-                this.actionTiroir.stop()
                 this.actionTiroir.play()
             }
         }
@@ -212,6 +233,16 @@ export default class Intro extends Scene {
             }
             if (this.tiroirMixer && this.userStarted) {
                 this.tiroirMixer.update(this.time.delta * 0.001)
+            }
+
+            if (this.card && this.timbre) {
+                const distance = this.card.position.distanceTo(this.timbre.position)
+                if (distance < .2) {
+                    this.card.material.color.set(0xff0000)
+                }
+                else {
+                   this.card.material.color.set(0x00ff00)
+                }
             }
         }
     }
