@@ -20,6 +20,8 @@ export default class Camera {
         this.easedMouse = new THREE.Vector2(0, 0)
         this.mouseEaseRatio = 0.08
         this.raycaster = new THREE.Raycaster()
+        this.groupToAnimateOnMousemove = new THREE.Group()
+
         
         
         // Set up
@@ -30,11 +32,14 @@ export default class Camera {
         // this.instance = new THREE.PerspectiveCamera(25, this.config.width / this.config.height, 0.1, 150)
         // this.instance.rotation.reorder('YXZ')
 
+        this.groupToAnimateOnMousemove.add(this.defaultCamera)
+
         this.setModes()
 
         window.addEventListener('mousemove', (e) => {
             this.mouse.x = (e.clientX / window.innerWidth) * 2 - 1
             this.mouse.y = - (e.clientY / window.innerHeight) * 2 + 1
+            console.log(this.mouse)
         })
     }
 
@@ -106,22 +111,11 @@ export default class Camera {
     update() {
         // Update debug orbit controls
         this.modes.debug.orbitControls.update()
-        // this.defaultCamera.position.x += ( this.mouse.x - this.defaultCamera.position.x ) * .005;
-       // this.defaultCamera.position.z += ( - this.mouse.y - this.defaultCamera.position.z ) * .005;
-        // this.defaultCamera.lookAt( new THREE.Vector3(0, -5, 0) );
 
-        // Apply coordinates
-
-        // this.instance.position.copy(this.modes[this.mode].instance.position)
-        // this.instance.quaternion.copy(this.modes[this.mode].instance.quaternion)
-        // this.instance.updateMatrixWorld() // To be used in projection
-
-        // Mise à jour de la position de la caméra
-        //this.easeMouse = this.lerp(this.mouse, this.mouseEaseRation)
-
-        // this.defaultCamera.rotateY(this.easeMouse.x * -this.mouseRotationH)
-        // this.defaultCamera.rotateX(this.easeMouse.y * this.mouseRotationV)
-        
+        //this.defaultCamera.position.z += ( this.mouse.x - this.groupToAnimateOnMousemove.position.x ) * 0.005;
+        this.groupToAnimateOnMousemove.position.x += ( - this.mouse.x - this.groupToAnimateOnMousemove.position.x ) * 0.05;
+        console.log(this.groupToAnimateOnMousemove.position)
+		this.groupToAnimateOnMousemove.position.y += ( - this.mouse.y - this.groupToAnimateOnMousemove.position.y ) * 0.05;
     }
 
     destroy() {

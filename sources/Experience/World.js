@@ -189,22 +189,8 @@ export default class World
         this.activeSceneIndex = this.getSceneIdFromUrl()
         this.scenes[this.activeSceneIndex].init()
 
+        this.scene.add(this.cameraControls.groupToAnimateOnMousemove)
 
-
-        // if root -> intro.init() else scenes[sceneId].init()
-
-        //intro 
-
-        // this.introScene = new Intro(this.resources.items.intro)
-        // this.introScene.init()
-        // this.scene.add(this.introScene.scene)
-
-        // test shader scene 1
-        // this.scene1 = new Scene_1(this.resources.items.noiseTex, this.renderer)
-        // this.scene.add(this.scene1.scene)
-        // this.scene1.init()
-
-        // intro.init()
 
         // test shader scene 1
         // this.shaderTestScene = new ShaderTestScene(this.renderer, this.resources.items)
@@ -223,9 +209,10 @@ export default class World
     update()
     {
 
-
-        if(this.scenes && this.activeSceneIndex !==0 ) this.scenes[this.activeSceneIndex-1].update()
-        if(this.scenes) this.scenes[this.activeSceneIndex].update() // contineu update until trnasition is done
+        //continue update until prev scene transition is done
+        if(this.scenes && this.activeSceneIndex !==0 &&  this.scenes[this.activeSceneIndex-1].shouldPlayTransition ) this.scenes[this.activeSceneIndex-1].update()
+        
+        if(this.scenes) this.scenes[this.activeSceneIndex].update() //update main scene
 
     }
 
