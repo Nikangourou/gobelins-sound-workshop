@@ -20,6 +20,7 @@ export default class Camera {
         this.easedMouse = new THREE.Vector2(0, 0)
         this.mouseEaseRatio = 0.08
         this.raycaster = new THREE.Raycaster()
+        this.groupToAnimateOnMousemove = new THREE.Group()
         
         
         // Set up
@@ -27,6 +28,7 @@ export default class Camera {
 
         this.debugCamera = new THREE.PerspectiveCamera(25, this.config.width / this.config.height, 0.1, 150)
         this.defaultCamera = new THREE.PerspectiveCamera(25, this.config.width / this.config.height, 0.1, 150)
+        this.groupToAnimateOnMousemove.add(this.defaultCamera)
         // this.instance = new THREE.PerspectiveCamera(25, this.config.width / this.config.height, 0.1, 150)
         // this.instance.rotation.reorder('YXZ')
 
