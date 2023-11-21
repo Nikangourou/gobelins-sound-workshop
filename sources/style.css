@@ -51,6 +51,10 @@ ul {
     /* transform: translateX(-100%); */
 }
 
+/* #sceneList{
+    display: none;
+} */
+
 #sceneList>li {
     padding: 64px 0;
 }
@@ -86,6 +90,8 @@ button:hover {
     position: fixed;
     z-index: 100;
     /* background-color: red; */
+    pointer-events: none;
+
 }
 
 #transition>img {
