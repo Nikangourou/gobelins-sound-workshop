@@ -3,6 +3,7 @@ import Scene from './Scene'
 import CustomMat from './CustomMat'
 import { PositionalAudioHelper } from 'three/examples/jsm/helpers/PositionalAudioHelper.js'
 import { DragControls } from 'three/examples/jsm/controls/DragControls.js'
+import Pin from '../Pin'
 
 export default class Scene_1 extends Scene {
     constructor(scene, renderer, cameraControls, mainScene, callback) {
@@ -142,6 +143,13 @@ export default class Scene_1 extends Scene {
         this.cubeRadio.visible = false
 
         this.scene.add(this.cubeRadio)
+
+          // Pin
+          this.pinTiroir = new Pin(this.tiroir.position, true)
+          this.pinTiroir.init()
+          
+          this.scene.add(this.pinTiroir.pin)
+
         this.dragSetup()
     }
 
