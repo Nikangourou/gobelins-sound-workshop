@@ -14,8 +14,8 @@ export default class Camera {
         this.scene = this.experience.scene
         this.mouse = new THREE.Vector2(0, 0)
         this.easeMouse = new THREE.Vector2(0, 0)
-        this.mouseRotationH = 0.05
-        this.mouseRotationV = 0.05
+        this.mouseRotationH = 0.02
+        this.mouseRotationV = 0.02
         this.mouseEaseRation = 0.08
         
         // Set up
