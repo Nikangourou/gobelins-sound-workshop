@@ -1,11 +1,13 @@
 import Time from "../Utils/Time";
 import * as THREE from 'three'
 import CustomMat from './CustomMat'
+import Transition from './../Transition'
 
 export default class Scene {
     constructor(scene) {
         this.isActive = false;
         this.hasBeenCompleted = false;
+        this.transition = new Transition()
         this.time = new Time()
         this.outlineMat = new THREE.ShaderMaterial({
             uniforms: {

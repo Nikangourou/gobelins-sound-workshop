@@ -79,3 +79,16 @@ button {
 button:hover {
     cursor: pointer
 }
+
+#transition {
+    height: 100vh;
+    width: 100vw;
+    position: fixed;
+    z-index: 100;
+    /* background-color: red; */
+}
+
+#transition>img {
+    width: 100%;
+    height: 100%;
+}

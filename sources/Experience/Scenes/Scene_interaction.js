@@ -27,9 +27,9 @@ export default class Scene_interaction extends Scene {
             this.mouse.y = - (e.clientY / window.innerHeight) * 2 + 1
         })
 
-        window.addEventListener('click', (e) => {
-            this.click(e)
-        })
+        // window.addEventListener('click', (e) => {
+        //     this.click(e)
+        // })
     }
 
     init() {

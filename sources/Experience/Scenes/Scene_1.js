@@ -3,6 +3,7 @@ import Scene from './Scene'
 import CustomMat from './CustomMat'
 import GUI from 'lil-gui'
 
+
 export default class Scene_1 extends Scene {
     constructor(scene, renderer, cameraControls, mainScene, callback) {
         super()
@@ -20,6 +21,7 @@ export default class Scene_1 extends Scene {
         this.gui = new GUI()
         this.renderer = renderer
         this.nextBtn = document.getElementById('next')
+
         this.cameraMixer.addEventListener( 'finished', function( e ) {
             console.log("finised")
             // transition UI in 
@@ -27,6 +29,9 @@ export default class Scene_1 extends Scene {
             callback()
             
         } )
+
+        this.shouldPlayTransition = false
+        this.delayAnimationTransition = 1000
 
         this.namesToBeOutlines = ["desk", "bag", "radio", "commode", "tabletop_high", 'library', "lamp", "box", "old_chair", "Flame", "Chair"]
         
@@ -45,6 +50,10 @@ export default class Scene_1 extends Scene {
             this.nextBtn.style.display = 'none'
             this.hasBeenCompleted = true
             this.cameraMixer.clipAction(this.cameraMouvement).isPaused = false;
+            this.transition.init()
+            setTimeout(() => {this.shouldPlayTransition = true}, this.delayAnimationTransition);
+            
+           
         })
 
         this.cameraEnterMovementIsDone = false
@@ -196,5 +205,7 @@ export default class Scene_1 extends Scene {
                 // if(this.doorMixer.clipAction(this.doorMovement).time > 
             }
         }
+
+        if(this.shouldPlayTransition)  this.transition.play()
     }
 }

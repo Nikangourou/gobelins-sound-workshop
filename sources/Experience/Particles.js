@@ -5,13 +5,14 @@ const getRandomFloat = (min, max) => (Math.random() * (max - min) + min);
 export default class Particles {
   constructor (color, scene) {
     this.scene = scene
-    this.geo = new THREE.SphereGeometry(0.02, 8)
+    this.geo = new THREE.SphereGeometry(0.01, 8)
     this.mat = new THREE.MeshBasicMaterial({color: color})
     this.mat.needsUpdate = true
     this.obj = new THREE.Object3D()
-    this.particleCount = 700;
+    this.particleCount = 1500;
     this.group = new THREE.Group()
     this.particlesData = []
+    this.particlesHasBeenInit
     
   }
 
@@ -36,7 +37,7 @@ export default class Particles {
   generateParticlesData() {
     for (let i = 0; i < this.particleCount; i++) {
         const time = getRandomFloat(0, 50);
-        const factor = getRandomFloat(1, 20);
+        const factor = getRandomFloat(5, 15);
         const speed = getRandomFloat(0.001, 0.0015) / 2;
         const x = getRandomFloat(0, 1);
         const y = getRandomFloat(0,0.1);
@@ -48,6 +49,10 @@ export default class Particles {
 
   updateMatColor(color) {
     this.mat.color.set(color)
+  }
+
+  updatePosition(pos) {
+    this.group.position.copy(pos)
   }
 
   update() {

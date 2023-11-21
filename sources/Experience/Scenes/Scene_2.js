@@ -58,17 +58,27 @@ export default class Scene_2 extends Scene {
             curr.onSceneIsDone()
             callback()
         } )
+        console.log(this.renderer)
+        document.querySelector('.experience').addEventListener('click', (e) => {
+         console.log(e.target)
+            if(!this.particles.particlesHasBeenInit) {
+                this.scene.add(this.particles.group)
+                this.particles.init()
+                this.particles.particlesHasBeenInit = true
+            }
 
-        window.addEventListener('click', (e) => {
             this.cameraControls.mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
             this.cameraControls.mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-            console.log(this.cameraControls)
+    
             if(!this.cameraControls.defaultCamera || !this.cameraControls.raycaster)return
             this.cameraControls.raycaster.setFromCamera(this.cameraControls.mouse, this.camera);
             let intersects = this.cameraControls.raycaster.intersectObject(this.scene, true)
             let filteredByMat = intersects.filter(e => e.object.material.type === "MeshBasicMaterial")
-            console.log(filteredByMat[0].object.material.color)
-            if(filteredByMat[0].object) this.particles.updateMatColor(filteredByMat[0].object.material.color)
+            if(filteredByMat[0].object) {
+                this.particles.updateMatColor(filteredByMat[0].object.material.color)
+                this.particles.updatePosition(filteredByMat[0].object.position)
+               
+            } 
             // update particle color
         })
         
@@ -80,8 +90,7 @@ export default class Scene_2 extends Scene {
         // const helper = new THREE.CameraHelper( this.camera );
         // this.scene.add(helper)
 
-        this.particles.init()
-        this.scene.add(this.particles.group)
+        
         this.particles.group.position.x = 10
         this.particles.group.position.z = -1
         this.particles.group.position.y = 2
@@ -239,7 +248,7 @@ export default class Scene_2 extends Scene {
         if(this.boxMixer && !this.boxMixer.clipAction(this.boxFalling).paused) {
             this.boxMixer.update(this.time.delta*0.001)
         }
-        this.particles.update()
+        if(this.particles.particlesHasBeenInit) this.particles.update()
 
         // if (this.intersects.length > 0) {
 	
