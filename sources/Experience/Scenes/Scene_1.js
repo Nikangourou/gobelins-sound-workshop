@@ -55,8 +55,8 @@ export default class Scene_1 extends Scene {
         this.mainScene.add(this.scene)
         this.startBtn.style.display = "block"
         this.cameraControls.setDefaultCamera(this.camera)
-        const helper = new THREE.CameraHelper( this.camera );
-        this.scene.add(helper)
+        // const helper = new THREE.CameraHelper( this.camera );
+        // this.scene.add(helper)
         this.isActive = true
         const light = new THREE.PointLight( 0xff0000, 10, 100 );
         light.position.set( 10, 0.76, 2.6 );

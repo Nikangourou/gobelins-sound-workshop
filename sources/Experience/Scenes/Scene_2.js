@@ -10,6 +10,7 @@ export default class Scene_2 extends Scene {
         this.name = "scene2"
         this.gui = new GUI()
         this.renderer = renderer
+        this.onclick = cameraControls.onclick
         this.cameraControls = cameraControls
         this.mainScene = mainScene
         this.animations = scene.animations
@@ -26,7 +27,7 @@ export default class Scene_2 extends Scene {
         } )
         this.dotTex = pointTex
         this.particles = new Particles("#ef4444", this.scene)
-
+        // this.intersects = this.cameraControls.raycaster.intersectObject(this.scene, true);
         this.cardColors = ["#ef4444", "#f97316", "#eab308", "#0d9488", "#2563eb", "#d946ef"]
         
         // State / UI
@@ -48,7 +49,6 @@ export default class Scene_2 extends Scene {
         this.namesToBeOutlines = ["plane_box_1", "plane_box_2", "box_drag_drop"]
         this.lightPos = new THREE.Vector3(2, 5, 3)
 
-
         this.rugAnimation = scene.animations[0]
         this.boxFalling = scene.animations[1]
       
@@ -58,14 +58,27 @@ export default class Scene_2 extends Scene {
             curr.onSceneIsDone()
             callback()
         } )
+
+        window.addEventListener('click', (e) => {
+            this.cameraControls.mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            this.cameraControls.mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+            console.log(this.cameraControls)
+            if(!this.cameraControls.defaultCamera || !this.cameraControls.raycaster)return
+            this.cameraControls.raycaster.setFromCamera(this.cameraControls.mouse, this.camera);
+            let intersects = this.cameraControls.raycaster.intersectObject(this.scene, true)
+            let filteredByMat = intersects.filter(e => e.object.material.type === "MeshBasicMaterial")
+            console.log(filteredByMat[0].object.material.color)
+            if(filteredByMat[0].object) this.particles.updateMatColor(filteredByMat[0].object.material.color)
+            // update particle color
+        })
         
     }
     
     init() {
         this.mainScene.add(this.scene)
         this.cameraControls.setDefaultCamera(this.camera)
-        const helper = new THREE.CameraHelper( this.camera );
-        this.scene.add(helper)
+        // const helper = new THREE.CameraHelper( this.camera );
+        // this.scene.add(helper)
 
         this.particles.init()
         this.scene.add(this.particles.group)
@@ -102,7 +115,7 @@ export default class Scene_2 extends Scene {
         let toBeAdded = []
         this.scene.traverse(e => {
             if(e.isMesh) {
-                console.log("name", e.name)
+                // console.log("name", e.name)
                 if(e.name === "box_drag_drop") {
                     console.log("found box drag and drop")
                     this.boxMixer = new THREE.AnimationMixer(e)
@@ -149,9 +162,9 @@ export default class Scene_2 extends Scene {
                     mesh.material = this.outlineMat
                     toBeAdded.push(mesh)
                 } else if(e.name.toLowerCase().includes('plane')){
-                    console.log(e.name)
+                    // console.log(e.name)
                     let color = this.getRandomColor()
-                    console.log(color)
+                    
                     e.material = new THREE.MeshBasicMaterial({color : new THREE.Color(this.getRandomColor())})
                     e.material.side = THREE.DoubleSide
                 }
@@ -227,6 +240,15 @@ export default class Scene_2 extends Scene {
             this.boxMixer.update(this.time.delta*0.001)
         }
         this.particles.update()
+
+        // if (this.intersects.length > 0) {
+	
+        //     var object = this.intersects[0].object;
+        //     console.log(object)
+    
+        //     object.material.color.set( Math.random() * 0xffffff );
+    
+        // }
 
         
         // this.updateParticles();

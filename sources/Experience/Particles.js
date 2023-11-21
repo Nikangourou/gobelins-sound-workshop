@@ -7,6 +7,7 @@ export default class Particles {
     this.scene = scene
     this.geo = new THREE.SphereGeometry(0.02, 8)
     this.mat = new THREE.MeshBasicMaterial({color: color})
+    this.mat.needsUpdate = true
     this.obj = new THREE.Object3D()
     this.particleCount = 700;
     this.group = new THREE.Group()
@@ -43,6 +44,10 @@ export default class Particles {
 
         this.particlesData.push({ time, factor, speed, x, y, z });
     }
+  }
+
+  updateMatColor(color) {
+    this.mat.color.set(color)
   }
 
   update() {
