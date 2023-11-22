@@ -6,19 +6,19 @@ import Particles from './../Particles.js'
 import { PositionalAudioHelper } from 'three/examples/jsm/helpers/PositionalAudioHelper.js'
 
 export default class Scene_2 extends Scene {
-    constructor(scene, renderer, cameraControls, mainScene, callback, pointTex) {
+    constructor(scene, renderer, cameraControls, mainScene, callback) {
         super()
         this.name = "scene2"
         this.renderer = renderer
         this.gui = this.renderer.debug
         this.cameraControls = cameraControls
+        this.raycaster = this.cameraControls.raycaster
         this.mainScene = mainScene
         this.animations = scene.animations
         this.scene = scene.scene
         this.camera = scene.cameras[0]
         this.cameraMixer = new THREE.AnimationMixer(this.camera)
         this.cameraMouvement = scene.animations[3]
-        this.dotTex = pointTex
         this.particles = new Particles("#ef4444", this.scene)
         this.cardColors = ["#ef4444", "#f97316", "#eab308", "#0d9488", "#2563eb", "#d946ef"]
         
@@ -156,9 +156,9 @@ export default class Scene_2 extends Scene {
         this.cameraControls.mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
         this.cameraControls.mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
 
-        if (!this.cameraControls.defaultCamera || !this.cameraControls.raycaster) return
-        this.cameraControls.raycaster.setFromCamera(this.cameraControls.mouse, this.camera);
-        let intersects = this.cameraControls.raycaster.intersectObject(this.scene, true)
+        if (!this.cameraControls.defaultCamera || ! this.raycaster) return
+         this.raycaster.setFromCamera(this.cameraControls.mouse, this.camera);
+        let intersects =  this.raycaster.intersectObject(this.scene, true)
         let filteredByMat = intersects.filter(e => e.object.material.type === "MeshBasicMaterial")
 
        if(filteredByMat.length === 0) return

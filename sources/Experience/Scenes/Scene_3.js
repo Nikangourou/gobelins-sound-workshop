@@ -14,6 +14,7 @@ export default class Scene_3 extends Scene {
         this.animations = scene.animations
         this.scene = scene.scene
         this.camera = scene.cameras[0]
+        this.raycaster = this.cameraControls.raycaster
 
         // this.cameraMixer = new THREE.AnimationMixer(this.camera)
         // this.cameraMouvement = scene.animations[0]
@@ -37,20 +38,19 @@ export default class Scene_3 extends Scene {
         this.plane =  this.scene.getObjectByName('avion')
         this.planeMixer = new THREE.AnimationMixer(this.plane)
         this.planeMovement = this.animations[0]
-        console.log(this.planeMovement)
-
+        
         this.bird = this.scene.getObjectByName('Bird')
         this.birdMixer = new THREE.AnimationMixer(this.bird)
-        this.birdFlying = this.animations[1]
-        this.birdGroup = new THREE.Group()
-
-
+        this.birdMixer2 = new THREE.AnimationMixer(this.bird)
+        this.birdFlying = this.animations[2]
+        this.birdMoving = this.animations[1]
+        this.birdShouldCatchCard = false
+        
         //lights
-
-        this.light = new THREE.PointLight(0xff0000, 5, 100);
-        this.light2 = new THREE.PointLight(0xff0000, 5, 100);
-
-
+        this.light = new THREE.PointLight(0xffffff, 5, 100);
+        this.light2 = new THREE.PointLight(0xffffff, 5, 100);
+        
+        console.log(this.animations)
     }
     
     init() {
@@ -75,13 +75,15 @@ export default class Scene_3 extends Scene {
         this.setupGui()
 
         
-
-
         const action = this.birdMixer.clipAction(this.birdFlying);
         //action.clampWhenFinished = true;
         action.loop = THREE.LoopRepeat
         action.play()
         // action.paused = true
+        const birdMovingAction =  this.birdMixer2.clipAction(this.birdMoving);
+        birdMovingAction.loop = THREE.LoopOnce
+        birdMovingAction.play()
+        
 
         const planeAction = this.planeMixer.clipAction(this.planeMovement)
         planeAction.clampWhenFinished = true;
@@ -89,6 +91,14 @@ export default class Scene_3 extends Scene {
         planeAction.play()
         // boxAction.paused = true
 
+        document.querySelector('.experience').addEventListener('click', (e) => {this.click(e)})
+        
+        // this.setSounds()
+
+
+    }
+
+    setSounds() {
 
     }
 
@@ -106,6 +116,21 @@ export default class Scene_3 extends Scene {
         light2Folder.add(this.light2.position, 'y').min(-10).max(10).name('light y')
         light2Folder.add(this.light2.position, 'z').min(-10).max(10).name('light z')
 
+    }
+
+    click(e) {
+        this.cameraControls.mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+        this.cameraControls.mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+
+        if (!this.cameraControls.defaultCamera || ! this.raycaster) return
+        this.raycaster.setFromCamera(this.cameraControls.mouse, this.camera);
+        let intersects =  this.raycaster.intersectObject(this.scene, true)
+        if(intersects.length === 0) return
+  
+        if(intersects.map(e => e.object.name).includes("main_card")) {
+            this.birdShouldCatchCard = true
+        }
+       
     }
 
     onSceneIsDone() {
@@ -178,6 +203,10 @@ export default class Scene_3 extends Scene {
     update() {
         if(this.birdMixer) {
             this.birdMixer.update(this.time.delta * 0.001)
+        }
+
+        if(this.birdMixer2 && this.birdShouldCatchCard) {
+            this.birdMixer2.update(this.time.delta * 0.001)
         }
 
         if(this.planeMixer) {
