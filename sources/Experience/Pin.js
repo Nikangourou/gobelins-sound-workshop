@@ -2,24 +2,26 @@ import * as THREE from 'three'
 
 export default class Pin {
 
-    constructor(position, hover = false) {
+    constructor(position, mouse, raycaster, camera) {
         this.pin = new THREE.Group();
         this.clock = new THREE.Clock();
-        this.hover = hover;
         this.position = position;
+        this.mouse = mouse;
+        this.raycaster = raycaster
+        this.camera = camera
 
         this.globalUniforms = {
-            time: { value: 0 }
+            time: { value: 0 },
+            isHovered: { value: 0 }
         };
 
-        this.markerCount = 1;
-        this.markerInfo = [];
-        this.gMarker = new THREE.PlaneGeometry();
+        this.gMarker = new THREE.PlaneGeometry(0.05, 0.05, 1, 1);
         this.mMarker = new THREE.MeshBasicMaterial({
             color: 0xffffff,
             side: THREE.DoubleSide,
             onBeforeCompile: (shader) => {
                 shader.uniforms.time = this.globalUniforms.time;
+                shader.uniforms.isHovered = this.globalUniforms.isHovered;
                 shader.vertexShader = `
                   attribute float phase;
                 varying float vPhase;
@@ -35,6 +37,7 @@ export default class Pin {
                 //console.log(shader.vertexShader);
                 shader.fragmentShader = `
                   uniform float time;
+                uniform float isHovered;
                 varying float vPhase;
                 varying vec2 vUv;
                   ${shader.fragmentShader}
@@ -48,8 +51,13 @@ export default class Pin {
                 val = max(val, step(0.4, lenUv) - step(0.5, lenUv)); // outer circle
                 
                 float tShift = fract(time * 0.5 + vPhase);
-                val = max(val, step(0.4 + (tShift * 0.6), lenUv) - step(0.5 + (tShift * 0.5), lenUv)); // ripple
-                
+                tShift = mix(tShift, -1. * tShift, isHovered);
+
+                float valCurrent = max(val, step(0.4 + (tShift * 0.5), lenUv) - step(0.5 + (tShift * 0.5), lenUv)); // ripple
+                float valHovered = max(val, step(0.8 + (tShift ), lenUv) - step(0.9 + (tShift ), lenUv));
+
+                val = mix(valCurrent, valHovered, isHovered);
+
                 if (val < 0.5) discard;
                 
                 vec4 diffuseColor = vec4( diffuse, opacity );`
@@ -57,32 +65,32 @@ export default class Pin {
                 //console.log(shader.fragmentShader)
             }
         });
-        this.markers = new THREE.InstancedMesh(this.gMarker, this.mMarker, this.markerCount);
+        this.mesh = new THREE.Mesh(this.gMarker, this.mMarker);
+        // name for raycaster
+        this.mesh.name = "pin"
 
-        var dummy = new THREE.Object3D();
-        let phase = [];
-        for (var i = 0; i < this.markerCount; i++) {
-            dummy.lookAt(dummy.position.clone().setLength(this.hover ? 1.1 : 0.2));
-            dummy.updateMatrix();
-
-            this.markers.setMatrixAt(i, dummy.matrix);
-            phase.push(Math.random());
-
-            this.markerInfo.push({ id: i + 1, mag: THREE.MathUtils.randInt(1, 10), crd: position });
-        }
-        this.gMarker.setAttribute("phase", new THREE.InstancedBufferAttribute(new Float32Array(phase), 1));
-
-        this.pin.add(this.markers);
+        this.pin.add(this.mesh);
     }
 
     init() {
         this.pin.position.set(this.position.x, this.position.y, this.position.z)
     }
 
-    //get elapsedTime
 
     animate() {
         let t = this.clock.getElapsedTime();
         this.globalUniforms.time.value = t;
+
+        // this.pin.lookAt(this.camera.position);
+
+        this.raycaster.setFromCamera(this.mouse, this.camera);
+
+        const intersects = this.raycaster.intersectObjects(this.pin.children);
+
+        if (intersects.length > 0) {
+            this.globalUniforms.isHovered.value = 1;
+        } else {
+            this.globalUniforms.isHovered.value = 0;
+        }
     }
 }

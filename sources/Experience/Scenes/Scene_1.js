@@ -137,9 +137,17 @@ export default class Scene_1 extends Scene {
         this.radio.add(this.radioSound);
 
         // Pin
-        this.pinTiroir = new Pin(this.tiroir.position, true)
+        this.pinTiroir = new Pin({x: 0.1, y: 0.67, z: 7.25}, this.mouse, this.raycaster, this.camera)
         this.pinTiroir.init()
-        this.scene.add(this.pinTiroir.pin)
+        this.tiroir.add(this.pinTiroir.pin)
+
+        this.pinLampe = new Pin({x: 0.02, y: -0.2, z: -0.1}, this.mouse, this.raycaster, this.camera)
+        this.pinLampe.init()
+        this.lampe.add(this.pinLampe.pin)
+
+        this.pinRadio = new Pin({x: -0.1, y: 0, z: -0.1}, this.mouse, this.raycaster, this.camera)
+        this.pinRadio.init()
+        this.radio.add(this.pinRadio.pin)
 
         this.dragSetup()
     }
@@ -275,8 +283,13 @@ export default class Scene_1 extends Scene {
     click() {
         this.raycaster.setFromCamera(this.mouse, this.camera)
         const modelIntersects = this.raycaster.intersectObjects([this.lampe, this.radio, this.tiroir])
-
+       
         if (modelIntersects.length) {
+
+            if(modelIntersects[0].object.name === 'pin') {
+                modelIntersects.shift()
+            }
+
             if (modelIntersects[0].object.name === 'desk_lamp') {
 
                 this.actionLampe.stop()
@@ -286,6 +299,7 @@ export default class Scene_1 extends Scene {
                 this.radioSound.play()
             }
             if (modelIntersects[0].object.name === 'tiroir_desk') {
+
 
                 if (this.tiroirOpen) {
                     this.actionTiroir.paused = false;
@@ -345,6 +359,12 @@ export default class Scene_1 extends Scene {
             }
             if(this.pinTiroir) {
                 this.pinTiroir.animate()
+            }
+            if(this.pinLampe) {
+                this.pinLampe.animate()
+            }
+            if(this.pinRadio){
+                this.pinRadio.animate()
             }
         }
 
