@@ -27,7 +27,7 @@ export default class Camera {
         // Set up
         this.mode = 'default' // defaultCamera \ debugCamera
 
-        this.debugCamera = new THREE.PerspectiveCamera(25, this.config.width / this.config.height, 0.1, 150)
+        this.debugCamera = new THREE.PerspectiveCamera(25, this.config.width / this.config.height, 0.1, 300)
         this.defaultCamera = new THREE.PerspectiveCamera(25, this.config.width / this.config.height, 0.1, 150)
         this.groupToAnimateOnMousemove.add(this.defaultCamera)
         // this.instance = new THREE.PerspectiveCamera(25, this.config.width / this.config.height, 0.1, 150)
