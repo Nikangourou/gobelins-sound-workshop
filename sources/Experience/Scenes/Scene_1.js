@@ -65,7 +65,7 @@ export default class Scene_1 extends Scene {
         this.lightPos = new THREE.Vector3(2, 5, 3)
         this.userStarted = false;
         this.startBtn = document.querySelector('button')
-        
+
         this.startBtn.addEventListener('click', e => {
             this.userStarted = true;
             this.doorMixer.clipAction(this.doorMovement).paused = false;
@@ -83,7 +83,6 @@ export default class Scene_1 extends Scene {
         this.actionTiroir = this.tiroirMixer.clipAction(this.tiroirMouvement);
         this.actionTiroir.loop = THREE.LoopOnce
         this.tiroirOpen = false
-
     }
 
     init() {
@@ -115,8 +114,8 @@ export default class Scene_1 extends Scene {
         light2Folder.add(light2.position, 'y').min(-10).max(10).name('light y')
         light2Folder.add(light2.position, 'z').min(-10).max(10).name('light z')
 
-        document.querySelector('.experience').addEventListener('click', (e) => {this.click(e)})
-   
+        document.querySelector('.experience').addEventListener('click', (e) => { this.click(e) })
+
         let toBeAdded = []
         this.scene.traverse(e => {
             if (e.isMesh) {
@@ -133,7 +132,7 @@ export default class Scene_1 extends Scene {
                             nbColors: { value: 3 },
                             lightDirection: { value: light.position },
                             lightDirection2: { value: light2.position },
-                            lightDirection3: {value: this.lampLight.position},
+                            lightDirection3: { value: this.lampLight.position },
                         }
                     })
                     mat.init()
@@ -152,7 +151,7 @@ export default class Scene_1 extends Scene {
                             nbColors: { value: 3 },
                             lightDirection: { value: light.position },
                             lightDirection2: { value: light2.position },
-                            lightDirection3: {value: this.lampLight.position},
+                            lightDirection3: { value: this.lampLight.position },
                         }
                     })
                     mat.init()
@@ -178,8 +177,8 @@ export default class Scene_1 extends Scene {
                             noiseStep: { value: 1.0 },
                             nbColors: { value: 5 },
                             lightDirection: { value: light.position },
-                            lightDirection2: { value: light2.position},
-                            lightDirection3: {value: this.lampLight.position},
+                            lightDirection2: { value: light2.position },
+                            lightDirection3: { value: this.lampLight.position },
                         }
                     })
                     mat.init()
@@ -195,7 +194,7 @@ export default class Scene_1 extends Scene {
         this.scene.add(testLight)
 
         this.lampe.add(this.lampLight)
-       
+
         const action = this.cameraMixer.clipAction(this.cameraMouvement);
         action.clampWhenFinished = true;
         action.loop = THREE.LoopOnce
@@ -232,11 +231,10 @@ export default class Scene_1 extends Scene {
 
         this.scene.add(this.cubeRadio)
 
-          // Pin
-          this.pinTiroir = new Pin(this.tiroir.position, true)
-          this.pinTiroir.init()
-          
-          this.scene.add(this.pinTiroir.pin)
+        // Pin
+        this.pinTiroir = new Pin(this.tiroir.position, true)
+        this.pinTiroir.init()
+        this.scene.add(this.pinTiroir.pin)
 
         this.dragSetup()
     }
@@ -257,7 +255,7 @@ export default class Scene_1 extends Scene {
                     this.hasBeenCompleted = true
                     this.cameraMixer.clipAction(this.cameraMouvement).isPaused = false;
                     this.transition.init()
-                    setTimeout(() => {this.shouldPlayTransition = true}, this.delayAnimationTransition);
+                    setTimeout(() => { this.shouldPlayTransition = true }, this.delayAnimationTransition);
                 }
                 else {
                     this.card.material.color.set(0x00ff00)
@@ -304,7 +302,7 @@ export default class Scene_1 extends Scene {
     onSceneIsDone() {
         this.isActive = false
         this.hasBeenCompleted = true
-        document.querySelector('.experience').removeEventListener('click', (e) => {this.click(e)})
+        document.querySelector('.experience').removeEventListener('click', (e) => { this.click(e) })
 
 
         // remove scene from main scene
@@ -338,8 +336,11 @@ export default class Scene_1 extends Scene {
             if (this.tiroirMixer && this.userStarted) {
                 this.tiroirMixer.update(this.time.delta * 0.001)
             }
+            if(this.pinTiroir) {
+                this.pinTiroir.animate()
+            }
         }
 
-        if(this.shouldPlayTransition)  this.transition.play()
+        if (this.shouldPlayTransition) this.transition.play()
     }
 }
