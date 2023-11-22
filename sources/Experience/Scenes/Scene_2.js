@@ -146,10 +146,10 @@ export default class Scene_2 extends Scene {
     }
 
     click(e) {
-        if (!this.particles.particlesHasBeenInit) {
+        if (!this.particles.shouldAnimate) {
             this.scene.add(this.particles.group)
             this.particles.init()
-            this.particles.particlesHasBeenInit = true
+            this.particles.shouldAnimate = true
         }
 
         this.cameraControls.mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
@@ -266,7 +266,7 @@ export default class Scene_2 extends Scene {
         if (this.boxMixer && !this.boxMixer.clipAction(this.boxFalling).paused) {
             this.boxMixer.update(this.time.delta * 0.001)
         }
-        if (this.particles.particlesHasBeenInit) this.particles.update()
+        if (this.particles.shouldAnimate) this.particles.update()
         if(this.shouldPlayTransition)  this.transition.play()
     }
 }

@@ -13,9 +13,8 @@ export default class Particles {
     this.particleCount = 100;
     this.group = new THREE.Group()
     this.particlesData = []
-    this.particlesHasBeenInit
+    this.shouldAnimate = false
     this.dir = 1
-    
   }
 
   init() {
@@ -31,6 +30,7 @@ export default class Particles {
 
     this.particleSystem.instanceMatrix.needsUpdate = true
     this.group.add(this.particleSystem)
+    console.log("gets init")
   }
 
   generateParticlesData() {

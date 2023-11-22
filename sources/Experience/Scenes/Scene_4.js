@@ -118,7 +118,7 @@ export default class Scene_4 extends Scene {
                     e.material = mat.get()
 
                 } else if (e.name === "ground_grass") {
-                    e.material = new THREE.MeshBasicMaterial({color: '#064e3b'})
+                    e.visible = false
                 } else if( e.name.includes("ground_boxes") ) {
                     let mat = new CustomMat({
                         renderer: this.renderer, uniforms: {

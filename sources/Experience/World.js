@@ -101,7 +101,7 @@ export default class World
     {
 
 
-        // if(this.scenes && this.activeSceneIndex !==0 ) this.scenes[this.activeSceneIndex-1].update()
+        if(this.scenes && this.activeSceneIndex !==0 && !this.scenes[this.activeSceneIndex-1].transition.isDone ) this.scenes[this.activeSceneIndex-1].update()
         if(this.scenes) this.scenes[this.activeSceneIndex].update() // contineu update until trnasition is done
 
     }
