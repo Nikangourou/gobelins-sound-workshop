@@ -1,7 +1,7 @@
 import * as THREE from 'three'
 import Scene from './Scene'
 import CustomMat from './CustomMat'
-
+import Pin from '../Pin'
 import Particles from './../Particles.js'
 import { PositionalAudioHelper } from 'three/examples/jsm/helpers/PositionalAudioHelper.js'
 
@@ -12,6 +12,8 @@ export default class Scene_2 extends Scene {
         this.renderer = renderer
         this.gui = this.renderer.debug
         this.cameraControls = cameraControls
+        this.raycaster = cameraControls.raycaster
+        this.mouse = cameraControls.mouse
         this.mainScene = mainScene
         this.animations = scene.animations
         this.scene = scene.scene
@@ -21,37 +23,36 @@ export default class Scene_2 extends Scene {
         this.dotTex = pointTex
         this.particles = new Particles("#ef4444", this.scene)
         this.cardColors = ["#ef4444", "#f97316", "#eab308", "#0d9488", "#2563eb", "#d946ef"]
-        
+
         this.namesToBeOutlines = ["plane_box_1", "plane_box_2", "box_drag_drop"]
         this.lightPos = new THREE.Vector3(2, 5, 3)
-        
+
         this.rugAnimation = scene.animations[0]
         this.boxFalling = scene.animations[1]
-        
+
         this.delayAnimationTransition = 22000
         this.shouldPlayTransition = false
         // State / UI
         this.nextBtn = document.getElementById('next')
         this.userHasClickedBox = false
-        this.ambientSound = new THREE.Audio( this.cameraControls.audioListener );
-        this.buttonSound = new THREE.Audio( this.cameraControls.audioListener );
-        this.boxFallingSound = new THREE.Audio( this.cameraControls.audioListener );
-
+        this.ambientSound = new THREE.Audio(this.cameraControls.audioListener);
+        this.buttonSound = new THREE.Audio(this.cameraControls.audioListener);
+        this.boxFallingSound = new THREE.Audio(this.cameraControls.audioListener);
 
         //objects 
-        this.boxToBeRemoved= this.scene.getObjectByName('box_drag_drop')
+        this.boxToBeRemoved = this.scene.getObjectByName('box_drag_drop')
         this.boxMixer = new THREE.AnimationMixer(this.boxToBeRemoved)
 
         let curr = this
         this.cameraMixer.addEventListener('finished', function (e) {
             console.log("scene 2 is finised")
             curr.onSceneIsDone()
-           
+
             callback()
         })
 
-       this.light = new THREE.PointLight(0xff0000, 5, 100);
-       this.light2 = new THREE.PointLight(0xff0000, 5, 100);
+        this.light = new THREE.PointLight(0xff0000, 5, 100);
+        this.light2 = new THREE.PointLight(0xff0000, 5, 100);
 
     }
 
@@ -73,7 +74,7 @@ export default class Scene_2 extends Scene {
         const helper1 = new THREE.PointLightHelper(this.light, 0.1);
         this.scene.add(this.light, helper1)
 
-       
+
         this.light2.position.set(1.04, 8.32, 2);
         const helper2 = new THREE.PointLightHelper(this.light2, 0.1);
         this.scene.add(this.light2, helper2)
@@ -97,32 +98,38 @@ export default class Scene_2 extends Scene {
         boxAction.play()
         boxAction.paused = true
 
-        document.querySelector('.experience').addEventListener('click', (e) => {this.click(e)})
+        document.querySelector('.experience').addEventListener('click', (e) => { this.click(e) })
 
         this.setSounds()
+
+        // Pin
+        this.pinBox = new Pin({ x: 0.2, y: 0, z: -0.1}, this.mouse, this.raycaster, this.camera)
+        this.pinBox.init()
+        this.boxToBeRemoved.add(this.pinBox.pin)
+        console.log(this.boxToBeRemoved.position)
     }
 
     setSounds() {
         console.log(this.cameraControls.audioListener)
         const audioLoader = new THREE.AudioLoader();
         audioLoader.load('/assets/sounds/scene2/ambient.mp3', (buffer) => {
-            this.ambientSound.setBuffer( buffer );
-            this.ambientSound.setLoop( true );
-            this.ambientSound.setVolume( 0.5 );
+            this.ambientSound.setBuffer(buffer);
+            this.ambientSound.setLoop(true);
+            this.ambientSound.setVolume(0.5);
             this.ambientSound.play();
         })
 
         audioLoader.load('/assets/sounds/scene2/bouton.wav', (buffer) => {
-            this.buttonSound.setBuffer( buffer );
-            this.buttonSound.setLoop( false );
-            this.buttonSound.setVolume( 1 );
+            this.buttonSound.setBuffer(buffer);
+            this.buttonSound.setLoop(false);
+            this.buttonSound.setVolume(1);
         })
-        
+
         audioLoader.load('/assets/sounds/scene2/colis1.mp3', (buffer) => {
-            this.boxFallingSound.setBuffer( buffer );
-            this.boxFallingSound.setLoop( false );
-            this.boxFallingSound.setVolume( 1 );
-        })   
+            this.boxFallingSound.setBuffer(buffer);
+            this.boxFallingSound.setLoop(false);
+            this.boxFallingSound.setVolume(1);
+        })
 
     }
 
@@ -153,25 +160,25 @@ export default class Scene_2 extends Scene {
             this.particles.particlesHasBeenInit = true
         }
 
-        this.cameraControls.mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
-        this.cameraControls.mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+        this.mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+        this.mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
 
-        if (!this.cameraControls.defaultCamera || !this.cameraControls.raycaster) return
-        this.cameraControls.raycaster.setFromCamera(this.cameraControls.mouse, this.camera);
-        let intersects = this.cameraControls.raycaster.intersectObject(this.scene, true)
+        if (!this.cameraControls.defaultCamera || !this.raycaster) return
+        this.raycaster.setFromCamera(this.mouse, this.camera);
+        let intersects = this.raycaster.intersectObject(this.scene, true)
         let filteredByMat = intersects.filter(e => e.object.material.type === "MeshBasicMaterial")
 
-       if(filteredByMat.length === 0) return
-        if( filteredByMat[0].object.name === "box_drag_drop" ) {
+        if (filteredByMat.length === 0) return
+        if (filteredByMat[0].object.name === "box_drag_drop") {
             this.boxFallingSound.play()
             this.userClickedBox = true
             this.boxMixer.clipAction(this.boxFalling).paused = false
-        }  else if(filteredByMat[0].object.name.includes("button")) {
+        } else if (filteredByMat[0].object.name.includes("button")) {
             this.buttonSound.play();
             this.hasBeenCompleted = true
             this.cameraMixer.clipAction(this.cameraMouvement).paused = false;
             this.transition.init()
-            setTimeout(() => {this.shouldPlayTransition = true}, this.delayAnimationTransition);
+            setTimeout(() => { this.shouldPlayTransition = true }, this.delayAnimationTransition);
         } else if (filteredByMat[0].object) {
             this.particles.updateMatColor(filteredByMat[0].object.material.color)
             this.particles.updatePosition(filteredByMat[0].object.position)
@@ -200,13 +207,13 @@ export default class Scene_2 extends Scene {
         let toBeAdded = []
         this.scene.traverse(e => {
             if (e.isMesh) {
-                 if (e.name.includes("button")) {
-                   
+                if (e.name.includes("button")) {
+
                     e.material = new THREE.MeshBasicMaterial({ color: 0xff0000 })
                     let mesh = e.clone()
                     mesh.material = this.outlineMat
                     toBeAdded.push(mesh)
-                 }else if(e.name === "box_drag_drop") {
+                } else if (e.name === "box_drag_drop") {
                     e.material = new THREE.MeshBasicMaterial({ color: e.material.color })
                 } else if (e.name.includes("box")) {
                     let mat = new CustomMat({
@@ -266,6 +273,9 @@ export default class Scene_2 extends Scene {
             this.boxMixer.update(this.time.delta * 0.001)
         }
         if (this.particles.particlesHasBeenInit) this.particles.update()
-        if(this.shouldPlayTransition)  this.transition.play()
+        if (this.shouldPlayTransition) this.transition.play()
+        if(this.pinBox){
+            this.pinBox.animate()
+        }
     }
 }

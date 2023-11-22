@@ -81,7 +81,7 @@ export default class Pin {
         let t = this.clock.getElapsedTime();
         this.globalUniforms.time.value = t;
 
-        // this.pin.lookAt(this.camera.position);
+        this.pin.lookAt(this.camera.position);
 
         this.raycaster.setFromCamera(this.mouse, this.camera);
 
