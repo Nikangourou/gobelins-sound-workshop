@@ -36,7 +36,6 @@ export default class Scene {
 
     init() {
         this.isActive = true
-
     }
 
     onNext() {
