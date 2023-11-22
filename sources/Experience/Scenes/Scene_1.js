@@ -4,7 +4,6 @@ import CustomMat from './CustomMat'
 import { PositionalAudioHelper } from 'three/examples/jsm/helpers/PositionalAudioHelper.js'
 import { DragControls } from 'three/examples/jsm/controls/DragControls.js'
 import Pin from '../Pin'
-import Pin from '../Pin'
 
 export default class Scene_1 extends Scene {
     constructor(scene, renderer, cameraControls, mainScene, callback) {
@@ -129,26 +128,13 @@ export default class Scene_1 extends Scene {
 
         const audioLoader = new THREE.AudioLoader();
 
-        audioLoader.load('assets/RadioSound.mp3', (buffer) => {
+        audioLoader.load('assets/sounds/RadioSound.mp3', (buffer) => {
             this.radioSound.setBuffer(buffer);
             this.radioSound.setRefDistance(1);
         });
 
-        this.radioSound.add(helperRadio);
-        this.cubeRadio = new THREE.Mesh(
-            new THREE.BoxGeometry(0.2, 0.2, 0.2),
-            new THREE.MeshBasicMaterial({ color: 0x00ff00 })
-        )
-        this.cubeRadio.position.set(1.2, 0.6, 7.8)
-        this.cubeRadio.add(this.radioSound)
-        this.cubeRadio.visible = false
-
-        this.scene.add(this.cubeRadio)
-
-        // Pin
-        this.pinTiroir = new Pin(this.tiroir.position, true)
-        this.pinTiroir.init()
-        this.scene.add(this.pinTiroir.pin)
+        // this.radioSound.add(helperRadio);
+        this.radio.add(this.radioSound);
 
         // Pin
         this.pinTiroir = new Pin(this.tiroir.position, true)
@@ -294,11 +280,7 @@ export default class Scene_1 extends Scene {
             if (modelIntersects[0].object.name === 'desk_lamp') {
 
                 this.actionLampe.stop()
-                this.actionLampe.play()
-
-                this.lampLight.visible = !this.lampLight.visible
-                
-
+                this.actionLampe.play()                
             }
             if (modelIntersects[0].object.name === 'radio') {
                 this.radioSound.play()

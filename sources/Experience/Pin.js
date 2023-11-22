@@ -3,65 +3,86 @@ import * as THREE from 'three'
 export default class Pin {
 
     constructor(position, hover = false) {
-        this.pin = new THREE.Group()
-        this.position = position
-        this.hover = hover
-        // sprite
-        this.pinGeometry = new THREE.SphereGeometry(0.1, 32, 32);
-        this.pinMaterial = new THREE.MeshBasicMaterial({ color: 0xffff00 });
-        this.pinCenter = new THREE.Mesh(this.pinGeometry, this.pinMaterial);
+        this.pin = new THREE.Group();
+        this.clock = new THREE.Clock();
+        this.hover = hover;
+        this.position = position;
 
-        this.haloRadius = 1; // Rayon du halo
-        this.count = 1000 // Augmenter le nombre de particules
-        this.positions = new Float32Array(this.count * 3)
+        this.globalUniforms = {
+            time: { value: 0 }
+        };
 
-        for (let i = 0; i < this.count; i++) {
-            const i3 = i * 3
+        this.markerCount = 1;
+        this.markerInfo = [];
+        this.gMarker = new THREE.PlaneGeometry();
+        this.mMarker = new THREE.MeshBasicMaterial({
+            color: 0xffffff,
+            side: THREE.DoubleSide,
+            onBeforeCompile: (shader) => {
+                shader.uniforms.time = this.globalUniforms.time;
+                shader.vertexShader = `
+                  attribute float phase;
+                varying float vPhase;
+                varying vec2 vUv;
+                ${shader.vertexShader}
+              `.replace(
+                    `#include <begin_vertex>`,
+                    `#include <begin_vertex>
+                    vPhase = phase; // de-synch of ripples
+                    vUv = uv;
+                `
+                );
+                //console.log(shader.vertexShader);
+                shader.fragmentShader = `
+                  uniform float time;
+                varying float vPhase;
+                varying vec2 vUv;
+                  ${shader.fragmentShader}
+              `.replace(
+                    `vec4 diffuseColor = vec4( diffuse, opacity );`,
+                    `
+                vec2 lUv = (vUv - 0.5) * 2.;
+                float val = 0.;
+                float lenUv = length(lUv);
+                val = max(val, 1. - step(0.25, lenUv)); // central circle
+                val = max(val, step(0.4, lenUv) - step(0.5, lenUv)); // outer circle
+                
+                float tShift = fract(time * 0.5 + vPhase);
+                val = max(val, step(0.4 + (tShift * 0.6), lenUv) - step(0.5 + (tShift * 0.5), lenUv)); // ripple
+                
+                if (val < 0.5) discard;
+                
+                vec4 diffuseColor = vec4( diffuse, opacity );`
+                );
+                //console.log(shader.fragmentShader)
+            }
+        });
+        this.markers = new THREE.InstancedMesh(this.gMarker, this.mMarker, this.markerCount);
 
-            // Utiliser des Math.random pour positionner les particules aléatoirement dans une sphère autour du point central
-            const radius = 0.5
-            const theta = 0
-            const phi = i * 0.1
+        var dummy = new THREE.Object3D();
+        let phase = [];
+        for (var i = 0; i < this.markerCount; i++) {
+            dummy.lookAt(dummy.position.clone().setLength(this.hover ? 1.1 : 0.2));
+            dummy.updateMatrix();
 
-            this.positions[i3] = radius * Math.sin(phi) * Math.cos(theta)
-            this.positions[i3 + 1] = radius * Math.sin(phi) * Math.sin(theta)
-            this.positions[i3 + 2] = radius * Math.cos(phi)
+            this.markers.setMatrixAt(i, dummy.matrix);
+            phase.push(Math.random());
+
+            this.markerInfo.push({ id: i + 1, mag: THREE.MathUtils.randInt(1, 10), crd: position });
         }
+        this.gMarker.setAttribute("phase", new THREE.InstancedBufferAttribute(new Float32Array(phase), 1));
 
-        this.halloGeometry = new THREE.BufferGeometry();
-        this.halloGeometry.setAttribute('position', new THREE.BufferAttribute(this.positions, 3))
-
-        this.halloMaterial = new THREE.PointsMaterial({
-            size: .05,
-            sizeAttenuation: true
-        })
-        this.hallo = new THREE.Points(this.halloGeometry, this.halloMaterial)
-
-        this.pin.add(this.pinCenter, this.hallo)
+        this.pin.add(this.markers);
     }
 
     init() {
         this.pin.position.set(this.position.x, this.position.y, this.position.z)
     }
 
+    //get elapsedTime
+
     animate() {
-
-        const delta = Date.now()
-
-
-        const newRadius = this.haloRadius + Math.sin(delta * 0.001) * 0.1
-
-        for (let i = 0; i < this.count; i++) {
-            const i3 = i * 3;
-
-            const theta = 0
-            const phi = i * 0.1
-
-            // Mise à jour du rayon
-            this.halloGeometry.attributes.position.array[i3] = newRadius * Math.sin(phi) * Math.cos(theta);
-        }
-
-        this.halloGeometry.attributes.position.needsUpdate = true
+        let t = this.clock.getElapsedTime();
+        this.globalUniforms.time.value = t;
     }
-
 }
