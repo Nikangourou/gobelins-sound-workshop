@@ -9,6 +9,7 @@ export default class Scene {
         this.hasBeenCompleted = false;
         this.transition = new Transition()
         this.time = new Time()
+        this.cardColors = ["#ef4444", "#f97316", "#eab308", "#0d9488", "#2563eb", "#d946ef"]
         this.outlineMat = new THREE.ShaderMaterial({
             uniforms: {
                 outlineColor: { value: new THREE.Color('#000000') },

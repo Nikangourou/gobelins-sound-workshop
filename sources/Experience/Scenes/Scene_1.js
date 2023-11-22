@@ -26,6 +26,8 @@ export default class Scene_1 extends Scene {
         this.camera = scene.cameras[0]
         this.tiroir.add(this.timbre, this.timbre2)
 
+        console.log( 'camera', this.camera, this.camera.rotation )
+
         // Mixer 
         this.lampeMixer = new THREE.AnimationMixer(this.lamp_switch)
         this.tiroirMixer = new THREE.AnimationMixer(this.tiroir)
@@ -94,6 +96,11 @@ export default class Scene_1 extends Scene {
         this.startBtn.style.display = "block"
         this.cameraControls.setDefaultCamera(this.camera)
         this.isActive = true
+
+        const helper = new THREE.CameraHelper( this.camera );
+        this.scene.add(helper)
+
+        this.scene.add(this.cameraControls.dummyCamera, this.cameraControls.groupToAnimateOnMousemove)
         
         this.setLights(this.deskLight)
         this.setupGui()
@@ -217,8 +224,23 @@ export default class Scene_1 extends Scene {
 
                 } else if (e.name.includes("contain")) {
                     e.material = new THREE.MeshBasicMaterial({ color: 0x00ff00 })
-                }
-                else {
+                } else if(e.name === "radio") {
+                    let mat = new CustomMat({
+                        renderer: this.renderer, uniforms: {
+                            color1: { value: new THREE.Color('#1e293b') }, // darker
+                            color2: { value: new THREE.Color('#4c0519') },
+                            color3: { value: new THREE.Color('#9f1239') },
+                            color4: { value: new THREE.Color('#e11d48') },
+                            color5: { value: new THREE.Color('#1d4ed8') },// lighter
+                            noiseStep: { value: 1.0 },
+                            nbColors: { value: 5 },
+                            lightDirection: { value: this.light.position },
+                            lightDirection2: { value: this.lampLight.position },
+                        }
+                    })
+
+
+                } else {
                     let mat = new CustomMat({
                         renderer: this.renderer, uniforms: {
                             color1: { value: new THREE.Color('#1e293b') }, // darker

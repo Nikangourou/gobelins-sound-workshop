@@ -6,23 +6,22 @@ import Particles from './../Particles.js'
 import { PositionalAudioHelper } from 'three/examples/jsm/helpers/PositionalAudioHelper.js'
 
 export default class Scene_2 extends Scene {
-    constructor(scene, renderer, cameraControls, mainScene, callback, pointTex) {
+    constructor(scene, renderer, cameraControls, mainScene, callback) {
         super()
         this.name = "scene2"
         this.renderer = renderer
         this.gui = this.renderer.debug
         this.cameraControls = cameraControls
         this.raycaster = cameraControls.raycaster
-        this.mouse = cameraControls.mouse
+        this.mouse = this.cameraControls.mouse
+        this.raycaster = this.cameraControls.raycaster
         this.mainScene = mainScene
         this.animations = scene.animations
         this.scene = scene.scene
         this.camera = scene.cameras[0]
         this.cameraMixer = new THREE.AnimationMixer(this.camera)
         this.cameraMouvement = scene.animations[3]
-        this.dotTex = pointTex
         this.particles = new Particles("#ef4444", this.scene)
-        this.cardColors = ["#ef4444", "#f97316", "#eab308", "#0d9488", "#2563eb", "#d946ef"]
 
         this.namesToBeOutlines = ["plane_box_1", "plane_box_2", "box_drag_drop"]
         this.lightPos = new THREE.Vector3(2, 5, 3)
@@ -58,9 +57,11 @@ export default class Scene_2 extends Scene {
 
     init() {
         this.mainScene.add(this.scene)
-        this.cameraControls.setDefaultCamera(this.camera)
+        this.isActive = true
         // const helper = new THREE.CameraHelper( this.camera );
         // this.scene.add(helper)
+        this.scene.add(this.cameraControls.dummyCamera, this.cameraControls.groupToAnimateOnMousemove)
+        this.cameraControls.setDefaultCamera(this.camera)
 
         this.setSceneMaterials()
 
@@ -80,8 +81,6 @@ export default class Scene_2 extends Scene {
         this.scene.add(this.light2, helper2)
 
         this.setupGui()
-
-        this.isActive = true
 
         let testLight = new THREE.AmbientLight(0xffffff);
         this.scene.add(testLight)
@@ -158,10 +157,10 @@ export default class Scene_2 extends Scene {
     }
 
     click(e) {
-        if (!this.particles.particlesHasBeenInit) {
+        if (!this.particles.shouldAnimate) {
             this.scene.add(this.particles.group)
             this.particles.init()
-            this.particles.particlesHasBeenInit = true
+            this.particles.shouldAnimate = true
         }
 
         this.mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
@@ -189,8 +188,10 @@ export default class Scene_2 extends Scene {
             this.pinButton.remove()
             setTimeout(() => { this.shouldPlayTransition = true }, this.delayAnimationTransition);
         } else if (filteredByMat[0].object) {
-            this.particles.updateMatColor(filteredByMat[0].object.material.color)
-            this.particles.updatePosition(filteredByMat[0].object.position)
+            this.particles.respawnAt(filteredByMat[0].object.material.color, filteredByMat[0].object.position)
+            // this.particles.updateMatColor(filteredByMat[0].object.material.color)
+            // this.particles.updatePosition(filteredByMat[0].object.position)
+            // update with direction 
         }
 
     }
@@ -281,13 +282,14 @@ export default class Scene_2 extends Scene {
         if (this.boxMixer && !this.boxMixer.clipAction(this.boxFalling).paused) {
             this.boxMixer.update(this.time.delta * 0.001)
         }
-        if (this.particles.particlesHasBeenInit) this.particles.update()
-        if (this.shouldPlayTransition) this.transition.play()
+
         if(this.pinBox){
             this.pinBox.animate()
         }
         if(this.pinButton){
             this.pinButton.animate()
         }
+        if (this.particles.shouldAnimate) this.particles.update()
+        if(this.shouldPlayTransition)  this.transition.play()
     }
 }
