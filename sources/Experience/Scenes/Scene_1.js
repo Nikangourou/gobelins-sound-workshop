@@ -60,7 +60,7 @@ export default class Scene_1 extends Scene {
         this.lightPos = new THREE.Vector3(2, 5, 3)
         this.userStarted = false;
         this.startBtn = document.querySelector('button')
-        
+
         this.startBtn.addEventListener('click', e => {
             this.userStarted = true;
             this.doorMixer.clipAction(this.doorMovement).paused = false;
@@ -144,11 +144,10 @@ export default class Scene_1 extends Scene {
 
         this.scene.add(this.cubeRadio)
 
-          // Pin
-          this.pinTiroir = new Pin(this.tiroir.position, true)
-          this.pinTiroir.init()
-          
-          this.scene.add(this.pinTiroir.pin)
+        // Pin
+        this.pinTiroir = new Pin(this.tiroir.position, true)
+        this.pinTiroir.init()
+        this.scene.add(this.pinTiroir.pin)
 
         this.dragSetup()
     }
@@ -260,7 +259,7 @@ export default class Scene_1 extends Scene {
                     this.hasBeenCompleted = true
                     this.cameraMixer.clipAction(this.cameraMouvement).isPaused = false;
                     this.transition.init()
-                    setTimeout(() => {this.shouldPlayTransition = true}, this.delayAnimationTransition);
+                    setTimeout(() => { this.shouldPlayTransition = true }, this.delayAnimationTransition);
                 }
                 else {
                     this.card.material.color.set(0x00ff00)
@@ -320,7 +319,7 @@ export default class Scene_1 extends Scene {
     onSceneIsDone() {
         this.isActive = false
         this.hasBeenCompleted = true
-        document.querySelector('.experience').removeEventListener('click', (e) => {this.click(e)})
+        document.querySelector('.experience').removeEventListener('click', (e) => { this.click(e) })
 
 
         // remove scene from main scene
@@ -354,8 +353,11 @@ export default class Scene_1 extends Scene {
             if (this.tiroirMixer && this.userStarted) {
                 this.tiroirMixer.update(this.time.delta * 0.001)
             }
+            if(this.pinTiroir) {
+                this.pinTiroir.animate()
+            }
         }
 
-        if(this.shouldPlayTransition)  this.transition.play()
+        if (this.shouldPlayTransition) this.transition.play()
     }
 }
