@@ -3,6 +3,8 @@ import Scene from './Scene'
 import GUI from 'lil-gui'
 import CustomMat from './CustomMat'
 
+const getRandomFloat = (min, max) => (Math.random() * (max - min) + min);
+
 export default class Scene_3 extends Scene {
     constructor(scene, renderer, cameraControls, mainScene, callback) {
         super()
@@ -15,6 +17,7 @@ export default class Scene_3 extends Scene {
         this.scene = scene.scene
         this.camera = scene.cameras[0]
         this.raycaster = this.cameraControls.raycaster
+       
 
         // this.cameraMixer = new THREE.AnimationMixer(this.camera)
         // this.cameraMouvement = scene.animations[0]
@@ -45,12 +48,23 @@ export default class Scene_3 extends Scene {
         this.birdFlying = this.animations[2]
         this.birdMoving = this.animations[1]
         this.birdShouldCatchCard = false
+
+        this.cloudMesh = this.scene.getObjectByName('cloud')
+        this.cloudCount = 40
+        this.obj = new THREE.Object3D()
+        //setup gui
+        this.cloudRangeX = new THREE.Vector2(-14, 14)
+        this.cloudRangeY = new THREE.Vector2(-1, 16)
+        this.cloudRangeZ = new THREE.Vector2(-10, 10)
+        this.cloudsData = []
         
         //lights
         this.light = new THREE.PointLight(0xffffff, 5, 100);
         this.light2 = new THREE.PointLight(0xffffff, 5, 100);
         
         console.log(this.animations)
+        this.thresholdYEnd = -13
+        this.thresholdYStart = 11
     }
     
     init() {
@@ -64,16 +78,15 @@ export default class Scene_3 extends Scene {
 
         this.setSceneMaterials()
         
-        this.light.position.set(10, 0.76, 2.6);
+        this.light.position.set(3.08, -10, 2.6);
         const helper1 = new THREE.PointLightHelper(this.light, 0.1);
         this.scene.add(this.light, helper1)
         
-        this.light2.position.set(1.04, 8.32, 2);
+        this.light2.position.set(10, 0, 2);
         const helper2 = new THREE.PointLightHelper(this.light2, 0.1);
         this.scene.add(this.light2, helper2)
 
         this.setupGui()
-
         
         const action = this.birdMixer.clipAction(this.birdFlying);
         //action.clampWhenFinished = true;
@@ -90,6 +103,7 @@ export default class Scene_3 extends Scene {
         planeAction.loop = THREE.LoopRepeat
         planeAction.play()
         // boxAction.paused = true
+        this.makeClouds()
 
         document.querySelector('.experience').addEventListener('click', (e) => {this.click(e)})
         
@@ -100,6 +114,32 @@ export default class Scene_3 extends Scene {
 
     setSounds() {
 
+    }
+
+    makeClouds() {
+        this.clouds = new THREE.InstancedMesh(this.cloudMesh.geometry, this.cloudMesh.material, 40 )
+        this.clouds.name = "clouds"
+ 
+    
+        for(let i = 0; i < this.cloudCount; i++){
+            let currCloud = {
+                startPosition : new THREE.Vector3(getRandomFloat(-6, 14), getRandomFloat(11, -13), getRandomFloat(-3, 13)),
+                life: getRandomFloat(3, 5),
+                scale : getRandomFloat(0.5, 2), 
+                speed : getRandomFloat(0.1, 0.5),
+            }
+            this.cloudsData.push(currCloud)
+
+            this.obj.position.copy(currCloud.startPosition)
+            this.obj.scale.set(currCloud.scale, currCloud.scale, currCloud.scale)
+
+            this.obj.updateMatrix()
+            this.clouds.setMatrixAt(i, this.obj.matrix)
+        }
+
+        this.clouds.instanceMatrix.needsUpdate = true
+        this.scene.add(this.clouds)
+  
     }
 
     setupGui() {
@@ -116,6 +156,54 @@ export default class Scene_3 extends Scene {
         light2Folder.add(this.light2.position, 'y').min(-10).max(10).name('light y')
         light2Folder.add(this.light2.position, 'z').min(-10).max(10).name('light z')
 
+        const cloudFolder = scene3Folder.addFolder("cloud settings")
+        cloudFolder.add(this.cloudRangeX, 'x').min(-20).max(20).name("range X low").onChange(e => {
+            this.resetClouds()
+        })
+        cloudFolder.add(this.cloudRangeY, 'x').min(-20).max(20).name("range Y low").onChange(e => {
+            this.resetClouds()
+        })
+        cloudFolder.add(this.cloudRangeZ, 'x').min(-20).max(20).name("range Z low").onChange(e => {
+            this.resetClouds()
+        })
+        cloudFolder.add(this.cloudRangeX, 'y').min(-20).max(20).name("range X high").onChange(e => {
+            this.resetClouds()
+        })
+        cloudFolder.add(this.cloudRangeY, 'y').min(-20).max(20).name("range Y high").onChange(e => {
+            this.resetClouds()
+        })
+        cloudFolder.add(this.cloudRangeZ, 'y').min(-20).max(20).name("range Z high").onChange(e => {
+            this.resetClouds()
+        })
+
+    }
+
+    resetClouds() {
+        this.scene.remove(this.scene.getObjectByName('clouds'))
+        this.makeClouds()
+
+    }
+
+    moveClouds(d) {
+        this.cloudsData.forEach((e, i) => {
+            //update Y position t*
+            let currCloud = this.cloudsData[i]
+            currCloud.life -= d // retrieve time from life
+           
+            this.obj.position.y = (this.thresholdYEnd - currCloud.startPosition.y) * currCloud.life
+            // if beyond threshold, respawn start threshold aka at the left of the camera
+            if(currCloud.life < 0) {
+                this.obj.position.y = this.thresholdYStart
+                currCloud.life = getRandomFloat(3, 5);
+            }
+            if(i === 0) {
+                console.log(this.obj.position.y, "yPosition")
+                console.log(currCloud.life, "cloud life")
+            } 
+            this.clouds.setMatrixAt(i, this.obj.matrix);
+        })
+        this.clouds.instanceMatrix.needsUpdate = true;
+        
     }
 
     click(e) {
@@ -151,6 +239,7 @@ export default class Scene_3 extends Scene {
         let toBeAdded = []
         this.scene.traverse(e => {
             if (e.isMesh) {
+                console.log(e.name)
                 if(e.name === "avion") {
                     let mat = new CustomMat({
                         renderer: this.renderer, uniforms: {
@@ -213,10 +302,8 @@ export default class Scene_3 extends Scene {
             this.planeMixer.update(this.time.delta * 0.001)
         }
 
-       
-        // if (this.cameraMixer) {
-        //     this.cameraMixer.update(this.time.delta * 0.001)
-        // }
+        this.moveClouds(this.time.delta * 0.001)
+
 
 
     }
