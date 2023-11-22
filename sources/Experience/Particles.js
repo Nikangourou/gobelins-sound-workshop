@@ -58,11 +58,11 @@ export default class Particles {
     this.group.position.copy(pos)
   }
 
-  respawnAt(color, position) {
+  respawnAt(color, position, dir) {
     // empty prev
     this.particlesData = []
     this.group.children = []
-    this.dir = Math.sign(position.z)
+    this.dir = dir ? dir : Math.sign(position.z)
     this.updateMatColor(color)
     this.updatePosition(position)
     this.init()

@@ -60,6 +60,8 @@ export default class Scene_3 extends Scene {
         this.birdFlying = this.animations[2]
         this.birdMoving = this.animations[1]
         this.birdShouldCatchCard = false
+        this.birdGroup = new THREE.Group()
+        this.birdGroup.add(this.bird)
 
         this.cloudMesh = this.scene.getObjectByName('cloud')
         this.cloudCount = 40
@@ -71,6 +73,7 @@ export default class Scene_3 extends Scene {
         this.cloudsData = []
 
         this.cardMesh = this.scene.getObjectByName('main_card')
+        this.cardMeshTargetPos = this.cardMesh.position.clone()
         this.cardsCount = 60
         this.cardsData = []
         this.cardObj = new THREE.Object3D()
@@ -88,12 +91,15 @@ export default class Scene_3 extends Scene {
     
     init() {
         this.mainScene.add(this.scene)
+        this.scene.add(this.birdGroup)
         this.cameraControls.setDefaultCamera(this.camera)
         this.isActive = true
         
         this.scene.add(this.particles.group)
         this.particles.init()
         this.particles.shouldAnimate = true
+
+        this.cardMesh.position.z = this.thresholdZStart
 
         this.bird.position.y = 0
         this.nextBtn.style.display = "block"
@@ -155,6 +161,22 @@ export default class Scene_3 extends Scene {
     }
 
     setSounds() {
+
+    }
+
+    setupGui() {
+        const scene3Folder = this.gui.addFolder("scene 3")
+        const matFolder = scene3Folder.addFolder("toon settings")
+        const lightFolder = matFolder.addFolder('light')
+        const light1 = lightFolder.addFolder("light1")
+        light1.add(this.light.position, 'x').min(-10).max(10).name('light x')
+        light1.add(this.light.position, 'y').min(-10).max(10).name('light y')
+        light1.add(this.light.position, 'z').min(-10).max(10).name('light z')
+
+        const light2Folder = lightFolder.addFolder("light2")
+        light2Folder.add(this.light2.position, 'x').min(-10).max(10).name('light x')
+        light2Folder.add(this.light2.position, 'y').min(-10).max(10).name('light y')
+        light2Folder.add(this.light2.position, 'z').min(-10).max(10).name('light z')
 
     }
 
@@ -223,21 +245,7 @@ export default class Scene_3 extends Scene {
   
     }
 
-    setupGui() {
-        const scene3Folder = this.gui.addFolder("scene 3")
-        const matFolder = scene3Folder.addFolder("toon settings")
-        const lightFolder = matFolder.addFolder('light')
-        const light1 = lightFolder.addFolder("light1")
-        light1.add(this.light.position, 'x').min(-10).max(10).name('light x')
-        light1.add(this.light.position, 'y').min(-10).max(10).name('light y')
-        light1.add(this.light.position, 'z').min(-10).max(10).name('light z')
-
-        const light2Folder = lightFolder.addFolder("light2")
-        light2Folder.add(this.light2.position, 'x').min(-10).max(10).name('light x')
-        light2Folder.add(this.light2.position, 'y').min(-10).max(10).name('light y')
-        light2Folder.add(this.light2.position, 'z').min(-10).max(10).name('light z')
-
-    }
+   
 
     animateCards() {
         this.cardsData.forEach((e, i) => {
@@ -272,6 +280,19 @@ export default class Scene_3 extends Scene {
             this.clouds.setMatrixAt(i, this.obj.matrix);
         })
         this.clouds.instanceMatrix.needsUpdate = true;
+    }
+
+    animateMainCard() {
+        // this.cardMesh.position.z -= 0.01
+        // console.log(this.cardMesh.position.z, this.cardMeshTargetPos.z)
+        if(this.cardMesh.position.z > this.cardMeshTargetPos.z) {
+            this.cardMesh.position.z -= 0.01
+            this.particles.updatePosition(this.cardMesh.position)
+            // this.birdGroup.position.y += 0.1
+            // console.log(this.birdGroup.position)
+        } 
+        
+        //update position of particles system
     }
 
     click(e) {
@@ -351,7 +372,7 @@ export default class Scene_3 extends Scene {
                     e.material = new THREE.MeshBasicMaterial({color: 0xff0000})
                     e.material.side = THREE.DoubleSide
 
-                    this.particles.respawnAt(e.material.color, e.position)
+                    this.particles.respawnAt(e.material.color, e.position, -1)
 
                 } else if(e.name === "cloud") {
                     e.visible = false
@@ -375,7 +396,10 @@ export default class Scene_3 extends Scene {
             this.planeMixer.update(this.time.delta * 0.001)
         }
         this.animateClouds(this.time.delta * 0.001)
-        if(this.cardsShouldFall) this.animateCards(this.time.delta * 0.001)
+        if(this.cardsShouldFall) {
+            this.animateCards(this.time.delta * 0.001)
+            this.animateMainCard(this.time.delta * 0.001)
+        }
 
         if(this.particles.shouldAnimate) this.particles.update()
     }
