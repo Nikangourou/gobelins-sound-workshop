@@ -4,6 +4,9 @@ import GUI from 'lil-gui'
 import CustomMat from './CustomMat'
 
 const getRandomFloat = (min, max) => (Math.random() * (max - min) + min);
+function getRandomInt(max) {
+    return Math.floor(Math.random() * max);
+  }
 
 export default class Scene_3 extends Scene {
     constructor(scene, renderer, cameraControls, mainScene, callback) {
@@ -52,11 +55,16 @@ export default class Scene_3 extends Scene {
         this.cloudMesh = this.scene.getObjectByName('cloud')
         this.cloudCount = 40
         this.obj = new THREE.Object3D()
-        //setup gui
+        //setup gui for clouds instance
         this.cloudRangeX = new THREE.Vector2(-14, 14)
         this.cloudRangeY = new THREE.Vector2(-1, 16)
         this.cloudRangeZ = new THREE.Vector2(-10, 10)
         this.cloudsData = []
+
+        this.cardMesh = this.scene.getObjectByName('main_card')
+        this.cardsCount = 30
+        this.cardsData = []
+        this.cardObj = new THREE.Object3D()
         
         //lights
         this.light = new THREE.PointLight(0xffffff, 5, 100);
@@ -65,6 +73,9 @@ export default class Scene_3 extends Scene {
         console.log(this.animations)
         this.thresholdYEnd = -13
         this.thresholdYStart = 11
+
+        this.thresholdZEnd = -3
+        this.thresholdZStart = 14
     }
     
     init() {
@@ -72,6 +83,23 @@ export default class Scene_3 extends Scene {
         this.cameraControls.setDefaultCamera(this.camera)
         this.isActive = true
         // this.nextBtn.style.display = "block"
+
+        // debug threshold
+        let debugMeshThresholdStart = new THREE.Mesh(new THREE.SphereGeometry(1, 16), new THREE.MeshNormalMaterial())
+        debugMeshThresholdStart.position.y = this.thresholdYStart
+        this.scene.add(debugMeshThresholdStart)
+        
+        let debugMeshThresholdEnd = new THREE.Mesh(new THREE.SphereGeometry(1, 16), new THREE.MeshBasicMaterial({color: 0x00ff00}))
+        debugMeshThresholdEnd.position.y = this.thresholdYEnd
+        this.scene.add(debugMeshThresholdEnd)
+
+        let debugMeshThresholdZStart = new THREE.Mesh(new THREE.SphereGeometry(1, 16),  new THREE.MeshBasicMaterial({color: 0x0000ff}))
+        debugMeshThresholdZStart.position.z = this.thresholdZStart
+        this.scene.add(debugMeshThresholdZStart)
+        
+        let debugMeshThresholdZEnd = new THREE.Mesh(new THREE.SphereGeometry(1, 16), new THREE.MeshBasicMaterial({color: 0xffff00}))
+        debugMeshThresholdZEnd.position.z = this.thresholdZEnd
+        this.scene.add(debugMeshThresholdZEnd)
 
         const helper = new THREE.CameraHelper( this.camera );
         this.scene.add(helper)
@@ -104,6 +132,7 @@ export default class Scene_3 extends Scene {
         planeAction.play()
         // boxAction.paused = true
         this.makeClouds()
+        this.makeCards()
 
         document.querySelector('.experience').addEventListener('click', (e) => {this.click(e)})
         
@@ -116,8 +145,42 @@ export default class Scene_3 extends Scene {
 
     }
 
+    makeCards() {
+        this.cards = new THREE.InstancedMesh(this.cardMesh.geometry, new THREE.MeshBasicMaterial(), this.cardsCount)
+        this.cards.name = "cards"
+        // 
+        const color = new THREE.Color();
+        for(let i = 0; i < this.cardsCount; i++) {
+            let currCard = {
+                startPosition : new THREE.Vector3(getRandomFloat(-6, 14), getRandomFloat(11, -13), getRandomFloat(-3, 13)),
+                life: getRandomFloat(3, 5),
+                scale : getRandomFloat(0.5, 2), 
+                speed : getRandomFloat(0.1, 0.5),
+            }
+            this.cardsData.push(currCard)
+            
+            this.cardObj.scale.set(3, 3,3)
+            this.cardObj.position.copy(currCard.startPosition)
+            
+            this.cardObj.rotation.set( Math.floor(Math.random() * 20),  Math.floor(Math.random() * 20),  Math.floor(Math.random() * 20))
+            let hex = this.cardColors[getRandomInt(this.cardColors.length - 1)] 
+            this.cards.setColorAt( i, color.set(hex));
+            
+            this.cardObj.updateMatrix()
+            this.cards.setMatrixAt(i, this.cardObj.matrix)
+            
+            
+        }
+        this.cards.instanceMatrix.setUsage( THREE.DynamicDrawUsage );
+
+        this.cards.instanceMatrix.needsUpdate = true
+        this.cards.instanceColor.needsUpdate = true
+       
+        this.scene.add(this.cards)
+    }
+
     makeClouds() {
-        this.clouds = new THREE.InstancedMesh(this.cloudMesh.geometry, this.cloudMesh.material, 40 )
+        this.clouds = new THREE.InstancedMesh(this.cloudMesh.geometry, this.cloudMesh.material, this.cloudCount )
         this.clouds.name = "clouds"
  
     
@@ -184,7 +247,20 @@ export default class Scene_3 extends Scene {
 
     }
 
-    moveClouds(d) {
+    animateCards(d) {
+        this.cardsData.forEach((e, i) => {
+            let currCard = this.cardsData[i]
+            currCard.life -= d
+            this.cardObj.position.z = (this.thresholdZEnd - currCard.startPosition.z) * currCard.life
+            this.cards.setMatrixAt(i, this.cardObj.matrix);
+           
+
+        })
+        this.cards.instanceMatrix.needsUpdate = true;
+    }
+
+
+    animateClouds(d) {
         this.cloudsData.forEach((e, i) => {
             //update Y position t*
             let currCloud = this.cloudsData[i]
@@ -192,7 +268,7 @@ export default class Scene_3 extends Scene {
            
             this.obj.position.y = (this.thresholdYEnd - currCloud.startPosition.y) * currCloud.life
             // if beyond threshold, respawn start threshold aka at the left of the camera
-            if(currCloud.life < 0) {
+            if(this.obj.position.y > this.thresholdYEnd) {
                 this.obj.position.y = this.thresholdYStart
                 currCloud.life = getRandomFloat(3, 5);
             }
@@ -278,6 +354,11 @@ export default class Scene_3 extends Scene {
                     mat.init()
                     e.material = mat.get()
 
+                } else if( e.name ==="main_card") {
+                 
+                    e.material = new THREE.MeshBasicMaterial({color: 0xff0000})
+                    e.material.side = THREE.DoubleSide
+
                 }
                  
        
@@ -302,7 +383,9 @@ export default class Scene_3 extends Scene {
             this.planeMixer.update(this.time.delta * 0.001)
         }
 
-        this.moveClouds(this.time.delta * 0.001)
+       
+        // this.animateClouds(this.time.delta * 0.001)
+        // this.animateCards(this.time.delta * 0.001)
 
 
 

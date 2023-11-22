@@ -20,7 +20,6 @@ export default class Scene_2 extends Scene {
         this.cameraMixer = new THREE.AnimationMixer(this.camera)
         this.cameraMouvement = scene.animations[3]
         this.particles = new Particles("#ef4444", this.scene)
-        this.cardColors = ["#ef4444", "#f97316", "#eab308", "#0d9488", "#2563eb", "#d946ef"]
         
         this.namesToBeOutlines = ["plane_box_1", "plane_box_2", "box_drag_drop"]
         this.lightPos = new THREE.Vector3(2, 5, 3)
