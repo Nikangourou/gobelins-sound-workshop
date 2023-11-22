@@ -4,6 +4,7 @@ import CustomMat from './CustomMat'
 import { PositionalAudioHelper } from 'three/examples/jsm/helpers/PositionalAudioHelper.js'
 import { DragControls } from 'three/examples/jsm/controls/DragControls.js'
 import Pin from '../Pin'
+import Pin from '../Pin'
 
 export default class Scene_1 extends Scene {
     constructor(scene, renderer, cameraControls, mainScene, callback) {
@@ -149,6 +150,11 @@ export default class Scene_1 extends Scene {
         this.pinTiroir.init()
         this.scene.add(this.pinTiroir.pin)
 
+        // Pin
+        this.pinTiroir = new Pin(this.tiroir.position, true)
+        this.pinTiroir.init()
+        this.scene.add(this.pinTiroir.pin)
+
         this.dragSetup()
     }
 
@@ -260,6 +266,7 @@ export default class Scene_1 extends Scene {
                     this.cameraMixer.clipAction(this.cameraMouvement).isPaused = false;
                     this.transition.init()
                     setTimeout(() => { this.shouldPlayTransition = true }, this.delayAnimationTransition);
+                    setTimeout(() => { this.shouldPlayTransition = true }, this.delayAnimationTransition);
                 }
                 else {
                     this.card.material.color.set(0x00ff00)
@@ -319,6 +326,7 @@ export default class Scene_1 extends Scene {
     onSceneIsDone() {
         this.isActive = false
         this.hasBeenCompleted = true
+        document.querySelector('.experience').removeEventListener('click', (e) => { this.click(e) })
         document.querySelector('.experience').removeEventListener('click', (e) => { this.click(e) })
 
 
