@@ -103,10 +103,14 @@ export default class Scene_2 extends Scene {
         this.setSounds()
 
         // Pin
-        this.pinBox = new Pin({ x: 0.2, y: 0, z: -0.1}, this.mouse, this.raycaster, this.camera)
+        // this.pinBox = new Pin({ x: 0.2, y: 0, z: -0.1}, this.mouse, this.raycaster, this.camera)
+        this.pinBox = new Pin({ x: 17.5, y: 1, z: 0.5}, this.mouse, this.raycaster, this.camera)
         this.pinBox.init()
-        this.boxToBeRemoved.add(this.pinBox.pin)
-        console.log(this.boxToBeRemoved.position)
+        this.scene.add(this.pinBox.pin)
+
+        this.pinButton = new Pin({ x: 17.3, y: 0.85, z: 0.57}, this.mouse, this.raycaster, this.camera)
+        this.pinButton.init()
+        this.scene.add(this.pinButton.pin)
     }
 
     setSounds() {
@@ -166,6 +170,9 @@ export default class Scene_2 extends Scene {
         if (!this.cameraControls.defaultCamera || !this.raycaster) return
         this.raycaster.setFromCamera(this.mouse, this.camera);
         let intersects = this.raycaster.intersectObject(this.scene, true)
+        if(intersects[0].object.name === 'pin') {
+            intersects.shift()
+        }
         let filteredByMat = intersects.filter(e => e.object.material.type === "MeshBasicMaterial")
 
         if (filteredByMat.length === 0) return
@@ -173,11 +180,13 @@ export default class Scene_2 extends Scene {
             this.boxFallingSound.play()
             this.userClickedBox = true
             this.boxMixer.clipAction(this.boxFalling).paused = false
+            this.pinBox.remove()
         } else if (filteredByMat[0].object.name.includes("button")) {
             this.buttonSound.play();
             this.hasBeenCompleted = true
             this.cameraMixer.clipAction(this.cameraMouvement).paused = false;
             this.transition.init()
+            this.pinButton.remove()
             setTimeout(() => { this.shouldPlayTransition = true }, this.delayAnimationTransition);
         } else if (filteredByMat[0].object) {
             this.particles.updateMatColor(filteredByMat[0].object.material.color)
@@ -276,6 +285,9 @@ export default class Scene_2 extends Scene {
         if (this.shouldPlayTransition) this.transition.play()
         if(this.pinBox){
             this.pinBox.animate()
+        }
+        if(this.pinButton){
+            this.pinButton.animate()
         }
     }
 }

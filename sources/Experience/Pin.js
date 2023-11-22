@@ -9,6 +9,7 @@ export default class Pin {
         this.mouse = mouse;
         this.raycaster = raycaster
         this.camera = camera
+        this.fadeOut = false
 
         this.globalUniforms = {
             time: { value: 0 },
@@ -19,6 +20,8 @@ export default class Pin {
         this.mMarker = new THREE.MeshBasicMaterial({
             color: 0xffffff,
             side: THREE.DoubleSide,
+            transparent: true,
+            opacity: 1,
             onBeforeCompile: (shader) => {
                 shader.uniforms.time = this.globalUniforms.time;
                 shader.uniforms.isHovered = this.globalUniforms.isHovered;
@@ -76,6 +79,9 @@ export default class Pin {
         this.pin.position.set(this.position.x, this.position.y, this.position.z)
     }
 
+    remove(){
+        this.fadeOut = true
+    }
 
     animate() {
         let t = this.clock.getElapsedTime();
@@ -91,6 +97,11 @@ export default class Pin {
             this.globalUniforms.isHovered.value = 1;
         } else {
             this.globalUniforms.isHovered.value = 0;
+        }
+
+        if(this.fadeOut) {
+            // fade out with opacity
+            this.mesh.material.opacity -= 0.01
         }
     }
 }

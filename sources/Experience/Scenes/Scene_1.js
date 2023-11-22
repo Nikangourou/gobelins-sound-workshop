@@ -291,15 +291,15 @@ export default class Scene_1 extends Scene {
             }
 
             if (modelIntersects[0].object.name === 'desk_lamp') {
-
                 this.actionLampe.stop()
-                this.actionLampe.play()                
+                this.actionLampe.play()           
+                this.pinLampe.remove()    
             }
             if (modelIntersects[0].object.name === 'radio') {
                 this.radioSound.play()
+                this.pinRadio.remove()
             }
             if (modelIntersects[0].object.name === 'tiroir_desk') {
-
 
                 if (this.tiroirOpen) {
                     this.actionTiroir.paused = false;
@@ -313,6 +313,7 @@ export default class Scene_1 extends Scene {
                     this.actionTiroir.play();
                     this.tiroirOpen = true;
                 }
+                this.pinTiroir.remove()
 
                 this.actionTiroir.play()
             }
