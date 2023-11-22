@@ -56,9 +56,11 @@ export default class Scene_2 extends Scene {
 
     init() {
         this.mainScene.add(this.scene)
-        this.cameraControls.setDefaultCamera(this.camera)
+        this.isActive = true
         // const helper = new THREE.CameraHelper( this.camera );
         // this.scene.add(helper)
+        this.scene.add(this.cameraControls.dummyCamera, this.cameraControls.groupToAnimateOnMousemove)
+        this.cameraControls.setDefaultCamera(this.camera)
 
         this.setSceneMaterials()
 
@@ -78,8 +80,6 @@ export default class Scene_2 extends Scene {
         this.scene.add(this.light2, helper2)
 
         this.setupGui()
-
-        this.isActive = true
 
         let testLight = new THREE.AmbientLight(0xffffff);
         this.scene.add(testLight)
@@ -172,8 +172,10 @@ export default class Scene_2 extends Scene {
             this.transition.init()
             setTimeout(() => {this.shouldPlayTransition = true}, this.delayAnimationTransition);
         } else if (filteredByMat[0].object) {
-            this.particles.updateMatColor(filteredByMat[0].object.material.color)
-            this.particles.updatePosition(filteredByMat[0].object.position)
+            this.particles.respawnAt(filteredByMat[0].object.material.color, filteredByMat[0].object.position)
+            // this.particles.updateMatColor(filteredByMat[0].object.material.color)
+            // this.particles.updatePosition(filteredByMat[0].object.position)
+            // update with direction 
         }
 
     }

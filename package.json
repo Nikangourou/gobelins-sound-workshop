@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "lil-gui": "^0.16.1",
+    "simplex-noise": "^4.0.1",
     "stats.js": "^0.17.0",
     "stylus": "^0.58.1",
     "three": "^0.141.0",

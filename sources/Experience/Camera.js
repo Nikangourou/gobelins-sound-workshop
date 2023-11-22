@@ -21,15 +21,17 @@ export default class Camera {
         this.mouseEaseRatio = 0.08
         this.raycaster = new THREE.Raycaster()
         this.groupToAnimateOnMousemove = new THREE.Group()
-        
-        
+        // this.dummyCamera = new THREE.Mesh(new THREE.ConeGeometry( 1, 10, 32 ), new THREE.MeshBasicMaterial())
+        // this.dummyCamera.visible = false
         
         // Set up
         this.mode = 'default' // defaultCamera \ debugCamera
 
         this.debugCamera = new THREE.PerspectiveCamera(25, this.config.width / this.config.height, 0.1, 300)
         this.defaultCamera = new THREE.PerspectiveCamera(25, this.config.width / this.config.height, 0.1, 150)
-        this.groupToAnimateOnMousemove.add(this.defaultCamera)
+        // this.groupToAnimateOnMousemove.add(this.defaultCamera)
+
+        // console.log( this.groupToAnimateOnMousemove )
         // this.instance = new THREE.PerspectiveCamera(25, this.config.width / this.config.height, 0.1, 150)
         // this.instance.rotation.reorder('YXZ')
 
@@ -44,6 +46,7 @@ export default class Camera {
 
     setDefaultCamera( camera ) {
         camera.add(this.audioListener)
+        // this.groupToAnimateOnMousemove.add(camera)
         this.defaultCamera = camera
         //this.defaultCamera.rotation.reorder('YXZ')
 
@@ -105,23 +108,14 @@ export default class Camera {
     }
 
     update() {
-        // Update debug orbit controls
         this.modes.debug.orbitControls.update()
-        // this.defaultCamera.position.x += ( this.mouse.x - this.defaultCamera.position.x ) * .005;
-       // this.defaultCamera.position.z += ( - this.mouse.y - this.defaultCamera.position.z ) * .005;
-        // this.defaultCamera.lookAt( new THREE.Vector3(0, -5, 0) );
 
-        // Apply coordinates
-
-        // this.instance.position.copy(this.modes[this.mode].instance.position)
-        // this.instance.quaternion.copy(this.modes[this.mode].instance.quaternion)
-        // this.instance.updateMatrixWorld() // To be used in projection
-
-        // Mise à jour de la position de la caméra
-        //this.easeMouse = this.lerp(this.mouse, this.mouseEaseRation)
-
-        // this.defaultCamera.rotateY(this.easeMouse.x * -this.mouseRotationH)
-        // this.defaultCamera.rotateX(this.easeMouse.y * this.mouseRotationV)
+        //DOLLY EFFECT
+        //this.groupToAnimateOnMousemove.position.copy(this.dummyCamera.position)
+        //this.groupToAnimateOnMousemove.rotation.copy(this.dummyCamera.position)
+       
+        // this.defaultCamera.rotation.x = ( this.mouse.y * .02 ) rotate cmaera inside group that is animated
+        //this.defaultCamera.rotation.y = ( this.mouse.x * .02 )
         
     }
 

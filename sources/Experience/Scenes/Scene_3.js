@@ -34,6 +34,9 @@ export default class Scene_3 extends Scene {
         // })
         this.nextBtn = document.getElementById('next')
         this.nextBtn.addEventListener('click', e => {
+            curr.onSceneIsDone()
+            callback()
+            this.isActive = false
             this.nextBtn.style.display = 'none'
             this.hasBeenCompleted = true
             //this.cameraMixer.clipAction(this.cameraMouvement).paused = false;
@@ -62,7 +65,7 @@ export default class Scene_3 extends Scene {
         this.cloudsData = []
 
         this.cardMesh = this.scene.getObjectByName('main_card')
-        this.cardsCount = 30
+        this.cardsCount = 60
         this.cardsData = []
         this.cardObj = new THREE.Object3D()
         
@@ -70,9 +73,8 @@ export default class Scene_3 extends Scene {
         this.light = new THREE.PointLight(0xffffff, 5, 100);
         this.light2 = new THREE.PointLight(0xffffff, 5, 100);
         
-        console.log(this.animations)
-        this.thresholdYEnd = -13
-        this.thresholdYStart = 11
+        this.thresholdYEnd = -16
+        this.thresholdYStart = 15
 
         this.thresholdZEnd = -3
         this.thresholdZStart = 14
@@ -82,7 +84,9 @@ export default class Scene_3 extends Scene {
         this.mainScene.add(this.scene)
         this.cameraControls.setDefaultCamera(this.camera)
         this.isActive = true
-        // this.nextBtn.style.display = "block"
+
+        this.bird.position.y = 0
+        this.nextBtn.style.display = "block"
 
         // debug threshold
         let debugMeshThresholdStart = new THREE.Mesh(new THREE.SphereGeometry(1, 16), new THREE.MeshNormalMaterial())
@@ -146,30 +150,35 @@ export default class Scene_3 extends Scene {
     }
 
     makeCards() {
-        this.cards = new THREE.InstancedMesh(this.cardMesh.geometry, new THREE.MeshBasicMaterial(), this.cardsCount)
+        let mat = new THREE.MeshBasicMaterial()
+        mat.side = THREE.DoubleSide
+        this.cards = new THREE.InstancedMesh(this.cardMesh.geometry, mat, this.cardsCount)
         this.cards.name = "cards"
-        // 
+        
         const color = new THREE.Color();
         for(let i = 0; i < this.cardsCount; i++) {
+            let initPos = new THREE.Vector3(getRandomFloat(-6, 14), getRandomFloat(11, -13), getRandomFloat(-3, 13))
+            let initRotation = new THREE.Vector3( Math.floor(Math.random() * 20),  Math.floor(Math.random() * 20),  Math.floor(Math.random() * 20))
             let currCard = {
-                startPosition : new THREE.Vector3(getRandomFloat(-6, 14), getRandomFloat(11, -13), getRandomFloat(-3, 13)),
+                currPosition : initPos,
+                rotation: initRotation,
                 life: getRandomFloat(3, 5),
                 scale : getRandomFloat(0.5, 2), 
                 speed : getRandomFloat(0.1, 0.5),
+                matrix: null
             }
             this.cardsData.push(currCard)
             
             this.cardObj.scale.set(3, 3,3)
-            this.cardObj.position.copy(currCard.startPosition)
+            this.cardObj.position.set(initPos)
             
-            this.cardObj.rotation.set( Math.floor(Math.random() * 20),  Math.floor(Math.random() * 20),  Math.floor(Math.random() * 20))
+            this.cardObj.rotation.set(initRotation)
             let hex = this.cardColors[getRandomInt(this.cardColors.length - 1)] 
             this.cards.setColorAt( i, color.set(hex));
             
             this.cardObj.updateMatrix()
             this.cards.setMatrixAt(i, this.cardObj.matrix)
-            
-            
+             
         }
         this.cards.instanceMatrix.setUsage( THREE.DynamicDrawUsage );
 
@@ -180,25 +189,25 @@ export default class Scene_3 extends Scene {
     }
 
     makeClouds() {
-        this.clouds = new THREE.InstancedMesh(this.cloudMesh.geometry, this.cloudMesh.material, this.cloudCount )
+        this.clouds = new THREE.InstancedMesh(this.cloudMesh.geometry,  new THREE.MeshBasicMaterial({color: 0xffffff}), this.cloudCount )
         this.clouds.name = "clouds"
  
-    
         for(let i = 0; i < this.cloudCount; i++){
+            let initPos = new THREE.Vector3(getRandomFloat(-6, 14), getRandomFloat(11, -13), getRandomFloat(-3, 13))
             let currCloud = {
-                startPosition : new THREE.Vector3(getRandomFloat(-6, 14), getRandomFloat(11, -13), getRandomFloat(-3, 13)),
-                life: getRandomFloat(3, 5),
-                scale : getRandomFloat(0.5, 2), 
+                position : initPos,
+                scale: getRandomFloat(0.5, 2),
                 speed : getRandomFloat(0.1, 0.5),
             }
             this.cloudsData.push(currCloud)
 
-            this.obj.position.copy(currCloud.startPosition)
+            this.obj.position.copy(currCloud.position)
             this.obj.scale.set(currCloud.scale, currCloud.scale, currCloud.scale)
 
             this.obj.updateMatrix()
             this.clouds.setMatrixAt(i, this.obj.matrix)
         }
+        this.clouds.instanceMatrix.setUsage( THREE.DynamicDrawUsage );
 
         this.clouds.instanceMatrix.needsUpdate = true
         this.scene.add(this.clouds)
@@ -219,67 +228,68 @@ export default class Scene_3 extends Scene {
         light2Folder.add(this.light2.position, 'y').min(-10).max(10).name('light y')
         light2Folder.add(this.light2.position, 'z').min(-10).max(10).name('light z')
 
-        const cloudFolder = scene3Folder.addFolder("cloud settings")
-        cloudFolder.add(this.cloudRangeX, 'x').min(-20).max(20).name("range X low").onChange(e => {
-            this.resetClouds()
-        })
-        cloudFolder.add(this.cloudRangeY, 'x').min(-20).max(20).name("range Y low").onChange(e => {
-            this.resetClouds()
-        })
-        cloudFolder.add(this.cloudRangeZ, 'x').min(-20).max(20).name("range Z low").onChange(e => {
-            this.resetClouds()
-        })
-        cloudFolder.add(this.cloudRangeX, 'y').min(-20).max(20).name("range X high").onChange(e => {
-            this.resetClouds()
-        })
-        cloudFolder.add(this.cloudRangeY, 'y').min(-20).max(20).name("range Y high").onChange(e => {
-            this.resetClouds()
-        })
-        cloudFolder.add(this.cloudRangeZ, 'y').min(-20).max(20).name("range Z high").onChange(e => {
-            this.resetClouds()
-        })
+        // const cloudFolder = scene3Folder.addFolder("cloud settings")
+        // cloudFolder.add(this.cloudRangeX, 'x').min(-20).max(20).name("range X low").onChange(e => {
+        //     this.resetClouds()
+        // })
+        // cloudFolder.add(this.cloudRangeY, 'x').min(-20).max(20).name("range Y low").onChange(e => {
+        //     this.resetClouds()
+        // })
+        // cloudFolder.add(this.cloudRangeZ, 'x').min(-20).max(20).name("range Z low").onChange(e => {
+        //     this.resetClouds()
+        // })
+        // cloudFolder.add(this.cloudRangeX, 'y').min(-20).max(20).name("range X high").onChange(e => {
+        //     this.resetClouds()
+        // })
+        // cloudFolder.add(this.cloudRangeY, 'y').min(-20).max(20).name("range Y high").onChange(e => {
+        //     this.resetClouds()
+        // })
+        // cloudFolder.add(this.cloudRangeZ, 'y').min(-20).max(20).name("range Z high").onChange(e => {
+        //     this.resetClouds()
+        // })
 
     }
 
-    resetClouds() {
-        this.scene.remove(this.scene.getObjectByName('clouds'))
-        this.makeClouds()
+    // resetClouds() {
+    //     this.scene.remove(this.scene.getObjectByName('clouds'))
+    //     this.makeClouds()
 
-    }
+    // }
 
-    animateCards(d) {
+    animateCards() {
         this.cardsData.forEach((e, i) => {
             let currCard = this.cardsData[i]
-            currCard.life -= d
-            this.cardObj.position.z = (this.thresholdZEnd - currCard.startPosition.z) * currCard.life
+            this.cardObj.matrix.identity()
+            currCard.currPosition.z -= 0.1*currCard.speed
+            this.cardObj.position.copy(currCard.currPosition)
+            this.cardObj.rotation.setFromVector3(currCard.rotation)
+            if(currCard.currPosition.z < this.thresholdZEnd) {
+                //if reached threshold, respawn up
+                currCard.currPosition.z = this.thresholdZStart
+            }
+            this.cardObj.updateMatrix()
             this.cards.setMatrixAt(i, this.cardObj.matrix);
-           
-
         })
+        
         this.cards.instanceMatrix.needsUpdate = true;
     }
 
 
-    animateClouds(d) {
+    animateClouds() {
         this.cloudsData.forEach((e, i) => {
-            //update Y position t*
             let currCloud = this.cloudsData[i]
-            currCloud.life -= d // retrieve time from life
-           
-            this.obj.position.y = (this.thresholdYEnd - currCloud.startPosition.y) * currCloud.life
+            this.obj.matrix.identity()
+            currCloud.position.y -= 0.05*currCloud.speed
+            this.obj.position.copy(currCloud.position)
+            this.obj.scale.set(currCloud.scale, currCloud.scale, currCloud.scale)
             // if beyond threshold, respawn start threshold aka at the left of the camera
-            if(this.obj.position.y > this.thresholdYEnd) {
-                this.obj.position.y = this.thresholdYStart
-                currCloud.life = getRandomFloat(3, 5);
+            if(currCloud.position.y < this.thresholdYEnd) {
+                currCloud.position.y = this.thresholdYStart
             }
-            if(i === 0) {
-                console.log(this.obj.position.y, "yPosition")
-                console.log(currCloud.life, "cloud life")
-            } 
+            this.obj.updateMatrix()
             this.clouds.setMatrixAt(i, this.obj.matrix);
         })
         this.clouds.instanceMatrix.needsUpdate = true;
-        
     }
 
     click(e) {
@@ -359,12 +369,10 @@ export default class Scene_3 extends Scene {
                     e.material = new THREE.MeshBasicMaterial({color: 0xff0000})
                     e.material.side = THREE.DoubleSide
 
+                } else if(e.name === "cloud") {
+                    e.visible = false
                 }
-                 
-       
             }
-
-
         })
         toBeAdded.forEach(e => this.scene.add(e))
 
@@ -382,13 +390,8 @@ export default class Scene_3 extends Scene {
         if(this.planeMixer) {
             this.planeMixer.update(this.time.delta * 0.001)
         }
-
-       
-        // this.animateClouds(this.time.delta * 0.001)
-        // this.animateCards(this.time.delta * 0.001)
-
-
-
+        this.animateClouds(this.time.delta * 0.001)
+        this.animateCards(this.time.delta * 0.001)
     }
 
 }
