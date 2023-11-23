@@ -51,9 +51,9 @@ ul {
     transform: translateX(-100%);
 }
 
-/* #sceneList{
+#sceneList{
     display: none;
-} */
+}
 
 #sceneList>li {
     padding: 64px 0;

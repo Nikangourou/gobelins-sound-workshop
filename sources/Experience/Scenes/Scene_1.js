@@ -3,6 +3,7 @@ import Scene from './Scene'
 import CustomMat from './CustomMat'
 import { PositionalAudioHelper } from 'three/examples/jsm/helpers/PositionalAudioHelper.js'
 import { DragControls } from 'three/examples/jsm/controls/DragControls.js'
+import Pin from '../Pin'
 
 export default class Scene_1 extends Scene {
     constructor(scene, renderer, cameraControls, mainScene, callback) {
@@ -61,7 +62,7 @@ export default class Scene_1 extends Scene {
         this.lightPos = new THREE.Vector3(2, 5, 3)
         this.userStarted = false;
         this.startBtn = document.querySelector('button')
-        
+
         this.startBtn.addEventListener('click', e => {
             this.userStarted = true;
             this.doorMixer.clipAction(this.doorMovement).paused = false;
@@ -139,21 +140,27 @@ export default class Scene_1 extends Scene {
 
         const audioLoader = new THREE.AudioLoader();
 
-        audioLoader.load('assets/RadioSound.mp3', (buffer) => {
+        audioLoader.load('assets/sounds/RadioSound.mp3', (buffer) => {
             this.radioSound.setBuffer(buffer);
             this.radioSound.setRefDistance(1);
         });
 
-        this.radioSound.add(helperRadio);
-        this.cubeRadio = new THREE.Mesh(
-            new THREE.BoxGeometry(0.2, 0.2, 0.2),
-            new THREE.MeshBasicMaterial({ color: 0x00ff00 })
-        )
-        this.cubeRadio.position.set(1.2, 0.6, 7.8)
-        this.cubeRadio.add(this.radioSound)
-        this.cubeRadio.visible = false
+        // this.radioSound.add(helperRadio);
+        this.radio.add(this.radioSound);
 
-        this.scene.add(this.cubeRadio)
+        // Pin
+        this.pinTiroir = new Pin({x: 0.1, y: 0.67, z: 7.25}, this.mouse, this.raycaster, this.camera)
+        this.pinTiroir.init()
+        this.tiroir.add(this.pinTiroir.pin)
+
+        this.pinLampe = new Pin({x: 0.02, y: -0.2, z: -0.1}, this.mouse, this.raycaster, this.camera)
+        this.pinLampe.init()
+        this.lampe.add(this.pinLampe.pin)
+
+        this.pinRadio = new Pin({x: -0.1, y: 0, z: -0.1}, this.mouse, this.raycaster, this.camera)
+        this.pinRadio.init()
+        this.radio.add(this.pinRadio.pin)
+
         this.dragSetup()
     }
 
@@ -304,7 +311,8 @@ export default class Scene_1 extends Scene {
                     this.hasBeenCompleted = true
                     this.cameraMixer.clipAction(this.cameraMouvement).isPaused = false;
                     this.transition.init()
-                    setTimeout(() => {this.shouldPlayTransition = true}, this.delayAnimationTransition);
+                    setTimeout(() => { this.shouldPlayTransition = true }, this.delayAnimationTransition);
+                    setTimeout(() => { this.shouldPlayTransition = true }, this.delayAnimationTransition);
                 }
                 else {
                     this.card.material.color.set(0x00ff00)
@@ -327,19 +335,21 @@ export default class Scene_1 extends Scene {
     click() {
         this.raycaster.setFromCamera(this.mouse, this.camera)
         const modelIntersects = this.raycaster.intersectObjects([this.lampe, this.radio, this.tiroir])
-
+       
         if (modelIntersects.length) {
+
+            if(modelIntersects[0].object.name === 'pin') {
+                modelIntersects.shift()
+            }
+
             if (modelIntersects[0].object.name === 'desk_lamp') {
-
                 this.actionLampe.stop()
-                this.actionLampe.play()
-
-                this.lampLight.visible = !this.lampLight.visible
-                
-
+                this.actionLampe.play()           
+                this.pinLampe.remove()    
             }
             if (modelIntersects[0].object.name === 'radio') {
                 this.radioSound.play()
+                this.pinRadio.remove()
             }
             if (modelIntersects[0].object.name === 'tiroir_desk') {
 
@@ -355,6 +365,7 @@ export default class Scene_1 extends Scene {
                     this.actionTiroir.play();
                     this.tiroirOpen = true;
                 }
+                this.pinTiroir.remove()
 
                 this.actionTiroir.play()
             }
@@ -364,7 +375,8 @@ export default class Scene_1 extends Scene {
     onSceneIsDone() {
         this.isActive = false
         this.hasBeenCompleted = true
-        document.querySelector('.experience').removeEventListener('click', (e) => {this.click(e)})
+        document.querySelector('.experience').removeEventListener('click', (e) => { this.click(e) })
+        document.querySelector('.experience').removeEventListener('click', (e) => { this.click(e) })
 
 
         // remove scene from main scene
@@ -398,8 +410,17 @@ export default class Scene_1 extends Scene {
             if (this.tiroirMixer && this.userStarted) {
                 this.tiroirMixer.update(this.time.delta * 0.001)
             }
+            if(this.pinTiroir) {
+                this.pinTiroir.animate()
+            }
+            if(this.pinLampe) {
+                this.pinLampe.animate()
+            }
+            if(this.pinRadio){
+                this.pinRadio.animate()
+            }
         }
 
-        if(this.shouldPlayTransition)  this.transition.play()
+        if (this.shouldPlayTransition) this.transition.play()
     }
 }
