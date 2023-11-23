@@ -1,6 +1,5 @@
 import * as THREE from 'three'
 import Scene from './Scene'
-import GUI from 'lil-gui'
 import CustomMat from './CustomMat'
 import Particles from './../Particles.js'
 
@@ -23,26 +22,20 @@ export default class Scene_3 extends Scene {
         this.raycaster = this.cameraControls.raycaster
         this.particles = new Particles("#ef4444", this.scene)
         this.cardsShouldFall = false
+        this.mainCardOffset = 1
 
-        // this.cameraMixer = new THREE.AnimationMixer(this.camera)
-        // this.cameraMouvement = scene.animations[0]
+        this.shouldPlayTransition = false
+        this.delayAnimationTransition = 1500
+
+        this.cameraMixer = new THREE.AnimationMixer(this.camera)
+        this.cameraMouvement = scene.animations[12]
         let curr = this
-        // this.cameraMixer.addEventListener('finished', function (e) {
-        //     console.log("scene 3 finished")
-        //     // transition UI in 
-        //     curr.onSceneIsDone()
-        //     callback()
-
-        // })
-        this.nextBtn = document.getElementById('next')
-        this.nextBtn.addEventListener('click', e => {
+        this.cameraMixer.addEventListener('finished', function (e) {
+            console.log("scene 3 finished")
+            // transition UI in 
             curr.onSceneIsDone()
             callback()
-            this.isActive = false
-            this.nextBtn.style.display = 'none'
-            this.hasBeenCompleted = true
-            //this.cameraMixer.clipAction(this.cameraMouvement).paused = false;
-            
+
         })
 
         // animations 
@@ -56,12 +49,11 @@ export default class Scene_3 extends Scene {
         
         this.bird = this.scene.getObjectByName('Bird')
         this.birdMixer = new THREE.AnimationMixer(this.bird)
-        this.birdMixer2 = new THREE.AnimationMixer(this.bird)
+        this.birdMixer2 = new THREE.AnimationMixer(this.bird.parent)
+        
         this.birdFlying = this.animations[2]
         this.birdMoving = this.animations[1]
         this.birdShouldCatchCard = false
-        this.birdGroup = new THREE.Group()
-        this.birdGroup.add(this.bird)
 
         this.cloudMesh = this.scene.getObjectByName('cloud')
         this.cloudCount = 40
@@ -82,11 +74,18 @@ export default class Scene_3 extends Scene {
         this.light = new THREE.PointLight(0xffffff, 5, 100);
         this.light2 = new THREE.PointLight(0xffffff, 5, 100);
         
-        this.thresholdYEnd = -16
+        this.thresholdYEnd = -40
         this.thresholdYStart = 15
 
         this.thresholdZEnd = -3
         this.thresholdZStart = 14
+
+        this.birdPosOffset = 3
+
+        //sounds 
+        this.planeSound = new THREE.Audio(this.cameraControls.audioListener);
+        this.ambientSound = new THREE.Audio(this.cameraControls.audioListener);
+        this.birdSound = new THREE.Audio(this.cameraControls.audioListener);
     }
     
     init() {
@@ -100,29 +99,25 @@ export default class Scene_3 extends Scene {
         this.particles.shouldAnimate = true
 
         this.cardMesh.position.z = this.thresholdZStart
-
-        this.bird.position.y = 0
-        this.nextBtn.style.display = "block"
+        this.bird.parent.position.y += this.birdPosOffset
+        this.cardMesh.position.x = this.bird.parent.position.x 
 
         // debug threshold
-        let debugMeshThresholdStart = new THREE.Mesh(new THREE.SphereGeometry(1, 16), new THREE.MeshNormalMaterial())
-        debugMeshThresholdStart.position.y = this.thresholdYStart
-        this.scene.add(debugMeshThresholdStart)
+        // let debugMeshThresholdStart = new THREE.Mesh(new THREE.SphereGeometry(1, 16), new THREE.MeshNormalMaterial())
+        // debugMeshThresholdStart.position.y = this.thresholdYStart
+        // this.scene.add(debugMeshThresholdStart)
         
-        let debugMeshThresholdEnd = new THREE.Mesh(new THREE.SphereGeometry(1, 16), new THREE.MeshBasicMaterial({color: 0x00ff00}))
-        debugMeshThresholdEnd.position.y = this.thresholdYEnd
-        this.scene.add(debugMeshThresholdEnd)
+        // let debugMeshThresholdEnd = new THREE.Mesh(new THREE.SphereGeometry(1, 16), new THREE.MeshBasicMaterial({color: 0x00ff00}))
+        // debugMeshThresholdEnd.position.y = this.thresholdYEnd
+        // this.scene.add(debugMeshThresholdEnd)
 
-        let debugMeshThresholdZStart = new THREE.Mesh(new THREE.SphereGeometry(1, 16),  new THREE.MeshBasicMaterial({color: 0x0000ff}))
-        debugMeshThresholdZStart.position.z = this.thresholdZStart
-        this.scene.add(debugMeshThresholdZStart)
+        // let debugMeshThresholdZStart = new THREE.Mesh(new THREE.SphereGeometry(1, 16),  new THREE.MeshBasicMaterial({color: 0x0000ff}))
+        // debugMeshThresholdZStart.position.z = this.thresholdZStart
+        // this.scene.add(debugMeshThresholdZStart)
         
-        let debugMeshThresholdZEnd = new THREE.Mesh(new THREE.SphereGeometry(1, 16), new THREE.MeshBasicMaterial({color: 0xffff00}))
-        debugMeshThresholdZEnd.position.z = this.thresholdZEnd
-        this.scene.add(debugMeshThresholdZEnd)
-
-        const helper = new THREE.CameraHelper( this.camera );
-        this.scene.add(helper)
+        // let debugMeshThresholdZEnd = new THREE.Mesh(new THREE.SphereGeometry(1, 16), new THREE.MeshBasicMaterial({color: 0xffff00}))
+        // debugMeshThresholdZEnd.position.z = this.thresholdZEnd
+        // this.scene.add(debugMeshThresholdZEnd)
 
         this.setSceneMaterials()
         
@@ -135,6 +130,12 @@ export default class Scene_3 extends Scene {
         this.scene.add(this.light2, helper2)
 
         this.setupGui()
+
+        const cameraAction = this.cameraMixer.clipAction(this.cameraMouvement);
+        cameraAction.clampWhenFinished = true;
+        cameraAction.loop = THREE.LoopOnce
+        cameraAction.play()
+        cameraAction.paused = true
         
         const action = this.birdMixer.clipAction(this.birdFlying);
         //action.clampWhenFinished = true;
@@ -152,6 +153,8 @@ export default class Scene_3 extends Scene {
         // boxAction.paused = true
         this.makeClouds()
         this.makeCards()
+
+        this.setSounds()
 
         document.querySelector('.experience').addEventListener('click', (e) => {this.click(e)})
         
@@ -283,16 +286,21 @@ export default class Scene_3 extends Scene {
     }
 
     animateMainCard() {
-        // this.cardMesh.position.z -= 0.01
-        // console.log(this.cardMesh.position.z, this.cardMeshTargetPos.z)
-        if(this.cardMesh.position.z > this.cardMeshTargetPos.z) {
-            this.cardMesh.position.z -= 0.01
+        if(this.cardMesh.position.z > this.cardMeshTargetPos.z + this.mainCardOffset) {
+            this.cardMesh.position.z -= 0.02
             this.particles.updatePosition(this.cardMesh.position)
             // this.birdGroup.position.y += 0.1
             // console.log(this.birdGroup.position)
         } 
         
         //update position of particles system
+    }
+
+    moveBirdIntoView() {
+        if(this.birdPosOffset > 0) {
+            this.birdPosOffset -= 0.01
+            this.bird.parent.position.y -= 0.01
+        }
     }
 
     click(e) {
@@ -306,11 +314,23 @@ export default class Scene_3 extends Scene {
   
         if(intersects.map(e => e.object.name).includes("main_card")) {
             this.birdShouldCatchCard = true
+            this.birdSound.play();
+            let birdFlyingAway = ( ) => this.onBirdWentAway(this)
+            setTimeout(birdFlyingAway, 1200)
         }
        
     }
 
+    onBirdWentAway(ctx) {
+       ctx.cameraMixer.clipAction(this.cameraMouvement).paused = false
+       ctx.transition.init()
+        setTimeout(() => {ctx.shouldPlayTransition = true},ctx.delayAnimationTransition);
+    }
+
+    thi
+
     onSceneIsDone() {
+        this.ambientSound.stop();
         this.isActive = false
         this.hasBeenCompleted = true
 
@@ -328,7 +348,7 @@ export default class Scene_3 extends Scene {
         let toBeAdded = []
         this.scene.traverse(e => {
             if (e.isMesh) {
-                console.log(e.name)
+                console.log(e)
                 if(e.name === "avion") {
                     let mat = new CustomMat({
                         renderer: this.renderer, uniforms: {
@@ -383,7 +403,36 @@ export default class Scene_3 extends Scene {
 
     }
 
+    setSounds() {
+        const audioLoader = new THREE.AudioLoader();
+        audioLoader.load('/assets/sounds/scene3/avion.mp3', (buffer) => {
+            this.planeSound.setBuffer( buffer );
+            this.planeSound.setLoop( false );
+            this.planeSound.setVolume( 1 );
+            this.planeSound.play();
+        })
+
+        audioLoader.load('/assets/sounds/scene3/fall_in_sky.mp3', (buffer) => {
+            this.ambientSound.setBuffer( buffer );
+            this.ambientSound.setLoop( true );
+            this.ambientSound.setVolume( 1 );
+            this.ambientSound.play();
+        })
+
+        audioLoader.load('/assets/sounds/scene3/oiseau.mp3', (buffer) => {
+            birdSound.setBuffer( buffer );
+            birdSound.setLoop( false );
+            birdSound.setVolume( 1 );
+            // birdSound.play();
+        })
+
+    }
+
     update() {
+        if (this.cameraMixer) {
+            this.cameraMixer.update(this.time.delta * 0.001)
+        }
+        
         if(this.birdMixer) {
             this.birdMixer.update(this.time.delta * 0.001)
         }
@@ -402,6 +451,8 @@ export default class Scene_3 extends Scene {
         }
 
         if(this.particles.shouldAnimate) this.particles.update()
+
+        if(this.shouldPlayTransition)  this.transition.play()
     }
 
 }

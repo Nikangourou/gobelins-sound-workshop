@@ -20,16 +20,13 @@ export default class Scene_2 extends Scene {
         this.scene = scene.scene
         this.camera = scene.cameras[0]
         this.cameraMixer = new THREE.AnimationMixer(this.camera)
-        this.cameraMouvement = scene.animations[3]
+        this.cameraMouvement = scene.animations[4]
         this.particles = new Particles("#ef4444", this.scene)
 
         this.namesToBeOutlines = ["plane_box_1", "plane_box_2", "box_drag_drop"]
         this.lightPos = new THREE.Vector3(2, 5, 3)
-
-        this.rugAnimation = scene.animations[0]
-        this.boxFalling = scene.animations[1]
-
-        this.delayAnimationTransition = 22000
+        
+        this.delayAnimationTransition = 23100
         this.shouldPlayTransition = false
         // State / UI
         this.nextBtn = document.getElementById('next')
@@ -37,10 +34,24 @@ export default class Scene_2 extends Scene {
         this.ambientSound = new THREE.Audio(this.cameraControls.audioListener);
         this.buttonSound = new THREE.Audio(this.cameraControls.audioListener);
         this.boxFallingSound = new THREE.Audio(this.cameraControls.audioListener);
-
+        
         //objects 
         this.boxToBeRemoved = this.scene.getObjectByName('box_drag_drop')
         this.boxMixer = new THREE.AnimationMixer(this.boxToBeRemoved)
+        this.boxFalling = scene.animations[2]
+        
+        this.buttonToAnimate = this.scene.getObjectByName('button_animation')
+        this.buttonMixer =new THREE.AnimationMixer(this.buttonToAnimate)
+        this.buttonAnimation = scene.animations[3]
+
+        this.buttonMixer.addEventListener('finished', function (e) {
+            curr.onButtonPressed()
+        })
+
+        // this.movingRug =  this.scene.getObjectByName('box_drag_drop')
+        this.rugAnimation = scene.animations[1]
+        
+
 
         let curr = this
         this.cameraMixer.addEventListener('finished', function (e) {
@@ -58,33 +69,28 @@ export default class Scene_2 extends Scene {
     init() {
         this.mainScene.add(this.scene)
         this.isActive = true
-        // const helper = new THREE.CameraHelper( this.camera );
-        // this.scene.add(helper)
-        this.scene.add(this.cameraControls.dummyCamera, this.cameraControls.groupToAnimateOnMousemove)
         this.cameraControls.setDefaultCamera(this.camera)
-
         this.setSceneMaterials()
+        this.setupGui()
+        this.setSounds()
+       
 
         this.particles.group.position.x = 10
         this.particles.group.position.z = -1
         this.particles.group.position.y = 2
 
-        // this.userClickedBox.style.display = "block"
-
+        //lights
         this.light.position.set(10, 0.76, 2.6);
         const helper1 = new THREE.PointLightHelper(this.light, 0.1);
         this.scene.add(this.light, helper1)
-
-
         this.light2.position.set(1.04, 8.32, 2);
         const helper2 = new THREE.PointLightHelper(this.light2, 0.1);
         this.scene.add(this.light2, helper2)
-
-        this.setupGui()
-
         let testLight = new THREE.AmbientLight(0xffffff);
         this.scene.add(testLight)
 
+
+        //animations 
         const action = this.cameraMixer.clipAction(this.cameraMouvement);
         action.clampWhenFinished = true;
         action.loop = THREE.LoopOnce
@@ -97,9 +103,11 @@ export default class Scene_2 extends Scene {
         boxAction.play()
         boxAction.paused = true
 
-        document.querySelector('.experience').addEventListener('click', (e) => { this.click(e) })
+        const buttonAction = this.buttonMixer.clipAction(this.buttonAnimation)
+        buttonAction.clampWhenFinished = true;
+        buttonAction.loop = THREE.LoopOnce
 
-        this.setSounds()
+        document.querySelector('.experience').addEventListener('click', (e) => { this.click(e) })
 
         // Pin
         // this.pinBox = new Pin({ x: 0.2, y: 0, z: -0.1}, this.mouse, this.raycaster, this.camera)
@@ -114,24 +122,24 @@ export default class Scene_2 extends Scene {
 
     setSounds() {
         const audioLoader = new THREE.AudioLoader();
-        audioLoader.load('/assets/sounds/scene2/ambient.mp3', (buffer) => {
-            this.ambientSound.setBuffer(buffer);
-            this.ambientSound.setLoop(true);
-            this.ambientSound.setVolume(0.5);
+        audioLoader.load('/assets/sounds/scene2/ambiance.mp3', (buffer) => {
+            this.ambientSound.setBuffer( buffer );
+            this.ambientSound.setLoop( true );
+            this.ambientSound.setVolume( 0.5 );
             this.ambientSound.play();
         })
 
-        audioLoader.load('/assets/sounds/scene2/bouton.wav', (buffer) => {
-            this.buttonSound.setBuffer(buffer);
-            this.buttonSound.setLoop(false);
-            this.buttonSound.setVolume(1);
+        audioLoader.load('/assets/sounds/scene2/pressure_button.mp3', (buffer) => {
+            this.buttonSound.setBuffer( buffer );
+            this.buttonSound.setLoop( false );
+            this.buttonSound.setVolume( 3 );
         })
-
-        audioLoader.load('/assets/sounds/scene2/colis1.mp3', (buffer) => {
-            this.boxFallingSound.setBuffer(buffer);
-            this.boxFallingSound.setLoop(false);
-            this.boxFallingSound.setVolume(1);
-        })
+        
+        audioLoader.load('/assets/sounds/scene2/colis.mp3', (buffer) => {
+            this.boxFallingSound.setBuffer( buffer );
+            this.boxFallingSound.setLoop( false );
+            this.boxFallingSound.setVolume( 1 );
+        })   
 
     }
 
@@ -163,8 +171,8 @@ export default class Scene_2 extends Scene {
             this.particles.shouldAnimate = true
         }
 
-        this.mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
-        this.mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+        // this.mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+        // this.mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
 
         if (!this.cameraControls.defaultCamera || !this.raycaster) return
         this.raycaster.setFromCamera(this.mouse, this.camera);
@@ -176,16 +184,16 @@ export default class Scene_2 extends Scene {
 
         if (filteredByMat.length === 0) return
         if (filteredByMat[0].object.name === "box_drag_drop") {
+            
             this.boxFallingSound.play()
             this.userClickedBox = true
             this.boxMixer.clipAction(this.boxFalling).paused = false
             this.pinBox.remove()
         } else if (filteredByMat[0].object.name.includes("button")) {
+            console.log("button click detected")
+            this.buttonMixer.clipAction(this.buttonAnimation).play()
             this.buttonSound.play();
-            this.hasBeenCompleted = true
-            this.cameraMixer.clipAction(this.cameraMouvement).paused = false;
-            this.transition.init()
-            this.pinButton.remove()
+            
             setTimeout(() => { this.shouldPlayTransition = true }, this.delayAnimationTransition);
         } else if (filteredByMat[0].object) {
             this.particles.respawnAt(filteredByMat[0].object.material.color, filteredByMat[0].object.position)
@@ -195,6 +203,14 @@ export default class Scene_2 extends Scene {
         }
 
     }
+
+    onButtonPressed() {
+        this.hasBeenCompleted = true
+        this.cameraMixer.clipAction(this.cameraMouvement).paused = false;
+        this.transition.init()
+        this.pinButton.remove()
+    }
+    
 
     onSceneIsDone() {
         this.ambientSound.stop();
@@ -217,6 +233,7 @@ export default class Scene_2 extends Scene {
         let toBeAdded = []
         this.scene.traverse(e => {
             if (e.isMesh) {
+                console.log(e.name)
                 if (e.name.includes("button")) {
 
                     e.material = new THREE.MeshBasicMaterial({ color: 0xff0000 })
@@ -277,6 +294,10 @@ export default class Scene_2 extends Scene {
     update() {
         if (this.cameraMixer) {
             this.cameraMixer.update(this.time.delta * 0.001)
+        }
+
+        if (this.buttonMixer) {
+            this.buttonMixer.update(this.time.delta * 0.001)
         }
 
         if (this.boxMixer && !this.boxMixer.clipAction(this.boxFalling).paused) {

@@ -8,31 +8,37 @@ export default class Transition {
         this.animLength = this.frameCount/this.frameRate
         this.speed = 1.0
         this.isDone = false
+        this.isPlaying = false
         this.delay = delay
         //24 images / seconds
     }
 
     init() {
+        this.frameIndex = 0
         this.container.style.display = "block"
-        this.img.src = `/assets/paper_animation${this.frameIndex}.png`
-        console.log("init is called")
+        this.img.src = `assets/transition/new_paper_animation${this.frameIndex}.png`
+        this.isDone = false
+        this.isPlaying = false
     }
 
     remove() {
         this.frameIndex = 0;
         this.isDone = false;
-        this.container.style.display = "none"
+        //this.container.style.display = "none"
     }
 
     play() {
         
         if(this.frameIndex < this.frameCount && !this.isDone ) {
             this.frameIndex += 1
-            this.img.src = `/assets/paper_animation${this.frameIndex}.png`
+            this.img.src = `assets/transition/new_paper_animation${this.frameIndex}.png`
+            this.isPlaying = true
+
         }
 
         if(!this.isDone && this.frameIndex > this.frameCount) {
             this.isDone = true
+            this.isPlaying = false
         }
 
 
