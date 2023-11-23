@@ -54,7 +54,7 @@ export default class Scene_1 extends Scene {
         this.shouldPlayTransition = false
         this.delayAnimationTransition = 1500
 
-        this.namesToBeOutlines = ["desk", "bag", "radio", "commode", "tabletop_high", 'library', "lamp", "box", "old_chair", "Flame", "Chair"]
+        this.namesToBeOutlines = [ "radio",  "desk_lamp" ]
         this.lightPos = new THREE.Vector3(2, 5, 3)
         this.userStarted = false;
         this.startBtn = document.querySelector('button')
@@ -93,6 +93,22 @@ export default class Scene_1 extends Scene {
         this.lampSound = new THREE.Audio( this.cameraControls.audioListener );
         this.tiroirSound = new THREE.Audio( this.cameraControls.audioListener );
         this.ambientSound = new THREE.Audio( this.cameraControls.audioListener)
+
+        this.staticMatDarkColor = '#111722'
+        this.staticMatLightColor = '#E69262'
+        this.staticMat = new CustomMat({
+            renderer: this.renderer, uniforms: {
+                color1: { value: new THREE.Color(this.staticMatDarkColor) },// darker
+                color2: { value:  new THREE.Color(this.staticMatLightColor) }, 
+                color3: { value: new THREE.Color('#c2410c') },
+                color4: { value: new THREE.Color('#bae6fd') },
+                color5: { value: new THREE.Color('#E8A85E') },// lighter
+                noiseStep: { value: 1.0 },
+                nbColors: { value: 2},
+                lightDirection: { value: this.light.position },
+                lightDirection2: { value: this.lampLight.position },
+            }
+        })
     }
 
     init() {
@@ -173,6 +189,12 @@ export default class Scene_1 extends Scene {
         light2Folder.add(this.lampLight.position, 'y').min(-10).max(10).name('light y')
         light2Folder.add(this.lampLight.position, 'z').min(-10).max(10).name('light z')
 
+        const colors = matFolder.addFolder('colors')
+        colors.addColor(this, 'staticMatDarkColor').name('colorDark').onChange(e => {
+            this.staticMat.updateColor('color1', e )
+        })
+        colors.addColor(this, 'staticMatLightColor').name('colorLight')
+
     }
 
     setSounds() {
@@ -230,15 +252,15 @@ export default class Scene_1 extends Scene {
                     e.material = mat.get()
 
                 } else if (e.name.includes('timbre')) {
-                    e.material = new THREE.MeshBasicMaterial({ color: 0xff0000 })
+                    e.material = new THREE.MeshBasicMaterial({ color: '#699DF7' })
                 } else if (this.namesToBeOutlines.includes(e.name)) {
                     let mat = new CustomMat({
                         renderer: this.renderer, uniforms: {
-                            color1: { value: e.material.color }, // darker
-                            color2: { value: new THREE.Color('#ea580c') },
-                            color3: { value: new THREE.Color('#f59e0b') },
-                            color4: { value: new THREE.Color('#c2410c') },
-                            color5: { value: new THREE.Color('#bae6fd') },// lighter
+                            color1: { value: new THREE.Color('#699DF7') }, // darker
+                            color2: { value: new THREE.Color('#5E9EE8') },
+                            color3: { value: new THREE.Color('#50A5D7') },
+                            color4: { value: new THREE.Color('#45A6C9') },
+                            color5: { value: new THREE.Color('#3CA4B9') },// lighter
                             noiseStep: { value: 1.0 },
                             nbColors: { value: 3 },
                             lightDirection: { value: this.light.position },
@@ -257,7 +279,7 @@ export default class Scene_1 extends Scene {
                     let mat = new CustomMat({
                         renderer: this.renderer, uniforms: {
                             color1: { value: new THREE.Color('#1e293b') }, // darker
-                            color2: { value: new THREE.Color('#4c0519') },
+                            color2: { value: new THREE.Color('E69262') },
                             color3: { value: new THREE.Color('#9f1239') },
                             color4: { value: new THREE.Color('#e11d48') },
                             color5: { value: new THREE.Color('#1d4ed8') },// lighter
@@ -270,21 +292,8 @@ export default class Scene_1 extends Scene {
 
 
                 } else {
-                    let mat = new CustomMat({
-                        renderer: this.renderer, uniforms: {
-                            color1: { value: new THREE.Color('#1e293b') }, // darker
-                            color2: { value: new THREE.Color('#eab308') },
-                            color3: { value: new THREE.Color('#3b82f6') },
-                            color4: { value: new THREE.Color('#2563eb') },
-                            color5: { value: new THREE.Color('#1d4ed8') },// lighter
-                            noiseStep: { value: 1.0 },
-                            nbColors: { value: 3 },
-                            lightDirection: { value: this.light.position },
-                            lightDirection2: { value: this.lampLight.position },
-                        }
-                    })
-                    mat.init()
-                    e.material = mat.get()
+                    this.staticMat.init()
+                    e.material = this.staticMat.get()
 
                 }
             }
@@ -323,8 +332,8 @@ export default class Scene_1 extends Scene {
         // simulate lighting on/off by moving position
 
         if(this.deskLight) {
-            this.light.position.set(3, 0.76, -0.92)
-            this.lampLight.position.set(-5.68, 8.32, 2)
+            this.light.position.set(-5.94, -2.64, -3.84)
+            this.lampLight.position.set(-7.94, 7, 10)
         } else {
             this.light.position.set(10, 0.76, 2.6)
             this.lampLight.position.set(1.04, 8.32, 2)
@@ -418,6 +427,7 @@ export default class Scene_1 extends Scene {
             if(this.pinRadio){
                 this.pinRadio.animate()
             }
+            
         }
 
         if (this.shouldPlayTransition) this.transition.play()

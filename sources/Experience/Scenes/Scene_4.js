@@ -97,6 +97,7 @@ export default class Scene_4 extends Scene {
     onSceneIsDone() {
         this.isActive = false
         this.hasBeenCompleted = true
+        
 
         // remove scene from main scene
         let toBeRemoved = null

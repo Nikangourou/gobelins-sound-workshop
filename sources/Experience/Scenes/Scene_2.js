@@ -77,7 +77,6 @@ export default class Scene_2 extends Scene {
         this.setSceneMaterials()
         this.setupGui()
         this.setSounds()
-       
 
         this.particles.group.position.x = 10
         this.particles.group.position.z = -1
