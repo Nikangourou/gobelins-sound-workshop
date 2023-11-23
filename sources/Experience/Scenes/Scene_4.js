@@ -3,6 +3,7 @@ import Scene from './Scene'
 import GUI from 'lil-gui'
 import CustomMat from './CustomMat'
 import Particles from './../Particles.js'
+import Pin from '../Pin'
 
 
 const getRandomFloat = (min, max) => (Math.random() * (max - min) + min);
@@ -17,6 +18,8 @@ export default class Scene_4 extends Scene {
         this.renderer = renderer
         this.gui = this.renderer.debug
         this.cameraControls = cameraControls
+        this.mouse = this.cameraControls.mouse
+        this.raycaster = this.cameraControls.raycaster
         this.mainScene = mainScene
         this.animations = scene.animations
         this.scene = scene.scene
@@ -55,6 +58,7 @@ export default class Scene_4 extends Scene {
             this.hasBeenCompleted = true
             this.cameraMixer.clipAction(this.cameraMouvement).paused = false;
             document.querySelector('.generique').classList.add('active')
+            this.pinBox.remove()
         })
     }
     
@@ -85,6 +89,9 @@ export default class Scene_4 extends Scene {
 
         this.setSounds()
 
+        this.pinBox = new Pin({ x: 0.02, y: -0.01, z: 0}, this.mouse, this.raycaster, this.camera)
+        this.pinBox.init()
+        this.scene.add(this.pinBox.pin)
     }
     setupGui() {
         const scene4Folder = this.gui.addFolder("scene 4")
@@ -238,6 +245,9 @@ export default class Scene_4 extends Scene {
     update() {
         if (this.cameraMixer) {
             this.cameraMixer.update(this.time.delta * 0.001)
+        }
+        if(this.pinBox){
+            this.pinBox.animate()
         }
         this.particles.forEach(particleSystem => particleSystem.update())
 
