@@ -2,6 +2,7 @@ import * as THREE from 'three'
 import Scene from './Scene'
 import CustomMat from './CustomMat'
 import Particles from './../Particles.js'
+import Pin from '../Pin'
 
 const getRandomFloat = (min, max) => (Math.random() * (max - min) + min);
 function getRandomInt(max) {
@@ -20,6 +21,7 @@ export default class Scene_3 extends Scene {
         this.scene = scene.scene
         this.camera = scene.cameras[0]
         this.raycaster = this.cameraControls.raycaster
+        this.mouse = this.cameraControls.mouse
         this.particles = new Particles("#ef4444", this.scene)
         this.cardsShouldFall = false
         this.mainCardOffset = 1
@@ -104,7 +106,6 @@ export default class Scene_3 extends Scene {
 
         let cameraHelper = new THREE.CameraHelper(this.camera)
         this.scene.add(cameraHelper)
-        
         this.scene.add(this.particles.group)
         this.particles.init()
         this.particles.shouldAnimate = true
@@ -153,8 +154,11 @@ export default class Scene_3 extends Scene {
         this.setSounds()
 
         document.querySelector('.experience').addEventListener('click', (e) => {this.click(e)})
-
-
+        
+        // this.setSounds()
+        this.pinCard = new Pin({ x: 0.02, y: -0.01, z: 0}, this.mouse, this.raycaster, this.camera, 0.02)
+        this.pinCard.init()
+        this.cardMesh.add(this.pinCard.pin)
     }
 
     setupGui() {
@@ -295,6 +299,10 @@ export default class Scene_3 extends Scene {
         if(intersects.map(e => e.object.name).includes("main_card")) {
             this.birdShouldCatchCard = true
             this.birdSound.play();
+
+            //let birdFlyingAway = ( ) => this.onBirdWentAway(this)
+            this.pinCard.remove()
+
             this.birdMixer2.clipAction(this.birdMoving).play()
             // setTimeout(birdFlyingAway, 1200)
         }
@@ -452,7 +460,9 @@ export default class Scene_3 extends Scene {
             this.animateCards(this.time.delta * 0.001)
             this.animateMainCard(this.time.delta * 0.001)
         }
-
+        if(this.pinCard){
+            this.pinCard.animate()
+        }
         if(this.particles.shouldAnimate) this.particles.update()
 
         if(this.shouldPlayTransition)  this.transition.play()
