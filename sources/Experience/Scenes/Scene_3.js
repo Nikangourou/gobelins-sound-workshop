@@ -107,7 +107,6 @@ export default class Scene_3 extends Scene {
 
         let cameraHelper = new THREE.CameraHelper(this.camera)
         this.scene.add(cameraHelper)
-        
         this.scene.add(this.particles.group)
         this.particles.init()
         this.particles.shouldAnimate = true
