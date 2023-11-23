@@ -55,7 +55,7 @@ export default class Scene_3 extends Scene {
         
         this.bird = this.scene.getObjectByName('bird')
         this.birdMixer = new THREE.AnimationMixer(this.bird)
-        this.birdMixer2 = new THREE.AnimationMixer(this.bird.parent)
+        // this.birdMixer2 = new THREE.AnimationMixer(this.bird.parent)
         
         this.birdFlying = this.animations[2]
         this.birdMoving = this.animations[1]
