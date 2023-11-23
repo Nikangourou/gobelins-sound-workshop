@@ -99,9 +99,7 @@ export default class Scene_3 extends Scene {
         this.particles.shouldAnimate = true
 
         this.cardMesh.position.z = this.thresholdZStart
-
         this.bird.parent.position.y += this.birdPosOffset
-
         this.cardMesh.position.x = this.bird.parent.position.x 
 
         // debug threshold
@@ -120,9 +118,6 @@ export default class Scene_3 extends Scene {
         // let debugMeshThresholdZEnd = new THREE.Mesh(new THREE.SphereGeometry(1, 16), new THREE.MeshBasicMaterial({color: 0xffff00}))
         // debugMeshThresholdZEnd.position.z = this.thresholdZEnd
         // this.scene.add(debugMeshThresholdZEnd)
-
-        // const helper = new THREE.CameraHelper( this.camera );
-        // this.scene.add(helper)
 
         this.setSceneMaterials()
         
@@ -453,7 +448,6 @@ export default class Scene_3 extends Scene {
         if(this.cardsShouldFall) {
             this.animateCards(this.time.delta * 0.001)
             this.animateMainCard(this.time.delta * 0.001)
-            this.moveBirdIntoView()
         }
 
         if(this.particles.shouldAnimate) this.particles.update()

@@ -43,8 +43,6 @@ export default class Scene_1 extends Scene {
         this.raycaster = this.cameraControls.raycaster
         this.mouse = this.cameraControls.mouse
         this.audioListenner = this.cameraControls.audioListener
-        // this.audioListenner.context.resume()
-        // this.radioSound = new THREE.PositionalAudio(this.audioListenner);
         this.cameraMixer.addEventListener('finished', function (e) {
             console.log("finished")
             // transition UI in 
@@ -102,9 +100,6 @@ export default class Scene_1 extends Scene {
         this.startBtn.style.display = "block"
         this.cameraControls.setDefaultCamera(this.camera)
         this.isActive = true
-
-        const helper = new THREE.CameraHelper( this.camera );
-        this.scene.add(helper)
         
         this.setLights(this.deskLight)
         this.setupGui()

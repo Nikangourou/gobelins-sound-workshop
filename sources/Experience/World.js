@@ -91,8 +91,8 @@ export default class World
         // this.shaderTestScene.init()
         
         //helpers
-        const axesHelper = new THREE.AxesHelper( 5 );
-        this.scene.add( axesHelper );
+        // const axesHelper = new THREE.AxesHelper( 5 );
+        // this.scene.add( axesHelper );
     }
 
     resize()
