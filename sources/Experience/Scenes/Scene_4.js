@@ -56,6 +56,11 @@ export default class Scene_4 extends Scene {
             this.cameraMixer.clipAction(this.cameraMouvement).paused = false;
             document.querySelector('.generique').classList.add('active')
         })
+
+        this.bird = this.scene.getObjectByName('Plane')
+        console.log(this.bird)
+        this.birdMoving = this.animations[11]
+        this.birdMixer = new THREE.AnimationMixer(this.bird.parent)
     }
     
     init() {
@@ -69,6 +74,13 @@ export default class Scene_4 extends Scene {
         action.loop = THREE.LoopOnce
         action.play()
         action.paused = true
+
+        // console.log("bird moving", this.birdMoving.uuid, this.birdMixer)
+        // const actionBird = this.birdMixer.clipAction(this.birdMoving);
+        // actionBird.clampWhenFinished = true;
+        // actionBird.loop = THREE.LoopRepeat
+        // actionBird.play()
+        //action.paused = true
        
         this.light.position.set(-5.06, 2.48, -10);
         const helper1 = new THREE.PointLightHelper(this.light, 0.1);
@@ -84,6 +96,8 @@ export default class Scene_4 extends Scene {
         this.setupGui()
 
         this.setSounds()
+
+
 
     }
     setupGui() {
@@ -157,6 +171,7 @@ export default class Scene_4 extends Scene {
         let toBeAdded = []
         this.scene.traverse(e => {
             if (e.isMesh) {
+                console.log(e.name)
                  if(e.name === "sky") {
                     e.material = new THREE.MeshBasicMaterial({transparent: true, color: e.material.color})
                 } else if (e.name === "ground_mesh") {

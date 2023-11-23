@@ -71,7 +71,6 @@ export default class Scene_3 extends Scene {
         this.cloudsData = []
 
         this.cardMesh = this.scene.getObjectByName('main_card')
-        console.log(this.cardMesh)
         this.cardMeshTargetPos = this.cardMesh.position.clone()
         this.cardsCount = 60
         this.cardsData = []
@@ -138,9 +137,10 @@ export default class Scene_3 extends Scene {
         action.loop = THREE.LoopRepeat
         action.play()
         // action.paused = true
+        
         const birdMovingAction =  this.birdMixer2.clipAction(this.birdMoving);
-        birdMovingAction.loop = THREE.LoopOnce
-        birdMovingAction.play()
+        birdMovingAction.loop = THREE.LoopRepeat
+        //birdMovingAction.play()
         
         const planeAction = this.planeMixer.clipAction(this.planeMovement)
         planeAction.clampWhenFinished = true;
@@ -153,8 +153,6 @@ export default class Scene_3 extends Scene {
         this.setSounds()
 
         document.querySelector('.experience').addEventListener('click', (e) => {this.click(e)})
-        
-        // this.setSounds()
 
 
     }
@@ -278,25 +276,12 @@ export default class Scene_3 extends Scene {
     }
 
     animateMainCard() {
-        console.log(this.cardMesh.position.z, this.cardMeshTargetPos.z)
         if(this.cardMesh.position.z > this.cardMeshTargetPos.z - 1) {
             this.cardMesh.position.z -= 0.02
-            console.log(this.cardMesh.position.z)
             this.particles.updatePosition(this.cardMesh.position)
-            // this.birdGroup.position.y += 0.1
-            // console.log(this.birdGroup.position)
         } 
-
-        
-        //update position of particles system
     }
 
-    moveBirdIntoView() {
-        if(this.birdPosOffset > 0) {
-            this.birdPosOffset -= 0.01
-            this.bird.parent.position.y -= 0.01
-        }
-    }
 
     click(e) {
         this.cameraControls.mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
@@ -310,16 +295,10 @@ export default class Scene_3 extends Scene {
         if(intersects.map(e => e.object.name).includes("main_card")) {
             this.birdShouldCatchCard = true
             this.birdSound.play();
-            let birdFlyingAway = ( ) => this.onBirdWentAway(this)
-            setTimeout(birdFlyingAway, 1200)
+            this.birdMixer2.clipAction(this.birdMoving).play()
+            // setTimeout(birdFlyingAway, 1200)
         }
        
-    }
-
-    onBirdWentAway(ctx) {
-       ctx.cameraMixer.clipAction(this.cameraMouvement).paused = false
-       ctx.transition.init()
-        setTimeout(() => {ctx.shouldPlayTransition = true},ctx.delayAnimationTransition);
     }
 
     onSceneIsDone() {
@@ -328,7 +307,6 @@ export default class Scene_3 extends Scene {
         this.angerSound.stop();
         this.sadSound.stop();
         this.loveSound.stop();
-
 
         this.isActive = false
         this.hasBeenCompleted = true
@@ -347,7 +325,6 @@ export default class Scene_3 extends Scene {
         let toBeAdded = []
         this.scene.traverse(e => {
             if (e.isMesh) {
-                console.log(e)
                 if(e.name === "avion") {
                     let mat = new CustomMat({
                         renderer: this.renderer, uniforms: {
@@ -370,21 +347,24 @@ export default class Scene_3 extends Scene {
                 } else if(e.name === "sky") {
                     e.material = new THREE.MeshBasicMaterial({transparent: true, color: e.material.color})
                 } else if( e.name ==="bird") {
-                    let mat = new CustomMat({
-                        renderer: this.renderer, uniforms: {
-                            color1: { value: new THREE.Color('#6060bd') }, // darker purple
-                            color2: { value: new THREE.Color(e.material.color) },
-                            color3: { value: e.material.color },
-                            color4: { value: new THREE.Color('#94a3b8') },
-                            color5: { value: new THREE.Color('#e2e8f0') },// lighter
-                            noiseStep: { value: 1.0 },
-                            nbColors: { value: 4 },
-                            lightDirection: { value: this.light.position },
-                            lightDirection2: { value: this.light2.position }
-                        }
-                    })
-                    mat.init()
-                    e.material = mat.get()
+                    e.material = new THREE.MeshNormalMaterial({color: 0xff0000})
+                    e.material.side = THREE.DoubleSide
+
+                    // let mat = new CustomMat({
+                    //     renderer: this.renderer, uniforms: {
+                    //         color1: { value: new THREE.Color('#6060bd') }, // darker purple
+                    //         color2: { value: new THREE.Color(e.material.color) },
+                    //         color3: { value: e.material.color },
+                    //         color4: { value: new THREE.Color('#94a3b8') },
+                    //         color5: { value: new THREE.Color('#e2e8f0') },// lighter
+                    //         noiseStep: { value: 1.0 },
+                    //         nbColors: { value: 4 },
+                    //         lightDirection: { value: this.light.position },
+                    //         lightDirection2: { value: this.light2.position }
+                    //     }
+                    // })
+                    // mat.init()
+                    // e.material = mat.get()
 
                 } else if( e.name ==="main_card") {
                  
@@ -456,9 +436,9 @@ export default class Scene_3 extends Scene {
             this.cameraMixer.update(this.time.delta * 0.001)
         }
         
-        if(this.birdMixer) {
-            this.birdMixer.update(this.time.delta * 0.001)
-        }
+        // if(this.birdMixer) {
+        //     this.birdMixer.update(this.time.delta * 0.001)
+        // }
 
         if(this.birdMixer2 && this.birdShouldCatchCard) {
             this.birdMixer2.update(this.time.delta * 0.001)
