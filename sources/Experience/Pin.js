@@ -2,7 +2,7 @@ import * as THREE from 'three'
 
 export default class Pin {
 
-    constructor(position, mouse, raycaster, camera) {
+    constructor(position, mouse, raycaster, camera, size = 0.05) {
         this.pin = new THREE.Group();
         this.clock = new THREE.Clock();
         this.position = position;
@@ -10,13 +10,14 @@ export default class Pin {
         this.raycaster = raycaster
         this.camera = camera
         this.fadeOut = false
+        this.size = size
 
         this.globalUniforms = {
             time: { value: 0 },
             isHovered: { value: 0 }
         };
 
-        this.gMarker = new THREE.PlaneGeometry(0.05, 0.05, 1, 1);
+        this.gMarker = new THREE.PlaneGeometry(this.size, this.size, 1, 1);
         this.mMarker = new THREE.MeshBasicMaterial({
             color: 0xffffff,
             side: THREE.DoubleSide,

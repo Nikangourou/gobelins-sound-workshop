@@ -23,6 +23,7 @@ export default class Scene_1 extends Scene {
         this.card = this.scene.getObjectByName('card')
         this.timbre = this.scene.getObjectByName('timbre1')
         this.timbre2 = this.scene.getObjectByName('timbre2')
+        this.door = this.scene.getObjectByName('door')
         this.camera = scene.cameras[0]
         this.tiroir.add(this.timbre, this.timbre2)
 
@@ -57,28 +58,19 @@ export default class Scene_1 extends Scene {
         this.namesToBeOutlines = [ "radio",  "desk_lamp" ]
         this.lightPos = new THREE.Vector3(2, 5, 3)
         this.userStarted = false;
-        this.startBtn = document.querySelector('button')
-
-        this.startBtn.addEventListener('click', e => {
-            this.userStarted = true;
-            this.doorSound.play()
-            this.doorMixer.clipAction(this.doorMovement).paused = false;
-            this.cameraMixer.clipAction(this.cameraMouvement).paused = false;
-            e.target.style.display = 'none';
-        })
 
         this.cameraEnterMovementIsDone = false
-        
+
         // Toggling the openining of the drawer
         this.actionTiroir = this.tiroirMixer.clipAction(this.tiroirMouvement);
         this.actionTiroir.loop = THREE.LoopOnce
         this.tiroirOpen = false
-        
+
         // lights 
         this.light = new THREE.PointLight(0xff0000, 10, 100);
         this.lampLight = new THREE.PointLight(0xffffff, 2, 100)
         this.deskLight = false
-        
+
         // Action
         this.actionLampe = this.lampeMixer.clipAction(this.lampeMouvement);
         this.actionLampe.loop = THREE.LoopOnce
@@ -121,10 +113,9 @@ export default class Scene_1 extends Scene {
 
     init() {
         this.mainScene.add(this.scene)
-        this.startBtn.style.display = "block"
         this.cameraControls.setDefaultCamera(this.camera)
         this.isActive = true
-        
+
         this.setLights(this.deskLight)
         this.setupGui()
         const helper1 = new THREE.PointLightHelper(this.light, 0.1);
@@ -133,7 +124,7 @@ export default class Scene_1 extends Scene {
         const helper2 = new THREE.PointLightHelper(this.lampLight, 0.1);
         this.scene.add(this.lampLight, helper2)
 
-        document.querySelector('.experience').addEventListener('click', (e) => {this.click(e)})
+        document.querySelector('.experience').addEventListener('click', (e) => { this.click(e) })
         this.setSceneMaterial()
 
         let testLight = new THREE.AmbientLight(0xffffff);
@@ -164,20 +155,33 @@ export default class Scene_1 extends Scene {
         // });
 
         // this.radioSound.add(helperRadio);
-       // this.radio.add(this.radioSound);
+        // this.radio.add(this.radioSound);
 
         // Pin
-        this.pinTiroir = new Pin({x: 0.1, y: 0.67, z: 7.25}, this.mouse, this.raycaster, this.camera)
+        this.pinTiroir = new Pin({ x: 0.1, y: 0.67, z: 7.25 }, this.mouse, this.raycaster, this.camera)
         this.pinTiroir.init()
         this.tiroir.add(this.pinTiroir.pin)
 
-        this.pinLampe = new Pin({x: 0.02, y: -0.2, z: -0.1}, this.mouse, this.raycaster, this.camera)
+        this.pinLampe = new Pin({ x: 0.02, y: -0.2, z: -0.1 }, this.mouse, this.raycaster, this.camera)
         this.pinLampe.init()
         this.lampe.add(this.pinLampe.pin)
 
-        this.pinRadio = new Pin({x: -0.1, y: 0, z: -0.1}, this.mouse, this.raycaster, this.camera)
+        this.pinRadio = new Pin({ x: -0.1, y: 0, z: -0.1 }, this.mouse, this.raycaster, this.camera)
         this.pinRadio.init()
         this.radio.add(this.pinRadio.pin)
+
+        this.pinDoor = new Pin({ x: -0.38, y: 1.4, z: 2 }, this.mouse, this.raycaster, this.camera, 0.1)
+        this.pinDoor.init()
+        this.scene.add(this.pinDoor.pin)
+
+        // Logo
+        const logo = new THREE.TextureLoader().load('/assets/logo.png')
+        const logoMat = new THREE.MeshBasicMaterial({ map: logo, transparent: true, side: THREE.DoubleSide })
+        const logoPlane = new THREE.Mesh(new THREE.PlaneGeometry(0.552, 0.149), logoMat)
+        logoPlane.position.set(1.3, 1.2, 2)
+        logoPlane.scale.set(2.5, 2.5, 2.5)
+        logoPlane.rotateY(Math.PI)
+        this.scene.add(logoPlane)
 
         this.dragSetup()
         this.setSounds()
@@ -219,28 +223,28 @@ export default class Scene_1 extends Scene {
     setSounds() {
         const audioLoader = new THREE.AudioLoader();
         audioLoader.load('/assets/sounds/scene1/door1.mp3', (buffer) => {
-            this.doorSound.setBuffer( buffer );
-            this.doorSound.setLoop( false );
-            this.doorSound.setVolume( 3 );
+            this.doorSound.setBuffer(buffer);
+            this.doorSound.setLoop(false);
+            this.doorSound.setVolume(3);
         })
 
         audioLoader.load('/assets/sounds/scene1/lampe.mp3', (buffer) => {
-            this.lampSound.setBuffer( buffer );
-            this.lampSound.setLoop( false );
-            this.lampSound.setVolume( 2 );
+            this.lampSound.setBuffer(buffer);
+            this.lampSound.setLoop(false);
+            this.lampSound.setVolume(2);
         })
-        
+
         audioLoader.load('/assets/sounds/scene1/tiroir.mp3', (buffer) => {
 
-            this.tiroirSound.setBuffer( buffer );
-            this.tiroirSound.setLoop( false );
-            this.tiroirSound.setVolume( 3 );
-        })   
+            this.tiroirSound.setBuffer(buffer);
+            this.tiroirSound.setLoop(false);
+            this.tiroirSound.setVolume(3);
+        })
 
         audioLoader.load('/assets/sounds/scene1/extérieur.mp3', (buffer) => {
-            this.ambientSound.setBuffer( buffer );
-            this.ambientSound.setLoop( true );
-            this.ambientSound.setVolume( 1 );
+            this.ambientSound.setBuffer(buffer);
+            this.ambientSound.setLoop(true);
+            this.ambientSound.setVolume(1);
             this.ambientSound.play()
         })
 
@@ -288,7 +292,7 @@ export default class Scene_1 extends Scene {
                             nbColors: { value: 3 },
                             lightDirection: { value: this.light.position },
                             lightDirection2: { value: this.lampLight.position },
-                           
+
                         }
                     })
                     mat.init()
@@ -318,7 +322,7 @@ export default class Scene_1 extends Scene {
 
                 } else if (e.name.includes("contain")) {
                     e.material = new THREE.MeshBasicMaterial({ color: 0x00ff00 })
-                } else if(e.name === "radio") {
+                } else if (e.name === "radio") {
                     let mat = new CustomMat({
                         renderer: this.renderer, uniforms: {
                             color1: { value: new THREE.Color('#1e293b') }, // darker
@@ -385,18 +389,26 @@ export default class Scene_1 extends Scene {
 
     click() {
         this.raycaster.setFromCamera(this.mouse, this.camera)
-        const modelIntersects = this.raycaster.intersectObjects([this.lampe, this.radio, this.tiroir])
-       
+        const modelIntersects = this.raycaster.intersectObjects([this.lampe, this.radio, this.tiroir, this.door])
+
         if (modelIntersects.length) {
 
-            if(modelIntersects[0].object.name === 'pin') {
+            if (modelIntersects[0].object.name === 'pin') {
                 modelIntersects.shift()
+            }
+
+            if (modelIntersects[0].object.name === 'door') {
+                this.userStarted = true;
+                this.doorSound.play()
+                this.doorMixer.clipAction(this.doorMovement).paused = false;
+                this.cameraMixer.clipAction(this.cameraMouvement).paused = false;
+                this.pinDoor.remove()
             }
 
             if (modelIntersects[0].object.name === 'desk_lamp') {
                 this.actionLampe.stop()
-                this.actionLampe.play()           
-                this.pinLampe.remove()    
+                this.actionLampe.play()
+                this.pinLampe.remove()
             }
             if (modelIntersects[0].object.name === 'radio') {
                 this.switchRadioChannel()
@@ -455,22 +467,24 @@ export default class Scene_1 extends Scene {
             if (this.doorMixer && this.userStarted) {
                 this.doorMixer.update(this.time.delta * 0.001)
             }
-            if (this.lampeMixer && this.userStarted ) {
+            if (this.lampeMixer && this.userStarted) {
                 this.lampeMixer.update(this.time.delta * 0.001)
             }
             if (this.tiroirMixer && this.userStarted) {
                 this.tiroirMixer.update(this.time.delta * 0.001)
             }
-            if(this.pinTiroir) {
+            if (this.pinTiroir) {
                 this.pinTiroir.animate()
             }
-            if(this.pinLampe) {
+            if (this.pinLampe) {
                 this.pinLampe.animate()
             }
-            if(this.pinRadio){
+            if (this.pinRadio) {
                 this.pinRadio.animate()
             }
-            
+            if (this.pinDoor) {
+                this.pinDoor.animate()
+            }
         }
 
         if (this.shouldPlayTransition) this.transition.play()
