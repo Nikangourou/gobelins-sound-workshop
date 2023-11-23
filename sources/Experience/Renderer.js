@@ -22,6 +22,7 @@ export default class Renderer
 
         // Debug
         this.debugFolder = this.debug.addFolder('renderer')
+        this.debugFolder.close()
    
         
         this.usePostprocess = false
