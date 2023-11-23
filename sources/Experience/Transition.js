@@ -16,7 +16,7 @@ export default class Transition {
     init() {
         this.frameIndex = 0
         this.container.style.display = "block"
-        this.img.src = `/assets/paper_animation${this.frameIndex}.png`
+        this.img.src = `assets/transition/new_paper_animation${this.frameIndex}.png`
         this.isDone = false
         this.isPlaying = false
     }
@@ -31,7 +31,7 @@ export default class Transition {
         
         if(this.frameIndex < this.frameCount && !this.isDone ) {
             this.frameIndex += 1
-            this.img.src = `/assets/paper_animation${this.frameIndex}.png`
+            this.img.src = `assets/transition/new_paper_animation${this.frameIndex}.png`
             this.isPlaying = true
 
         }

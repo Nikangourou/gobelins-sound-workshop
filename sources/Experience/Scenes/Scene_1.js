@@ -26,8 +26,6 @@ export default class Scene_1 extends Scene {
         this.camera = scene.cameras[0]
         this.tiroir.add(this.timbre, this.timbre2)
 
-        console.log( 'camera', this.camera, this.camera.rotation )
-
         // Mixer 
         this.lampeMixer = new THREE.AnimationMixer(this.lamp_switch)
         this.tiroirMixer = new THREE.AnimationMixer(this.tiroir)
@@ -56,7 +54,7 @@ export default class Scene_1 extends Scene {
         })
 
         this.shouldPlayTransition = false
-        this.delayAnimationTransition = 1000
+        this.delayAnimationTransition = 1500
 
         this.namesToBeOutlines = ["desk", "bag", "radio", "commode", "tabletop_high", 'library', "lamp", "box", "old_chair", "Flame", "Chair"]
         this.lightPos = new THREE.Vector3(2, 5, 3)

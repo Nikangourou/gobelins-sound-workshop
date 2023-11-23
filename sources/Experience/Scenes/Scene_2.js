@@ -26,7 +26,6 @@ export default class Scene_2 extends Scene {
         this.namesToBeOutlines = ["plane_box_1", "plane_box_2", "box_drag_drop"]
         this.lightPos = new THREE.Vector3(2, 5, 3)
         
-        
         this.delayAnimationTransition = 23100
         this.shouldPlayTransition = false
         // State / UI
