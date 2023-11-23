@@ -51,6 +51,11 @@ export default class Scene_4 extends Scene {
         this.sadSound = new THREE.Audio(this.cameraControls.audioListener);
         this.loveSound = new THREE.Audio(this.cameraControls.audioListener);
         this.angerSound = new THREE.Audio(this.cameraControls.audioListener);
+     
+        this.bird = this.scene.getObjectByName('Plane')
+        console.log(this.bird)
+        this.birdMoving = this.animations[11]
+        this.birdMixer = new THREE.AnimationMixer(this.bird.parent)
     }
 
     init() {
@@ -63,6 +68,14 @@ export default class Scene_4 extends Scene {
         action.loop = THREE.LoopOnce
         action.play()
         action.paused = true
+
+        // console.log("bird moving", this.birdMoving.uuid, this.birdMixer)
+        // const actionBird = this.birdMixer.clipAction(this.birdMoving);
+        // actionBird.clampWhenFinished = true;
+        // actionBird.loop = THREE.LoopRepeat
+        // actionBird.play()
+        //action.paused = true
+       
 
         this.light.position.set(-5.06, 2.48, -10);
         const helper1 = new THREE.PointLightHelper(this.light, 0.1);
@@ -84,7 +97,7 @@ export default class Scene_4 extends Scene {
         this.pinBox = new Pin({ x: -0.05, y: 0.2, z: -0.14 }, this.mouse, this.raycaster, this.camera, 0.07)
         this.pinBox.init()
         this.nid.add(this.pinBox.pin)
-        console.log(this.nid.position)
+       
     }
     setupGui() {
         const scene4Folder = this.gui.addFolder("scene 4")
@@ -157,8 +170,8 @@ export default class Scene_4 extends Scene {
         let toBeAdded = []
         this.scene.traverse(e => {
             if (e.isMesh) {
-                if (e.name === "sky") {
-                    e.material = new THREE.MeshBasicMaterial({ transparent: true, color: e.material.color })
+                 if(e.name === "sky") {
+                    e.material = new THREE.MeshBasicMaterial({transparent: true, color: e.material.color})
                 } else if (e.name === "ground_mesh") {
                     let mat = new CustomMat({
                         renderer: this.renderer, uniforms: {
