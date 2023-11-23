@@ -7,10 +7,8 @@ import Scene_3 from './Scenes/Scene_3.js'
 import Scene_4 from './Scenes/Scene_4.js'
 import ShaderTestScene from './Scenes/ShaderTestScene.js'
 
-export default class World
-{
-    constructor(_options = {})
-    {
+export default class World {
+    constructor(_options = {}) {
         this.experience = new Experience()
         this.config = this.experience.config
         this.scene = this.experience.scene
@@ -21,27 +19,41 @@ export default class World
         this.renderer = _options.renderer
         this.activeSceneIndex = 0
         this.orbitControls = this.experience.camera.modes.debug.orbitControls
-        this.resources.on('groupEnd', (_group) =>
-        {
-            if(_group.name === 'base')
-            {
+        this.resources.on('groupEnd', (_group) => {
+            if (_group.name === 'base') {
                 this.init()
             }
         })
- 
-    }
-    
-    initEvent () {
-        
+
+        this.initEvent()
     }
 
-    onActiveSceneIsDone (currContext) {
+    initEvent() {
+        let sceneList = document.querySelectorAll('#sceneList li a')
+        sceneList.forEach((scene, index) => {
+            scene.addEventListener('click', () => {
+                let id = scene.id
+                let sceneId = id.split('scene')[1] - 2
+                const targetScene = this.scenes[sceneId]
+                const currContext = {
+                    scenes: this.scenes,
+                    activeSceneIndex: sceneId
+                }
+                this.onActiveSceneIsDone(currContext)
+                // this.onSceneSelect(sceneId)
+            })
+        })
+    }
+
+    onActiveSceneIsDone(currContext) {
         let prevScene = currContext.scenes[currContext.activeSceneIndex]
-        let nextScene = currContext.scenes[currContext.activeSceneIndex+1]
-        if( currContext.activeSceneIndex < currContext.scenes.length -1) {
+        let nextScene = currContext.scenes[currContext.activeSceneIndex + 1]
+
+        if (currContext.activeSceneIndex < currContext.scenes.length - 1) {
             // update UI on completed
-            if(prevScene.hasBeenCompleted) {
-                document.getElementById(prevScene.name).classList.remove('beforeComplete', 'active')
+            if (prevScene.hasBeenCompleted) {
+                let prevSceneDom = document.getElementById(prevScene.name)
+                prevSceneDom.classList.remove('beforeComplete', 'active')
                 document.getElementById(nextScene.name).classList.add('active')
             }
             currContext.activeSceneIndex += 1
@@ -60,26 +72,25 @@ export default class World
         targetScene.init()
     }
 
-    getSceneIdFromUrl() {
+    getSceneIdFromUrl() {
         const urlParts = document.URL.split('#');
         let sceneId = 0
-        if(urlParts[1] ===  "debug")  return sceneId
-        if(urlParts.length > 1) {
+        if (urlParts[1] === "debug") return sceneId
+        if (urlParts.length > 1) {
             const sceneName = urlParts[1].split('')
             sceneId = sceneName[sceneName.length - 1] - 1
         }
-        let scene = "scene"+(sceneId+1)
+        let scene = "scene" + (sceneId + 1)
         document.getElementById(scene).classList.add('active')
 
         return sceneId
     }
-        
-    init()
-    {
-        const scene_1 = new Scene_1(this.resources.items.scene_1, this.renderer, this.cameraControls, this.scene,() => this.onActiveSceneIsDone(this))
-        const scene_2 = new Scene_2(this.resources.items.scene_2, this.renderer, this.cameraControls, this.scene,() => this.onActiveSceneIsDone(this), this.resources.items.dotTex)
+
+    init() {
+        const scene_1 = new Scene_1(this.resources.items.scene_1, this.renderer, this.cameraControls, this.scene, () => this.onActiveSceneIsDone(this))
+        const scene_2 = new Scene_2(this.resources.items.scene_2, this.renderer, this.cameraControls, this.scene, () => this.onActiveSceneIsDone(this), this.resources.items.dotTex)
         const scene_3 = new Scene_3(this.resources.items.scene_3, this.renderer, this.cameraControls, this.scene, () => this.onActiveSceneIsDone(this))
-        const scene_4 = new Scene_4(this.resources.items.scene_4, this.renderer, this.cameraControls, this.scene,() => this.onActiveSceneIsDone(this))
+        const scene_4 = new Scene_4(this.resources.items.scene_4, this.renderer, this.cameraControls, this.scene, () => this.onActiveSceneIsDone(this))
         this.scenes = [scene_1, scene_2, scene_3, scene_4]
 
         this.activeSceneIndex = this.getSceneIdFromUrl()
@@ -89,26 +100,23 @@ export default class World
         // this.shaderTestScene = new ShaderTestScene(this.renderer, this.resources.items)
         // this.scene.add(this.shaderTestScene.scene)
         // this.shaderTestScene.init()
-        
+
         //helpers
-        const axesHelper = new THREE.AxesHelper( 5 );
-        this.scene.add( axesHelper );
+        const axesHelper = new THREE.AxesHelper(5);
+        this.scene.add(axesHelper);
     }
 
-    resize()
-    {
+    resize() {
     }
 
-    update()
-    {
+    update() {
 
 
-        if(this.scenes && this.activeSceneIndex !==0 && !this.scenes[this.activeSceneIndex-1].transition.isDone ) this.scenes[this.activeSceneIndex-1].update()
-        if(this.scenes) this.scenes[this.activeSceneIndex].update() // contineu update until trnasition is done
+        if (this.scenes && this.activeSceneIndex !== 0 && !this.scenes[this.activeSceneIndex - 1].transition.isDone) this.scenes[this.activeSceneIndex - 1].update()
+        if (this.scenes) this.scenes[this.activeSceneIndex].update() // contineu update until trnasition is done
 
     }
 
-    destroy()
-    {
+    destroy() {
     }
 }
