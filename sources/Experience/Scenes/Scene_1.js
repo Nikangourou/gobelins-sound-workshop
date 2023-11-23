@@ -207,7 +207,6 @@ export default class Scene_1 extends Scene {
     }
 
     setSceneMaterial() {
-
         let toBeAdded = []
         this.scene.traverse(e => {
             if (e.isMesh) {
@@ -279,7 +278,7 @@ export default class Scene_1 extends Scene {
                             color4: { value: new THREE.Color('#2563eb') },
                             color5: { value: new THREE.Color('#1d4ed8') },// lighter
                             noiseStep: { value: 1.0 },
-                            nbColors: { value: 5 },
+                            nbColors: { value: 3 },
                             lightDirection: { value: this.light.position },
                             lightDirection2: { value: this.lampLight.position },
                         }
