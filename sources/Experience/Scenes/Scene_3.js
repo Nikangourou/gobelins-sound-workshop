@@ -54,8 +54,6 @@ export default class Scene_3 extends Scene {
         this.birdFlying = this.animations[2]
         this.birdMoving = this.animations[1]
         this.birdShouldCatchCard = false
-        // this.birdGroup = new THREE.Group()
-        // this.birdGroup.add(this.bird)
 
         this.cloudMesh = this.scene.getObjectByName('cloud')
         this.cloudCount = 40
@@ -83,6 +81,11 @@ export default class Scene_3 extends Scene {
         this.thresholdZStart = 14
 
         this.birdPosOffset = 3
+
+        //sounds 
+        this.planeSound = new THREE.Audio(this.cameraControls.audioListener);
+        this.ambientSound = new THREE.Audio(this.cameraControls.audioListener);
+        this.birdSound = new THREE.Audio(this.cameraControls.audioListener);
     }
     
     init() {
@@ -155,6 +158,8 @@ export default class Scene_3 extends Scene {
         // boxAction.paused = true
         this.makeClouds()
         this.makeCards()
+
+        this.setSounds()
 
         document.querySelector('.experience').addEventListener('click', (e) => {this.click(e)})
         
@@ -314,6 +319,7 @@ export default class Scene_3 extends Scene {
   
         if(intersects.map(e => e.object.name).includes("main_card")) {
             this.birdShouldCatchCard = true
+            this.birdSound.play();
             let birdFlyingAway = ( ) => this.onBirdWentAway(this)
             setTimeout(birdFlyingAway, 1200)
         }
@@ -326,7 +332,10 @@ export default class Scene_3 extends Scene {
         setTimeout(() => {ctx.shouldPlayTransition = true},ctx.delayAnimationTransition);
     }
 
+    thi
+
     onSceneIsDone() {
+        this.ambientSound.stop();
         this.isActive = false
         this.hasBeenCompleted = true
 
@@ -396,6 +405,31 @@ export default class Scene_3 extends Scene {
             }
         })
         toBeAdded.forEach(e => this.scene.add(e))
+
+    }
+
+    setSounds() {
+        const audioLoader = new THREE.AudioLoader();
+        audioLoader.load('/assets/sounds/scene3/avion.mp3', (buffer) => {
+            this.planeSound.setBuffer( buffer );
+            this.planeSound.setLoop( false );
+            this.planeSound.setVolume( 1 );
+            this.planeSound.play();
+        })
+
+        audioLoader.load('/assets/sounds/scene3/fall_in_sky.mp3', (buffer) => {
+            this.ambientSound.setBuffer( buffer );
+            this.ambientSound.setLoop( true );
+            this.ambientSound.setVolume( 1 );
+            this.ambientSound.play();
+        })
+
+        audioLoader.load('/assets/sounds/scene3/oiseau.mp3', (buffer) => {
+            birdSound.setBuffer( buffer );
+            birdSound.setLoop( false );
+            birdSound.setVolume( 1 );
+            // birdSound.play();
+        })
 
     }
 

@@ -46,6 +46,9 @@ export default class Scene_4 extends Scene {
         this.cardsMat = this.cardColors.map(color => new THREE.MeshBasicMaterial({color: color}))
         this.particles = []
 
+        //sounds 
+        this.ambientSound = new THREE.Audio(this.cameraControls.audioListener);
+
     }
     
     init() {
@@ -72,6 +75,8 @@ export default class Scene_4 extends Scene {
         this.setSceneMaterials()
         this.particles.forEach(particleSystem => this.scene.add(particleSystem.group))
         this.setupGui()
+
+        this.setSounds()
 
     }
     setupGui() {
@@ -101,6 +106,18 @@ export default class Scene_4 extends Scene {
             }
         })
         this.mainScene.remove(toBeRemoved)
+    }
+
+    setSounds() {
+        const audioLoader = new THREE.AudioLoader();
+
+        audioLoader.load('/assets/sounds/scene4/fôret.mp3', (buffer) => {
+            this.ambientSound.setBuffer( buffer );
+            this.ambientSound.setLoop( true );
+            this.ambientSound.setVolume( 6);
+            this.ambientSound.play();
+        })
+
     }
 
     setSceneMaterials() {

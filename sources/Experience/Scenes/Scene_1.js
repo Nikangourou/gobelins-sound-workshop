@@ -44,9 +44,9 @@ export default class Scene_1 extends Scene {
         this.gui = this.renderer.debug
         this.raycaster = this.cameraControls.raycaster
         this.mouse = this.cameraControls.mouse
-        this.audioListenner = new THREE.AudioListener();
-        this.audioListenner.context.resume()
-        this.radioSound = new THREE.PositionalAudio(this.audioListenner);
+        this.audioListenner = this.cameraControls.audioListener
+        // this.audioListenner.context.resume()
+        // this.radioSound = new THREE.PositionalAudio(this.audioListenner);
         this.cameraMixer.addEventListener('finished', function (e) {
             console.log("finished")
             // transition UI in 
@@ -65,6 +65,7 @@ export default class Scene_1 extends Scene {
 
         this.startBtn.addEventListener('click', e => {
             this.userStarted = true;
+            this.doorSound.play()
             this.doorMixer.clipAction(this.doorMovement).paused = false;
             this.cameraMixer.clipAction(this.cameraMouvement).paused = false;
             e.target.style.display = 'none';
@@ -87,6 +88,7 @@ export default class Scene_1 extends Scene {
         this.actionLampe.loop = THREE.LoopOnce
         this.lampeMixer.addEventListener('finished', (e) => {
             this.deskLight = !this.deskLight
+            this.lampSound.play()
             curr.setLights()
         })
 
@@ -94,6 +96,7 @@ export default class Scene_1 extends Scene {
         this.doorSound = new THREE.Audio( this.cameraControls.audioListener );
         this.lampSound = new THREE.Audio( this.cameraControls.audioListener );
         this.tiroirSound = new THREE.Audio( this.cameraControls.audioListener );
+        this.ambientSound = new THREE.Audio( this.cameraControls.audioListener)
     }
 
     init() {
@@ -104,8 +107,6 @@ export default class Scene_1 extends Scene {
 
         const helper = new THREE.CameraHelper( this.camera );
         this.scene.add(helper)
-
-        this.scene.add(this.cameraControls.dummyCamera, this.cameraControls.groupToAnimateOnMousemove)
         
         this.setLights(this.deskLight)
         this.setupGui()
@@ -135,18 +136,18 @@ export default class Scene_1 extends Scene {
         openingDoorAnimation.paused = true
 
         // audio
-        this.camera.add(this.audioListenner)
-        const helperRadio = new PositionalAudioHelper(this.radioSound)
+        // this.camera.add(this.audioListenner)
+        // const helperRadio = new PositionalAudioHelper(this.radioSound)
 
-        const audioLoader = new THREE.AudioLoader();
+        // const audioLoader = new THREE.AudioLoader();
 
-        audioLoader.load('assets/sounds/RadioSound.mp3', (buffer) => {
-            this.radioSound.setBuffer(buffer);
-            this.radioSound.setRefDistance(1);
-        });
+        // audioLoader.load('assets/sounds/RadioSound.mp3', (buffer) => {
+        //     this.radioSound.setBuffer(buffer);
+        //     this.radioSound.setRefDistance(1);
+        // });
 
         // this.radioSound.add(helperRadio);
-        this.radio.add(this.radioSound);
+       // this.radio.add(this.radioSound);
 
         // Pin
         this.pinTiroir = new Pin({x: 0.1, y: 0.67, z: 7.25}, this.mouse, this.raycaster, this.camera)
@@ -162,6 +163,7 @@ export default class Scene_1 extends Scene {
         this.radio.add(this.pinRadio.pin)
 
         this.dragSetup()
+        this.setSounds()
     }
 
     setupGui() {
@@ -185,22 +187,28 @@ export default class Scene_1 extends Scene {
         const audioLoader = new THREE.AudioLoader();
         audioLoader.load('/assets/sounds/scene1/door1.mp3', (buffer) => {
             this.doorSound.setBuffer( buffer );
-            this.doorSound.setLoop( true );
-            this.doorSound.setVolume( 0.5 );
-            //this.doorSound.play(); // play with animation mixer
+            this.doorSound.setLoop( false );
+            this.doorSound.setVolume( 3 );
         })
 
         audioLoader.load('/assets/sounds/scene1/lampe.mp3', (buffer) => {
             this.lampSound.setBuffer( buffer );
             this.lampSound.setLoop( false );
-            this.lampSound.setVolume( 3 );
+            this.lampSound.setVolume( 2 );
         })
         
         audioLoader.load('/assets/sounds/scene1/tiroir.mp3', (buffer) => {
 
             this.tiroirSound.setBuffer( buffer );
             this.tiroirSound.setLoop( false );
-            this.tiroirSound.setVolume( 1 );
+            this.tiroirSound.setVolume( 3 );
+        })   
+
+        audioLoader.load('/assets/sounds/scene1/extérieur.mp3', (buffer) => {
+            this.ambientSound.setBuffer( buffer );
+            this.ambientSound.setLoop( true );
+            this.ambientSound.setVolume( 1 );
+            this.ambientSound.play()
         })   
 
     }
@@ -210,7 +218,6 @@ export default class Scene_1 extends Scene {
         let toBeAdded = []
         this.scene.traverse(e => {
             if (e.isMesh) {
-                console.log(e.name)
                 if (e.name === 'door') {
                     this.doorMixer = new THREE.AnimationMixer(e)
                     let mat = new CustomMat({
@@ -312,7 +319,6 @@ export default class Scene_1 extends Scene {
                     this.cameraMixer.clipAction(this.cameraMouvement).isPaused = false;
                     this.transition.init()
                     setTimeout(() => { this.shouldPlayTransition = true }, this.delayAnimationTransition);
-                    setTimeout(() => { this.shouldPlayTransition = true }, this.delayAnimationTransition);
                 }
                 else {
                     this.card.material.color.set(0x00ff00)
@@ -323,6 +329,7 @@ export default class Scene_1 extends Scene {
 
     setLights() {
         // simulate lighting on/off by moving position
+
         if(this.deskLight) {
             this.light.position.set(3, 0.76, -0.92)
             this.lampLight.position.set(-5.68, 8.32, 2)
@@ -353,6 +360,7 @@ export default class Scene_1 extends Scene {
             }
             if (modelIntersects[0].object.name === 'tiroir_desk') {
 
+                this.tiroirSound.play()
                 if (this.tiroirOpen) {
                     this.actionTiroir.paused = false;
                     this.actionTiroir.timeScale = -1; // Reverse the animation
@@ -402,9 +410,8 @@ export default class Scene_1 extends Scene {
 
             if (this.doorMixer && this.userStarted) {
                 this.doorMixer.update(this.time.delta * 0.001)
-                // if(this.doorMixer.clipAction(this.doorMovement).time > 
             }
-            if (this.lampeMixer && this.userStarted) {
+            if (this.lampeMixer && this.userStarted ) {
                 this.lampeMixer.update(this.time.delta * 0.001)
             }
             if (this.tiroirMixer && this.userStarted) {
