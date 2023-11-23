@@ -55,7 +55,7 @@ export default class Scene_1 extends Scene {
         this.shouldPlayTransition = false
         this.delayAnimationTransition = 1500
 
-        this.namesToBeOutlines = ["desk", "bag", "radio", "commode", "tabletop_high", 'library', "lamp", "box", "old_chair", "Flame", "Chair"]
+        this.namesToBeOutlines = [ "radio",  "desk_lamp" ]
         this.lightPos = new THREE.Vector3(2, 5, 3)
         this.userStarted = false;
 
@@ -81,10 +81,34 @@ export default class Scene_1 extends Scene {
         })
 
         //sounds 
-        this.doorSound = new THREE.Audio(this.cameraControls.audioListener);
-        this.lampSound = new THREE.Audio(this.cameraControls.audioListener);
-        this.tiroirSound = new THREE.Audio(this.cameraControls.audioListener);
-        this.ambientSound = new THREE.Audio(this.cameraControls.audioListener)
+        this.doorSound = new THREE.Audio( this.cameraControls.audioListener );
+        this.lampSound = new THREE.Audio( this.cameraControls.audioListener );
+        this.tiroirSound = new THREE.Audio( this.cameraControls.audioListener );
+        this.ambientSound = new THREE.Audio( this.cameraControls.audioListener);
+        this.radioSounds = {
+            0 : new THREE.Audio( this.cameraControls.audioListener),
+            1 : new THREE.Audio( this.cameraControls.audioListener),
+            2 : new THREE.Audio( this.cameraControls.audioListener),
+            3 : new THREE.Audio( this.cameraControls.audioListener),
+        }
+
+        this.radioChannel = 0
+
+        this.staticMatDarkColor = '#111722'
+        this.staticMatLightColor = '#E69262'
+        this.staticMat = new CustomMat({
+            renderer: this.renderer, uniforms: {
+                color1: { value: new THREE.Color(this.staticMatDarkColor) },// darker
+                color2: { value:  new THREE.Color(this.staticMatLightColor) }, 
+                color3: { value: new THREE.Color('#c2410c') },
+                color4: { value: new THREE.Color('#bae6fd') },
+                color5: { value: new THREE.Color('#E8A85E') },// lighter
+                noiseStep: { value: 1.0 },
+                nbColors: { value: 2},
+                lightDirection: { value: this.light.position },
+                lightDirection2: { value: this.lampLight.position },
+            }
+        })
     }
 
     init() {
@@ -177,10 +201,26 @@ export default class Scene_1 extends Scene {
         light2Folder.add(this.lampLight.position, 'y').min(-10).max(10).name('light y')
         light2Folder.add(this.lampLight.position, 'z').min(-10).max(10).name('light z')
 
+        const colors = matFolder.addFolder('colors')
+        colors.addColor(this, 'staticMatDarkColor').name('colorDark').onChange(e => {
+            this.staticMat.updateColor('color1', e )
+        })
+        colors.addColor(this, 'staticMatLightColor').name('colorLight')
+
+    }
+
+    switchRadioChannel(){
+        this.radioSounds[this.radioChannel].pause()
+        if(this.radioChannel === 3) {
+            this.radioChannel = 0
+        } else {
+            this.radioChannel += 1
+        }
+        this.radioSounds[this.radioChannel].play()
+
     }
 
     setSounds() {
-        console.log(this.cameraControls.audioListener)
         const audioLoader = new THREE.AudioLoader();
         audioLoader.load('/assets/sounds/scene1/door1.mp3', (buffer) => {
             this.doorSound.setBuffer(buffer);
@@ -208,10 +248,34 @@ export default class Scene_1 extends Scene {
             this.ambientSound.play()
         })
 
+        audioLoader.load('/assets/sounds/scene1/radio1.mp3', (buffer) => {
+            this.radioSounds[0].setBuffer( buffer );
+            this.radioSounds[0].setLoop( true );
+            this.radioSounds[0].setVolume( 1 );
+            this.radioSounds[0].play()
+        }) 
+        
+        audioLoader.load('/assets/sounds/scene1/radio2.mp3', (buffer) => {
+            this.radioSounds[1].setBuffer( buffer );
+            this.radioSounds[1].setLoop( true );
+            this.radioSounds[1].setVolume( 1 );
+        }) 
+
+        audioLoader.load('/assets/sounds/scene1/radio3.mp3', (buffer) => {
+            this.radioSounds[2].setBuffer( buffer );
+            this.radioSounds[2].setLoop( true );
+            this.radioSounds[2].setVolume( 1 );
+        })
+
+        audioLoader.load('/assets/sounds/scene1/radio4.mp3', (buffer) => {
+            this.radioSounds[3].setBuffer( buffer );
+            this.radioSounds[3].setLoop( true );
+            this.radioSounds[3].setVolume( 1 );
+        }) 
+
     }
 
     setSceneMaterial() {
-
         let toBeAdded = []
         this.scene.traverse(e => {
             if (e.isMesh) {
@@ -235,15 +299,15 @@ export default class Scene_1 extends Scene {
                     e.material = mat.get()
 
                 } else if (e.name.includes('timbre')) {
-                    e.material = new THREE.MeshBasicMaterial({ color: 0xff0000 })
+                    e.material = new THREE.MeshBasicMaterial({ color: '#699DF7' })
                 } else if (this.namesToBeOutlines.includes(e.name)) {
                     let mat = new CustomMat({
                         renderer: this.renderer, uniforms: {
-                            color1: { value: e.material.color }, // darker
-                            color2: { value: new THREE.Color('#ea580c') },
-                            color3: { value: new THREE.Color('#f59e0b') },
-                            color4: { value: new THREE.Color('#c2410c') },
-                            color5: { value: new THREE.Color('#bae6fd') },// lighter
+                            color1: { value: new THREE.Color('#699DF7') }, // darker
+                            color2: { value: new THREE.Color('#5E9EE8') },
+                            color3: { value: new THREE.Color('#50A5D7') },
+                            color4: { value: new THREE.Color('#45A6C9') },
+                            color5: { value: new THREE.Color('#3CA4B9') },// lighter
                             noiseStep: { value: 1.0 },
                             nbColors: { value: 3 },
                             lightDirection: { value: this.light.position },
@@ -262,7 +326,7 @@ export default class Scene_1 extends Scene {
                     let mat = new CustomMat({
                         renderer: this.renderer, uniforms: {
                             color1: { value: new THREE.Color('#1e293b') }, // darker
-                            color2: { value: new THREE.Color('#4c0519') },
+                            color2: { value: new THREE.Color('E69262') },
                             color3: { value: new THREE.Color('#9f1239') },
                             color4: { value: new THREE.Color('#e11d48') },
                             color5: { value: new THREE.Color('#1d4ed8') },// lighter
@@ -275,21 +339,8 @@ export default class Scene_1 extends Scene {
 
 
                 } else {
-                    let mat = new CustomMat({
-                        renderer: this.renderer, uniforms: {
-                            color1: { value: new THREE.Color('#1e293b') }, // darker
-                            color2: { value: new THREE.Color('#eab308') },
-                            color3: { value: new THREE.Color('#3b82f6') },
-                            color4: { value: new THREE.Color('#2563eb') },
-                            color5: { value: new THREE.Color('#1d4ed8') },// lighter
-                            noiseStep: { value: 1.0 },
-                            nbColors: { value: 5 },
-                            lightDirection: { value: this.light.position },
-                            lightDirection2: { value: this.lampLight.position },
-                        }
-                    })
-                    mat.init()
-                    e.material = mat.get()
+                    this.staticMat.init()
+                    e.material = this.staticMat.get()
 
                 }
             }
@@ -327,9 +378,9 @@ export default class Scene_1 extends Scene {
     setLights() {
         // simulate lighting on/off by moving position
 
-        if (this.deskLight) {
-            this.light.position.set(3, 0.76, -0.92)
-            this.lampLight.position.set(-5.68, 8.32, 2)
+        if(this.deskLight) {
+            this.light.position.set(-5.94, -2.64, -3.84)
+            this.lampLight.position.set(-7.94, 7, 10)
         } else {
             this.light.position.set(10, 0.76, 2.6)
             this.lampLight.position.set(1.04, 8.32, 2)
@@ -360,7 +411,7 @@ export default class Scene_1 extends Scene {
                 this.pinLampe.remove()
             }
             if (modelIntersects[0].object.name === 'radio') {
-                this.radioSound.play()
+                this.switchRadioChannel()
                 this.pinRadio.remove()
             }
             if (modelIntersects[0].object.name === 'tiroir_desk') {

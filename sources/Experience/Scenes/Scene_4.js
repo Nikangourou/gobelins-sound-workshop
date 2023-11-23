@@ -30,24 +30,32 @@ export default class Scene_4 extends Scene {
             // curr.onSceneIsDone()
             // callback()
         })
+        
+        //lights
+        this.light = new THREE.PointLight(0xffffff, 5, 100);
+        this.light2 = new THREE.PointLight(0xffffff, 5, 100);
+        
+        this.cardsMat = this.cardColors.map(color => new THREE.MeshBasicMaterial({color: color}))
+        this.particles = []
+        
+        //sounds 
+        this.ambientSound = new THREE.Audio(this.cameraControls.audioListener);
+        this.joySound = new THREE.Audio(this.cameraControls.audioListener);
+        this.sadSound = new THREE.Audio(this.cameraControls.audioListener);
+        this.loveSound = new THREE.Audio(this.cameraControls.audioListener);
+        this.angerSound = new THREE.Audio(this.cameraControls.audioListener);
+        
         this.nextBtn = document.getElementById('next')
         this.nextBtn.addEventListener('click', e => {
+            this.joySound.play()
+            this.sadSound.play()
+            this.loveSound.play()
+            this.angerSound.play()
             this.nextBtn.style.display = 'none'
             this.hasBeenCompleted = true
             this.cameraMixer.clipAction(this.cameraMouvement).paused = false;
             document.querySelector('.generique').classList.add('active')
         })
-
-        //lights
-        this.light = new THREE.PointLight(0xffffff, 5, 100);
-        this.light2 = new THREE.PointLight(0xffffff, 5, 100);
-
-        this.cardsMat = this.cardColors.map(color => new THREE.MeshBasicMaterial({color: color}))
-        this.particles = []
-
-        //sounds 
-        this.ambientSound = new THREE.Audio(this.cameraControls.audioListener);
-
     }
     
     init() {
@@ -96,6 +104,7 @@ export default class Scene_4 extends Scene {
     onSceneIsDone() {
         this.isActive = false
         this.hasBeenCompleted = true
+        
 
         // remove scene from main scene
         let toBeRemoved = null
@@ -116,6 +125,31 @@ export default class Scene_4 extends Scene {
             this.ambientSound.setVolume( 6);
             this.ambientSound.play();
         })
+
+        audioLoader.load('/assets/sounds/card/ANGER.mp3', (buffer) => {
+            this.angerSound.setBuffer( buffer );
+            this.angerSound.setLoop( true );
+            this.angerSound.setVolume( 0.1 );
+            
+        })   
+
+        audioLoader.load('/assets/sounds/card/JOY.mp3', (buffer) => {
+            this.joySound.setBuffer( buffer );
+            this.joySound.setLoop( true );
+            this.joySound.setVolume( 0.1 );
+        })  
+
+        audioLoader.load('/assets/sounds/card/SAD.mp3', (buffer) => {
+            this.sadSound.setBuffer( buffer );
+            this.sadSound.setLoop( true );
+            this.sadSound.setVolume( 0.1 );
+        }) 
+
+        audioLoader.load('/assets/sounds/card/LOVE.mp3', (buffer) => {
+            this.loveSound.setBuffer( buffer );
+            this.loveSound.setLoop( true );
+            this.loveSound.setVolume( 0.1 ); // augmenter le volume quand la carte tombe et arrive
+        }) 
 
     }
 

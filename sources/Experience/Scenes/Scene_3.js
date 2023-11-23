@@ -42,7 +42,13 @@ export default class Scene_3 extends Scene {
         this.plane =  this.scene.getObjectByName('avion')
         this.planeMixer = new THREE.AnimationMixer(this.plane)
         this.planeMixer.addEventListener('finished', (e) => {
-            setTimeout(() => {this.cardsShouldFall = true}, 500)
+            setTimeout(() => {
+                this.cardsShouldFall = true
+                this.joySound.play()
+                this.sadSound.play()
+                this.loveSound.play()
+                this.angerSound.play()
+            }, 500)
             
         })
         this.planeMovement = this.animations[0]
@@ -76,16 +82,18 @@ export default class Scene_3 extends Scene {
         
         this.thresholdYEnd = -40
         this.thresholdYStart = 15
-
         this.thresholdZEnd = -3
         this.thresholdZStart = 14
-
         this.birdPosOffset = 3
 
         //sounds 
         this.planeSound = new THREE.Audio(this.cameraControls.audioListener);
         this.ambientSound = new THREE.Audio(this.cameraControls.audioListener);
         this.birdSound = new THREE.Audio(this.cameraControls.audioListener);
+        this.joySound = new THREE.Audio(this.cameraControls.audioListener);
+        this.sadSound = new THREE.Audio(this.cameraControls.audioListener);
+        this.loveSound = new THREE.Audio(this.cameraControls.audioListener);
+        this.angerSound = new THREE.Audio(this.cameraControls.audioListener);
     }
     
     init() {
@@ -101,23 +109,6 @@ export default class Scene_3 extends Scene {
         this.cardMesh.position.z = this.thresholdZStart
         this.bird.parent.position.y += this.birdPosOffset
         this.cardMesh.position.x = this.bird.parent.position.x 
-
-        // debug threshold
-        // let debugMeshThresholdStart = new THREE.Mesh(new THREE.SphereGeometry(1, 16), new THREE.MeshNormalMaterial())
-        // debugMeshThresholdStart.position.y = this.thresholdYStart
-        // this.scene.add(debugMeshThresholdStart)
-        
-        // let debugMeshThresholdEnd = new THREE.Mesh(new THREE.SphereGeometry(1, 16), new THREE.MeshBasicMaterial({color: 0x00ff00}))
-        // debugMeshThresholdEnd.position.y = this.thresholdYEnd
-        // this.scene.add(debugMeshThresholdEnd)
-
-        // let debugMeshThresholdZStart = new THREE.Mesh(new THREE.SphereGeometry(1, 16),  new THREE.MeshBasicMaterial({color: 0x0000ff}))
-        // debugMeshThresholdZStart.position.z = this.thresholdZStart
-        // this.scene.add(debugMeshThresholdZStart)
-        
-        // let debugMeshThresholdZEnd = new THREE.Mesh(new THREE.SphereGeometry(1, 16), new THREE.MeshBasicMaterial({color: 0xffff00}))
-        // debugMeshThresholdZEnd.position.z = this.thresholdZEnd
-        // this.scene.add(debugMeshThresholdZEnd)
 
         this.setSceneMaterials()
         
@@ -160,10 +151,6 @@ export default class Scene_3 extends Scene {
         
         // this.setSounds()
 
-
-    }
-
-    setSounds() {
 
     }
 
@@ -292,6 +279,7 @@ export default class Scene_3 extends Scene {
             // this.birdGroup.position.y += 0.1
             // console.log(this.birdGroup.position)
         } 
+
         
         //update position of particles system
     }
@@ -327,10 +315,14 @@ export default class Scene_3 extends Scene {
         setTimeout(() => {ctx.shouldPlayTransition = true},ctx.delayAnimationTransition);
     }
 
-    thi
-
     onSceneIsDone() {
         this.ambientSound.stop();
+        this.joySound.stop();
+        this.angerSound.stop();
+        this.sadSound.stop();
+        this.loveSound.stop();
+
+
         this.isActive = false
         this.hasBeenCompleted = true
 
@@ -425,6 +417,30 @@ export default class Scene_3 extends Scene {
             birdSound.setVolume( 1 );
             // birdSound.play();
         })
+
+        audioLoader.load('/assets/sounds/card/ANGER.mp3', (buffer) => {
+            this.angerSound.setBuffer( buffer );
+            this.angerSound.setLoop( true );
+            this.angerSound.setVolume( 0.5 );
+        })   
+
+        audioLoader.load('/assets/sounds/card/JOY.mp3', (buffer) => {
+            this.joySound.setBuffer( buffer );
+            this.joySound.setLoop( true );
+            this.joySound.setVolume( 0.5 );
+        })  
+
+        audioLoader.load('/assets/sounds/card/SAD.mp3', (buffer) => {
+            this.sadSound.setBuffer( buffer );
+            this.sadSound.setLoop( true );
+            this.sadSound.setVolume( 0.5 );
+        }) 
+
+        audioLoader.load('/assets/sounds/card/LOVE.mp3', (buffer) => {
+            this.loveSound.setBuffer( buffer );
+            this.loveSound.setLoop( true );
+            this.loveSound.setVolume( 2 ); // augmenter le volume quand la carte tombe et arrive
+        }) 
 
     }
 
