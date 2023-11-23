@@ -2,6 +2,13 @@ import * as THREE from 'three'
 import Scene from './Scene'
 import GUI from 'lil-gui'
 import CustomMat from './CustomMat'
+import Particles from './../Particles.js'
+
+
+const getRandomFloat = (min, max) => (Math.random() * (max - min) + min);
+function getRandomInt(max) {
+    return Math.floor(Math.random() * max);
+  }
 
 export default class Scene_4 extends Scene {
     constructor(scene, renderer, cameraControls, mainScene, callback) {
@@ -36,6 +43,9 @@ export default class Scene_4 extends Scene {
         this.light = new THREE.PointLight(0xffffff, 5, 100);
         this.light2 = new THREE.PointLight(0xffffff, 5, 100);
 
+        this.cardsMat = this.cardColors.map(color => new THREE.MeshBasicMaterial({color: color}))
+        this.particles = []
+
     }
     
     init() {
@@ -60,6 +70,7 @@ export default class Scene_4 extends Scene {
         this.scene.add(this.light2, helper2)
 
         this.setSceneMaterials()
+        this.particles.forEach(particleSystem => this.scene.add(particleSystem.group))
         this.setupGui()
 
     }
@@ -96,8 +107,6 @@ export default class Scene_4 extends Scene {
         let toBeAdded = []
         this.scene.traverse(e => {
             if (e.isMesh) {
-                console.log(e.name)
-               
                  if(e.name === "sky") {
                     e.material = new THREE.MeshBasicMaterial({transparent: true, color: e.material.color})
                 } else if (e.name === "ground_mesh") {
@@ -119,7 +128,7 @@ export default class Scene_4 extends Scene {
 
                 } else if (e.name === "ground_grass") {
                     e.visible = false
-                } else if( e.name.includes("ground_boxes") ) {
+                } else if( e.name.includes("ground_boxes") || e.name === "nid" ) {
                     let mat = new CustomMat({
                         renderer: this.renderer, uniforms: {
                             color1: { value: new THREE.Color('#18181b') }, // darker
@@ -156,7 +165,16 @@ export default class Scene_4 extends Scene {
                     mat.init()
                     e.material = mat.get()
                    
-                } 
+                } else if( e.name.includes("card")) {
+                    e.material = this.cardsMat[getRandomInt(this.cardsMat.length -1 )]
+                    let particles = new Particles(e.material.color, this.scene)
+                    particles.respawnAt(e.material.color, e.position, -1)
+                    this.particles.push(particles)
+                    
+                } else if (e.name.includes("nid_eggs")) {
+                    e.material = new THREE.MeshBasicMaterial({colo : 0xffffff})
+                }
+
             
             }
         })
@@ -168,7 +186,7 @@ export default class Scene_4 extends Scene {
         if (this.cameraMixer) {
             this.cameraMixer.update(this.time.delta * 0.001)
         }
-
+        this.particles.forEach(particleSystem => particleSystem.update())
 
     }
 

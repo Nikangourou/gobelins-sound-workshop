@@ -30,7 +30,6 @@ export default class Particles {
 
     this.particleSystem.instanceMatrix.needsUpdate = true
     this.group.add(this.particleSystem)
-    console.log("gets init")
   }
 
   generateParticlesData() {
@@ -96,6 +95,7 @@ export default class Particles {
         this.particleSystem.setMatrixAt(index, this.obj.matrix);
       });
       this.particleSystem.instanceMatrix.needsUpdate = true;
+      
   }
  
   

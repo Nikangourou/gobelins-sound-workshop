@@ -24,25 +24,18 @@ export default class Scene_3 extends Scene {
         this.particles = new Particles("#ef4444", this.scene)
         this.cardsShouldFall = false
 
-        // this.cameraMixer = new THREE.AnimationMixer(this.camera)
-        // this.cameraMouvement = scene.animations[0]
-        let curr = this
-        // this.cameraMixer.addEventListener('finished', function (e) {
-        //     console.log("scene 3 finished")
-        //     // transition UI in 
-        //     curr.onSceneIsDone()
-        //     callback()
+        this.shouldPlayTransition = false
+        this.delayAnimationTransition = 1500
 
-        // })
-        this.nextBtn = document.getElementById('next')
-        this.nextBtn.addEventListener('click', e => {
+        this.cameraMixer = new THREE.AnimationMixer(this.camera)
+        this.cameraMouvement = scene.animations[12]
+        let curr = this
+        this.cameraMixer.addEventListener('finished', function (e) {
+            console.log("scene 3 finished")
+            // transition UI in 
             curr.onSceneIsDone()
             callback()
-            this.isActive = false
-            this.nextBtn.style.display = 'none'
-            this.hasBeenCompleted = true
-            //this.cameraMixer.clipAction(this.cameraMouvement).paused = false;
-            
+
         })
 
         // animations 
@@ -102,7 +95,6 @@ export default class Scene_3 extends Scene {
         this.cardMesh.position.z = this.thresholdZStart
 
         this.bird.position.y = 0
-        this.nextBtn.style.display = "block"
 
         // debug threshold
         let debugMeshThresholdStart = new THREE.Mesh(new THREE.SphereGeometry(1, 16), new THREE.MeshNormalMaterial())
@@ -135,6 +127,12 @@ export default class Scene_3 extends Scene {
         this.scene.add(this.light2, helper2)
 
         this.setupGui()
+
+        const cameraAction = this.cameraMixer.clipAction(this.cameraMouvement);
+        cameraAction.clampWhenFinished = true;
+        cameraAction.loop = THREE.LoopOnce
+        cameraAction.play()
+        cameraAction.paused = true
         
         const action = this.birdMixer.clipAction(this.birdFlying);
         //action.clampWhenFinished = true;
@@ -283,8 +281,6 @@ export default class Scene_3 extends Scene {
     }
 
     animateMainCard() {
-        // this.cardMesh.position.z -= 0.01
-        // console.log(this.cardMesh.position.z, this.cardMeshTargetPos.z)
         if(this.cardMesh.position.z > this.cardMeshTargetPos.z) {
             this.cardMesh.position.z -= 0.01
             this.particles.updatePosition(this.cardMesh.position)
@@ -306,6 +302,9 @@ export default class Scene_3 extends Scene {
   
         if(intersects.map(e => e.object.name).includes("main_card")) {
             this.birdShouldCatchCard = true
+            this.cameraMixer.clipAction(this.cameraMouvement).paused = false
+            this.transition.init()
+            setTimeout(() => {this.shouldPlayTransition = true}, this.delayAnimationTransition);
         }
        
     }
@@ -384,6 +383,10 @@ export default class Scene_3 extends Scene {
     }
 
     update() {
+        if (this.cameraMixer) {
+            this.cameraMixer.update(this.time.delta * 0.001)
+        }
+        
         if(this.birdMixer) {
             this.birdMixer.update(this.time.delta * 0.001)
         }
@@ -402,6 +405,9 @@ export default class Scene_3 extends Scene {
         }
 
         if(this.particles.shouldAnimate) this.particles.update()
+
+        if(this.shouldPlayTransition)  this.transition.play()
+        console.log(this.shouldPlayTransition)
     }
 
 }

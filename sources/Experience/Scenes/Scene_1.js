@@ -88,6 +88,11 @@ export default class Scene_1 extends Scene {
             this.deskLight = !this.deskLight
             curr.setLights()
         })
+
+        //sounds 
+        this.doorSound = new THREE.Audio( this.cameraControls.audioListener );
+        this.lampSound = new THREE.Audio( this.cameraControls.audioListener );
+        this.tiroirSound = new THREE.Audio( this.cameraControls.audioListener );
     }
 
     init() {
@@ -165,6 +170,31 @@ export default class Scene_1 extends Scene {
         light2Folder.add(this.lampLight.position, 'x').min(-10).max(10).name('light x')
         light2Folder.add(this.lampLight.position, 'y').min(-10).max(10).name('light y')
         light2Folder.add(this.lampLight.position, 'z').min(-10).max(10).name('light z')
+
+    }
+
+    setSounds() {
+        console.log(this.cameraControls.audioListener)
+        const audioLoader = new THREE.AudioLoader();
+        audioLoader.load('/assets/sounds/scene1/door1.mp3', (buffer) => {
+            this.doorSound.setBuffer( buffer );
+            this.doorSound.setLoop( true );
+            this.doorSound.setVolume( 0.5 );
+            //this.doorSound.play(); // play with animation mixer
+        })
+
+        audioLoader.load('/assets/sounds/scene1/lampe.mp3', (buffer) => {
+            this.lampSound.setBuffer( buffer );
+            this.lampSound.setLoop( false );
+            this.lampSound.setVolume( 3 );
+        })
+        
+        audioLoader.load('/assets/sounds/scene1/tiroir.mp3', (buffer) => {
+
+            this.tiroirSound.setBuffer( buffer );
+            this.tiroirSound.setLoop( false );
+            this.tiroirSound.setVolume( 1 );
+        })   
 
     }
 

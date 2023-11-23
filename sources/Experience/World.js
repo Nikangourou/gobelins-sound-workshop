@@ -83,6 +83,8 @@ export default class World
         this.activeSceneIndex = this.getSceneIdFromUrl()
         this.scenes[this.activeSceneIndex].init()
 
+        console.log("at init", this.activeSceneIndex)
+
         // test shader scene 1
         // this.shaderTestScene = new ShaderTestScene(this.renderer, this.resources.items)
         // this.scene.add(this.shaderTestScene.scene)
@@ -100,8 +102,7 @@ export default class World
     update()
     {
 
-
-        if(this.scenes && this.activeSceneIndex !==0 && !this.scenes[this.activeSceneIndex-1].transition.isDone ) this.scenes[this.activeSceneIndex-1].update()
+        if(this.scenes && this.activeSceneIndex !==0 && this.scenes[this.activeSceneIndex-1].transition.isPlaying ) this.scenes[this.activeSceneIndex-1].update()
         if(this.scenes) this.scenes[this.activeSceneIndex].update() // contineu update until trnasition is done
 
     }

@@ -18,14 +18,15 @@ export default class Scene_2 extends Scene {
         this.scene = scene.scene
         this.camera = scene.cameras[0]
         this.cameraMixer = new THREE.AnimationMixer(this.camera)
-        this.cameraMouvement = scene.animations[3]
+        this.cameraMouvement = scene.animations[4]
         this.particles = new Particles("#ef4444", this.scene)
         
         this.namesToBeOutlines = ["plane_box_1", "plane_box_2", "box_drag_drop"]
         this.lightPos = new THREE.Vector3(2, 5, 3)
         
-        this.rugAnimation = scene.animations[0]
-        this.boxFalling = scene.animations[1]
+        this.rugAnimation = scene.animations[1]
+        this.boxFalling = scene.animations[2]
+        this.buttonAnimation = scene.animations[3]
         
         this.delayAnimationTransition = 22000
         this.shouldPlayTransition = false
@@ -40,6 +41,7 @@ export default class Scene_2 extends Scene {
         //objects 
         this.boxToBeRemoved= this.scene.getObjectByName('box_drag_drop')
         this.boxMixer = new THREE.AnimationMixer(this.boxToBeRemoved)
+
 
         let curr = this
         this.cameraMixer.addEventListener('finished', function (e) {
@@ -104,20 +106,20 @@ export default class Scene_2 extends Scene {
     setSounds() {
         console.log(this.cameraControls.audioListener)
         const audioLoader = new THREE.AudioLoader();
-        audioLoader.load('/assets/sounds/scene2/ambient.mp3', (buffer) => {
+        audioLoader.load('/assets/sounds/scene2/ambiance.mp3', (buffer) => {
             this.ambientSound.setBuffer( buffer );
             this.ambientSound.setLoop( true );
             this.ambientSound.setVolume( 0.5 );
             this.ambientSound.play();
         })
 
-        audioLoader.load('/assets/sounds/scene2/bouton.wav', (buffer) => {
+        audioLoader.load('/assets/sounds/scene2/pressure_button.mp3', (buffer) => {
             this.buttonSound.setBuffer( buffer );
             this.buttonSound.setLoop( false );
-            this.buttonSound.setVolume( 1 );
+            this.buttonSound.setVolume( 3 );
         })
         
-        audioLoader.load('/assets/sounds/scene2/colis1.mp3', (buffer) => {
+        audioLoader.load('/assets/sounds/scene2/colis.mp3', (buffer) => {
             this.boxFallingSound.setBuffer( buffer );
             this.boxFallingSound.setLoop( false );
             this.boxFallingSound.setVolume( 1 );
