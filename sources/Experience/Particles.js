@@ -15,6 +15,7 @@ export default class Particles {
     this.particlesData = []
     this.shouldAnimate = false
     this.dir = 1
+    this.axis = 'z'
   }
 
   init() {
@@ -42,9 +43,9 @@ export default class Particles {
 
         const startPos = new THREE.Vector3(getRandomFloat(-0.1, 0.1), getRandomFloat(-0.1, 0.1), 0) // *dir
         let currPos = startPos
-        const targetPos = new THREE.Vector3(currPos.x,currPos.y, this.dir*getRandomFloat(0.2, 2))
+        const targetPos = currPos.clone()
+        targetPos[this.axis] = this.dir*getRandomFloat(0.2, 2)
 
-        //init 
         this.particlesData.push({ time, factor, speed, targetPos, currPos, startPos, initScale, currScale });
     }
   }
@@ -65,13 +66,43 @@ export default class Particles {
     this.updateMatColor(color)
     this.updatePosition(position)
     this.init()
-    console.log(this.dir, position.z)
+  }
+
+  updateOnY() {
+    this.particlesData.forEach((particle, index) => {
+      let { factor, speed, targetPos, currPos, currScale, startPos, time } = particle;
+      currPos.y = currPos.y - (targetPos.z - currPos.y)*0.0007*speed
+      
+
+       if(Math.abs(currPos.y) > Math.abs(targetPos.z)) {
+        currPos.y = 0
+        time = getRandomFloat(0, 50);
+      }
+      
+     
+      // Update the particle time
+      const t = (time += speed);
+      
+      this.obj.matrix.identity()
+  
+      this.obj.position.copy(currPos)
+      // Derive an oscillating value for size and rotation
+      const s = Math.cos(t);
+      this.obj.scale.set(s, s, s);
+      // this.obj.rotation.set(s * 5, s * 5, s * 5);
+      this.obj.updateMatrix();
+  
+      // And apply the matrix to the instanced item
+      this.particleSystem.setMatrixAt(index, this.obj.matrix);
+    });
+    this.particleSystem.instanceMatrix.needsUpdate = true;
   }
 
   update() {
     this.particlesData.forEach((particle, index) => {
         let { factor, speed, targetPos, currPos, currScale, startPos, time } = particle;
         currPos.z = currPos.z - (targetPos.z - currPos.z)*0.0007*speed
+        
 
          if(Math.abs(currPos.z) > Math.abs(targetPos.z)) {
           currPos.z = 0

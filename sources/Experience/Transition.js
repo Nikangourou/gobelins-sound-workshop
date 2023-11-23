@@ -29,12 +29,11 @@ export default class Transition {
 
     play() {
         
-        console.log("entres play")
         if(this.frameIndex < this.frameCount && !this.isDone ) {
             this.frameIndex += 1
             this.img.src = `/assets/paper_animation${this.frameIndex}.png`
             this.isPlaying = true
-            console.log("is playing")
+
         }
 
         if(!this.isDone && this.frameIndex > this.frameCount) {

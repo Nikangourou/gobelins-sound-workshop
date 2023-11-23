@@ -28,7 +28,7 @@ export default class Scene_2 extends Scene {
         
        
         
-        this.delayAnimationTransition = 25000
+        this.delayAnimationTransition = 23100
         this.shouldPlayTransition = false
         // State / UI
         this.nextBtn = document.getElementById('next')
@@ -71,33 +71,29 @@ export default class Scene_2 extends Scene {
     init() {
         this.mainScene.add(this.scene)
         this.isActive = true
-        // const helper = new THREE.CameraHelper( this.camera );
-        // this.scene.add(helper)
-        this.scene.add(this.cameraControls.dummyCamera, this.cameraControls.groupToAnimateOnMousemove)
         this.cameraControls.setDefaultCamera(this.camera)
-
         this.setSceneMaterials()
+        this.setupGui()
+        this.setSounds()
+       
+       
 
         this.particles.group.position.x = 10
         this.particles.group.position.z = -1
         this.particles.group.position.y = 2
 
-        // this.userClickedBox.style.display = "block"
-
+        //lights
         this.light.position.set(10, 0.76, 2.6);
         const helper1 = new THREE.PointLightHelper(this.light, 0.1);
         this.scene.add(this.light, helper1)
-
-
         this.light2.position.set(1.04, 8.32, 2);
         const helper2 = new THREE.PointLightHelper(this.light2, 0.1);
         this.scene.add(this.light2, helper2)
-
-        this.setupGui()
-
         let testLight = new THREE.AmbientLight(0xffffff);
         this.scene.add(testLight)
 
+
+        //animations 
         const action = this.cameraMixer.clipAction(this.cameraMouvement);
         action.clampWhenFinished = true;
         action.loop = THREE.LoopOnce
@@ -113,12 +109,8 @@ export default class Scene_2 extends Scene {
         const buttonAction = this.buttonMixer.clipAction(this.buttonAnimation)
         buttonAction.clampWhenFinished = true;
         buttonAction.loop = THREE.LoopOnce
-       
-
 
         document.querySelector('.experience').addEventListener('click', (e) => { this.click(e) })
-
-        this.setSounds()
 
         // Pin
         // this.pinBox = new Pin({ x: 0.2, y: 0, z: -0.1}, this.mouse, this.raycaster, this.camera)

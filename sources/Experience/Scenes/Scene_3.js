@@ -22,6 +22,7 @@ export default class Scene_3 extends Scene {
         this.raycaster = this.cameraControls.raycaster
         this.particles = new Particles("#ef4444", this.scene)
         this.cardsShouldFall = false
+        this.mainCardOffset = 1
 
         this.shouldPlayTransition = false
         this.delayAnimationTransition = 1500
@@ -48,12 +49,13 @@ export default class Scene_3 extends Scene {
         
         this.bird = this.scene.getObjectByName('Bird')
         this.birdMixer = new THREE.AnimationMixer(this.bird)
-        this.birdMixer2 = new THREE.AnimationMixer(this.bird)
+        this.birdMixer2 = new THREE.AnimationMixer(this.bird.parent)
+        
         this.birdFlying = this.animations[2]
         this.birdMoving = this.animations[1]
         this.birdShouldCatchCard = false
-        this.birdGroup = new THREE.Group()
-        this.birdGroup.add(this.bird)
+        // this.birdGroup = new THREE.Group()
+        // this.birdGroup.add(this.bird)
 
         this.cloudMesh = this.scene.getObjectByName('cloud')
         this.cloudCount = 40
@@ -74,11 +76,13 @@ export default class Scene_3 extends Scene {
         this.light = new THREE.PointLight(0xffffff, 5, 100);
         this.light2 = new THREE.PointLight(0xffffff, 5, 100);
         
-        this.thresholdYEnd = -16
+        this.thresholdYEnd = -40
         this.thresholdYStart = 15
 
         this.thresholdZEnd = -3
         this.thresholdZStart = 14
+
+        this.birdPosOffset = 3
     }
     
     init() {
@@ -93,27 +97,29 @@ export default class Scene_3 extends Scene {
 
         this.cardMesh.position.z = this.thresholdZStart
 
-        this.bird.position.y = 0
+        this.bird.parent.position.y += this.birdPosOffset
+
+        this.cardMesh.position.x = this.bird.parent.position.x 
 
         // debug threshold
-        let debugMeshThresholdStart = new THREE.Mesh(new THREE.SphereGeometry(1, 16), new THREE.MeshNormalMaterial())
-        debugMeshThresholdStart.position.y = this.thresholdYStart
-        this.scene.add(debugMeshThresholdStart)
+        // let debugMeshThresholdStart = new THREE.Mesh(new THREE.SphereGeometry(1, 16), new THREE.MeshNormalMaterial())
+        // debugMeshThresholdStart.position.y = this.thresholdYStart
+        // this.scene.add(debugMeshThresholdStart)
         
-        let debugMeshThresholdEnd = new THREE.Mesh(new THREE.SphereGeometry(1, 16), new THREE.MeshBasicMaterial({color: 0x00ff00}))
-        debugMeshThresholdEnd.position.y = this.thresholdYEnd
-        this.scene.add(debugMeshThresholdEnd)
+        // let debugMeshThresholdEnd = new THREE.Mesh(new THREE.SphereGeometry(1, 16), new THREE.MeshBasicMaterial({color: 0x00ff00}))
+        // debugMeshThresholdEnd.position.y = this.thresholdYEnd
+        // this.scene.add(debugMeshThresholdEnd)
 
-        let debugMeshThresholdZStart = new THREE.Mesh(new THREE.SphereGeometry(1, 16),  new THREE.MeshBasicMaterial({color: 0x0000ff}))
-        debugMeshThresholdZStart.position.z = this.thresholdZStart
-        this.scene.add(debugMeshThresholdZStart)
+        // let debugMeshThresholdZStart = new THREE.Mesh(new THREE.SphereGeometry(1, 16),  new THREE.MeshBasicMaterial({color: 0x0000ff}))
+        // debugMeshThresholdZStart.position.z = this.thresholdZStart
+        // this.scene.add(debugMeshThresholdZStart)
         
-        let debugMeshThresholdZEnd = new THREE.Mesh(new THREE.SphereGeometry(1, 16), new THREE.MeshBasicMaterial({color: 0xffff00}))
-        debugMeshThresholdZEnd.position.z = this.thresholdZEnd
-        this.scene.add(debugMeshThresholdZEnd)
+        // let debugMeshThresholdZEnd = new THREE.Mesh(new THREE.SphereGeometry(1, 16), new THREE.MeshBasicMaterial({color: 0xffff00}))
+        // debugMeshThresholdZEnd.position.z = this.thresholdZEnd
+        // this.scene.add(debugMeshThresholdZEnd)
 
-        const helper = new THREE.CameraHelper( this.camera );
-        this.scene.add(helper)
+        // const helper = new THREE.CameraHelper( this.camera );
+        // this.scene.add(helper)
 
         this.setSceneMaterials()
         
@@ -280,14 +286,21 @@ export default class Scene_3 extends Scene {
     }
 
     animateMainCard() {
-        if(this.cardMesh.position.z > this.cardMeshTargetPos.z) {
-            this.cardMesh.position.z -= 0.01
+        if(this.cardMesh.position.z > this.cardMeshTargetPos.z + this.mainCardOffset) {
+            this.cardMesh.position.z -= 0.02
             this.particles.updatePosition(this.cardMesh.position)
             // this.birdGroup.position.y += 0.1
             // console.log(this.birdGroup.position)
         } 
         
         //update position of particles system
+    }
+
+    moveBirdIntoView() {
+        if(this.birdPosOffset > 0) {
+            this.birdPosOffset -= 0.01
+            this.bird.parent.position.y -= 0.01
+        }
     }
 
     click(e) {
@@ -301,11 +314,16 @@ export default class Scene_3 extends Scene {
   
         if(intersects.map(e => e.object.name).includes("main_card")) {
             this.birdShouldCatchCard = true
-            this.cameraMixer.clipAction(this.cameraMouvement).paused = false
-            this.transition.init()
-            setTimeout(() => {this.shouldPlayTransition = true}, this.delayAnimationTransition);
+            let birdFlyingAway = ( ) => this.onBirdWentAway(this)
+            setTimeout(birdFlyingAway, 1200)
         }
        
+    }
+
+    onBirdWentAway(ctx) {
+       ctx.cameraMixer.clipAction(this.cameraMouvement).paused = false
+       ctx.transition.init()
+        setTimeout(() => {ctx.shouldPlayTransition = true},ctx.delayAnimationTransition);
     }
 
     onSceneIsDone() {
@@ -326,7 +344,7 @@ export default class Scene_3 extends Scene {
         let toBeAdded = []
         this.scene.traverse(e => {
             if (e.isMesh) {
-                console.log(e.name)
+                console.log(e)
                 if(e.name === "avion") {
                     let mat = new CustomMat({
                         renderer: this.renderer, uniforms: {
@@ -401,12 +419,12 @@ export default class Scene_3 extends Scene {
         if(this.cardsShouldFall) {
             this.animateCards(this.time.delta * 0.001)
             this.animateMainCard(this.time.delta * 0.001)
+            this.moveBirdIntoView()
         }
 
         if(this.particles.shouldAnimate) this.particles.update()
 
         if(this.shouldPlayTransition)  this.transition.play()
-        console.log(this.shouldPlayTransition)
     }
 
 }
