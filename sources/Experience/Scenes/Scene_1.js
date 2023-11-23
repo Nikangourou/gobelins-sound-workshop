@@ -144,11 +144,11 @@ export default class Scene_1 extends Scene {
         openingDoorAnimation.paused = true
 
         // Pin
-        this.pinTiroir = new Pin({ x: 0.1, y: 0.67, z: 7.25 }, this.mouse, this.raycaster, this.camera)
+        this.pinTiroir = new Pin({ x: 0, y: 0.67, z: 7.25 }, this.mouse, this.raycaster, this.camera)
         this.pinTiroir.init()
         this.tiroir.add(this.pinTiroir.pin)
 
-        this.pinLampe = new Pin({ x: 0.02, y: -0.2, z: -0.1 }, this.mouse, this.raycaster, this.camera)
+        this.pinLampe = new Pin({ x: 0, y: -0.2, z: -0.05}, this.mouse, this.raycaster, this.camera)
         this.pinLampe.init()
         this.lampe.add(this.pinLampe.pin)
 
@@ -156,7 +156,7 @@ export default class Scene_1 extends Scene {
         this.pinRadio.init()
         this.radio.add(this.pinRadio.pin)
 
-        this.pinDoor = new Pin({ x: -0.38, y: 1.4, z: 2 }, this.mouse, this.raycaster, this.camera, 0.1)
+        this.pinDoor = new Pin({ x: -0.26, y: 1.4, z: 2 }, this.mouse, this.raycaster, this.camera, 0.1)
         this.pinDoor.init()
         this.scene.add(this.pinDoor.pin)
 

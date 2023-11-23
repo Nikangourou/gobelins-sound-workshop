@@ -118,9 +118,14 @@ export default class Scene_2 extends Scene {
         this.pinBox = new Pin({ x: 17.5, y: 1, z: 0.5}, this.mouse, this.raycaster, this.camera)
         this.pinBox.init()
         this.scene.add(this.pinBox.pin)
+
         this.pinButton = new Pin({ x: 17.3, y: 0.85, z: 0.57}, this.mouse, this.raycaster, this.camera)
         this.pinButton.init()
         this.scene.add(this.pinButton.pin)
+
+        this.pinCard = new Pin({ x: 13.5, y: 1.5, z: 1.9}, this.mouse, this.raycaster, this.camera, 0.1)
+        this.pinCard.init()
+        this.scene.add(this.pinCard.pin)
     }
 
     setSounds() {
@@ -242,6 +247,7 @@ export default class Scene_2 extends Scene {
         //switch to new sound
         this.currCardSound = this.getSoundFromColor(color)
         this.currCardSound.play()
+        this.pinCard.remove()
     }
 
     onButtonPressed() {
@@ -345,6 +351,9 @@ export default class Scene_2 extends Scene {
         }
         if(this.pinButton){
             this.pinButton.animate()
+        }
+        if(this.pinCard){
+            this.pinCard.animate()
         }
         if (this.particles.shouldAnimate) this.particles.update()
         if(this.shouldPlayTransition)  this.transition.play()
