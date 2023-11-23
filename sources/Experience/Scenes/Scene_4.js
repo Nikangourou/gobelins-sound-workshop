@@ -29,7 +29,6 @@ export default class Scene_4 extends Scene {
             // transition UI in 
             // curr.onSceneIsDone()
             // callback()
-
         })
         
         //lights
@@ -55,7 +54,7 @@ export default class Scene_4 extends Scene {
             this.nextBtn.style.display = 'none'
             this.hasBeenCompleted = true
             this.cameraMixer.clipAction(this.cameraMouvement).paused = false;
-            
+            document.querySelector('.generique').classList.add('active')
         })
     }
     
