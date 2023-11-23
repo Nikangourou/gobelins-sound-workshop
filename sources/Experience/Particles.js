@@ -1,5 +1,4 @@
 import * as THREE from 'three'
-import { createNoise2D } from 'simplex-noise'
  
 const getRandomFloat = (min, max) => (Math.random() * (max - min) + min);
 

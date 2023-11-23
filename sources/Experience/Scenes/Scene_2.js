@@ -113,7 +113,6 @@ export default class Scene_2 extends Scene {
     }
 
     setSounds() {
-        console.log(this.cameraControls.audioListener)
         const audioLoader = new THREE.AudioLoader();
         audioLoader.load('/assets/sounds/scene2/ambient.mp3', (buffer) => {
             this.ambientSound.setBuffer(buffer);
@@ -139,6 +138,7 @@ export default class Scene_2 extends Scene {
     setupGui() {
         const scene2Folder = this.gui.addFolder("scene 2")
         const matFolder = scene2Folder.addFolder("toon settings")
+        matFolder.close()
         const lightFolder = matFolder.addFolder('light')
         const light1 = lightFolder.addFolder("light1")
         light1.add(this.light.position, 'x').min(-10).max(10).name('light x')

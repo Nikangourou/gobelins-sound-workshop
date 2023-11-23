@@ -41,7 +41,8 @@ export default class World
         if( currContext.activeSceneIndex < currContext.scenes.length -1) {
             // update UI on completed
             if(prevScene.hasBeenCompleted) {
-                document.getElementById(prevScene.name).classList.remove('beforeComplete')
+                document.getElementById(prevScene.name).classList.remove('beforeComplete', 'active')
+                document.getElementById(nextScene.name).classList.add('active')
             }
             currContext.activeSceneIndex += 1
             nextScene.init()
@@ -49,7 +50,6 @@ export default class World
     }
 
     onSceneSelect(sceneIndex) {
-        
         // goTo 
         const targetScene = this.scenes[sceneIndex]
         this.activeSceneIndex = sceneIndex
@@ -68,6 +68,8 @@ export default class World
             const sceneName = urlParts[1].split('')
             sceneId = sceneName[sceneName.length - 1] - 1
         }
+        let scene = "scene"+(sceneId+1)
+        document.getElementById(scene).classList.add('active')
 
         return sceneId
     }

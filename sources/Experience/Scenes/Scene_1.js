@@ -26,7 +26,6 @@ export default class Scene_1 extends Scene {
         this.camera = scene.cameras[0]
         this.tiroir.add(this.timbre, this.timbre2)
 
-        console.log( 'camera', this.camera, this.camera.rotation )
 
         // Mixer 
         this.lampeMixer = new THREE.AnimationMixer(this.lamp_switch)
@@ -180,7 +179,6 @@ export default class Scene_1 extends Scene {
         let toBeAdded = []
         this.scene.traverse(e => {
             if (e.isMesh) {
-                console.log(e.name)
                 if (e.name === 'door') {
                     this.doorMixer = new THREE.AnimationMixer(e)
                     let mat = new CustomMat({

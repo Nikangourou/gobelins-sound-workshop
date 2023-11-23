@@ -39,31 +39,60 @@ ul {
     justify-content: center;
     flex-direction: column;
     height: 100%;
-    margin: 1rem;
+    max-height: 500px;
 }
 
 .timeline {
     position: fixed;
+    right: 50px;
     height: 100vh;
-    padding: 64px;
     /* width: 5vw; */
-    background-color: black;
-    transform: translateX(-100%);
-}
-
-#sceneList{
-    display: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 #sceneList>li {
-    padding: 64px 0;
+    list-style: none;
+}
+
+#sceneList>li + li {
+    margin-top: 50px;
+}
+
+#sceneList>li>a {}
+
+#sceneList>li .circle {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#sceneList>li>a.active .circle {
+    border: 1px solid white;
+}
+
+#sceneList>li .btnScene {
+    width: 24px;
+    height: 24px;
+    background-image: url(../assets/polygon.svg);
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+#sceneList>li>a.active .btnScene {
+    background-image: url(../assets/polygonActive.svg);
 }
 
 .beforeComplete {
     pointer-events: none;
     cursor: default;
     text-decoration: none;
-    opacity: 0.2;
+    /* opacity: 0.2; */
 }
 
 
@@ -89,7 +118,6 @@ button:hover {
     width: 100vw;
     position: fixed;
     z-index: 100;
-    /* background-color: red; */
     pointer-events: none;
 
 }
