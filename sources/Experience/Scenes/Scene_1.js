@@ -92,7 +92,15 @@ export default class Scene_1 extends Scene {
         this.doorSound = new THREE.Audio( this.cameraControls.audioListener );
         this.lampSound = new THREE.Audio( this.cameraControls.audioListener );
         this.tiroirSound = new THREE.Audio( this.cameraControls.audioListener );
-        this.ambientSound = new THREE.Audio( this.cameraControls.audioListener)
+        this.ambientSound = new THREE.Audio( this.cameraControls.audioListener);
+        this.radioSounds = {
+            0 : new THREE.Audio( this.cameraControls.audioListener),
+            1 : new THREE.Audio( this.cameraControls.audioListener),
+            2 : new THREE.Audio( this.cameraControls.audioListener),
+            3 : new THREE.Audio( this.cameraControls.audioListener),
+        }
+
+        this.radioChannel = 0
 
         this.staticMatDarkColor = '#111722'
         this.staticMatLightColor = '#E69262'
@@ -197,8 +205,18 @@ export default class Scene_1 extends Scene {
 
     }
 
+    switchRadioChannel(){
+        this.radioSounds[this.radioChannel].pause()
+        if(this.radioChannel === 3) {
+            this.radioChannel = 0
+        } else {
+            this.radioChannel += 1
+        }
+        this.radioSounds[this.radioChannel].play()
+
+    }
+
     setSounds() {
-        console.log(this.cameraControls.audioListener)
         const audioLoader = new THREE.AudioLoader();
         audioLoader.load('/assets/sounds/scene1/door1.mp3', (buffer) => {
             this.doorSound.setBuffer( buffer );
@@ -224,7 +242,32 @@ export default class Scene_1 extends Scene {
             this.ambientSound.setLoop( true );
             this.ambientSound.setVolume( 1 );
             this.ambientSound.play()
-        })   
+        })
+
+        audioLoader.load('/assets/sounds/scene1/radio1.mp3', (buffer) => {
+            this.radioSounds[0].setBuffer( buffer );
+            this.radioSounds[0].setLoop( true );
+            this.radioSounds[0].setVolume( 1 );
+            this.radioSounds[0].play()
+        }) 
+        
+        audioLoader.load('/assets/sounds/scene1/radio2.mp3', (buffer) => {
+            this.radioSounds[1].setBuffer( buffer );
+            this.radioSounds[1].setLoop( true );
+            this.radioSounds[1].setVolume( 1 );
+        }) 
+
+        audioLoader.load('/assets/sounds/scene1/radio3.mp3', (buffer) => {
+            this.radioSounds[2].setBuffer( buffer );
+            this.radioSounds[2].setLoop( true );
+            this.radioSounds[2].setVolume( 1 );
+        })
+
+        audioLoader.load('/assets/sounds/scene1/radio4.mp3', (buffer) => {
+            this.radioSounds[3].setBuffer( buffer );
+            this.radioSounds[3].setLoop( true );
+            this.radioSounds[3].setVolume( 1 );
+        }) 
 
     }
 
@@ -356,7 +399,7 @@ export default class Scene_1 extends Scene {
                 this.pinLampe.remove()    
             }
             if (modelIntersects[0].object.name === 'radio') {
-                this.radioSound.play()
+                this.switchRadioChannel()
                 this.pinRadio.remove()
             }
             if (modelIntersects[0].object.name === 'tiroir_desk') {
