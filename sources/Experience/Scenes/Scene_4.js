@@ -29,14 +29,13 @@ export default class Scene_4 extends Scene {
             // transition UI in 
             // curr.onSceneIsDone()
             // callback()
-
         })
         this.nextBtn = document.getElementById('next')
         this.nextBtn.addEventListener('click', e => {
             this.nextBtn.style.display = 'none'
             this.hasBeenCompleted = true
             this.cameraMixer.clipAction(this.cameraMouvement).paused = false;
-            
+            document.querySelector('.generique').classList.add('active')
         })
 
         //lights

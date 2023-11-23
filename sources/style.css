@@ -94,21 +94,18 @@ ul {
     text-decoration: none;
 }
 
-
 button {
     height: 100px;
     width: 100px;
     border-radius: 50%;
-    background-color: black;
+    background-color: transparent;
+    text-transform: uppercase;
     border: solid white;
     margin-top: 3rem;
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-}
-
-button:hover {
     cursor: pointer
 }
 
@@ -118,10 +115,43 @@ button:hover {
     position: fixed;
     z-index: 100;
     pointer-events: none;
-
 }
 
 #transition>img {
     width: 100%;
     height: 100%;
+}
+
+.generique{
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 100;
+    display: flex;
+    pointer-events: none;
+    transform: translateY(100%);
+}
+
+.generique.active{
+    transform: translateY(0%); 
+    transition: 5s transform 20s ease-in-out; 
+}
+
+.generique__content{
+    font-size: 2rem;
+    text-transform: uppercase;
+    font-family: Arial, Helvetica, sans-serif;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.generique__content__item{
+    margin-bottom: 2rem;
+}
+
+.generique__content__item img{
+    width: 35%;
 }
