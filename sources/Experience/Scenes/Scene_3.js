@@ -55,10 +55,10 @@ export default class Scene_3 extends Scene {
         
         this.bird = this.scene.getObjectByName('bird')
         this.birdMixer = new THREE.AnimationMixer(this.bird)
-        // this.birdMixer2 = new THREE.AnimationMixer(this.bird.parent)
+        this.birdMixer2 = new THREE.AnimationMixer(this.bird.parent)
         
         this.birdFlying = this.animations[2]
-        this.birdMoving = this.animations[1]
+        this.birdMoving = this.animations[10]
         this.birdShouldCatchCard = false
 
         this.cloudMesh = this.scene.getObjectByName('cloud')
@@ -111,7 +111,7 @@ export default class Scene_3 extends Scene {
         this.particles.shouldAnimate = true
 
         this.cardMesh.position.z = this.thresholdZStart
-        this.cardMesh.position.y = this.thresholdYStart - 100
+        // this.cardMesh.position.y = this.thresholdYStart - 100
         // this.bird.parent.position.y += this.birdPosOffset
         // this.cardMesh.position.x = this.bird.parent.position.x 
 
@@ -279,7 +279,7 @@ export default class Scene_3 extends Scene {
 
     animateMainCard() {
         console.log(this.cardMesh.position.z, this.cardMeshTargetPos.z)
-        if(this.cardMesh.position.z > this.cardMeshTargetPos.z) {
+        if(this.cardMesh.position.z > this.cardMeshTargetPos.z - 1) {
             this.cardMesh.position.z -= 0.02
             console.log(this.cardMesh.position.z)
             this.particles.updatePosition(this.cardMesh.position)

@@ -300,25 +300,25 @@ export default class Scene_2 extends Scene {
                 } else if (e.name.toLowerCase().includes('plane')) {
                     e.material = new THREE.MeshBasicMaterial({ color: new THREE.Color(this.getRandomColor()) })
                     e.material.side = THREE.DoubleSide
+                } else {
+                    let mat = new CustomMat({
+                        renderer: this.renderer, uniforms: {
+                            color1: { value: new THREE.Color('#18181b') }, // darker
+                            color2: { value: new THREE.Color('#374151') },
+                            color3: { value: new THREE.Color('#475569') },
+                            color4: { value: new THREE.Color('#94a3b8') },
+                            color5: { value: new THREE.Color('#e2e8f0') },// lighter
+                            noiseStep: { value: 1.0 },
+                            nbColors: { value: 3 },
+                            lightDirection: { value: this.light.position },
+                            lightDirection2: { value: this.light2.position }
+                        }
+                    })
+                    mat.init()
+                    e.material = mat.get()
                 }
-
-            } else {
-                let mat = new CustomMat({
-                    renderer: this.renderer, uniforms: {
-                        color1: { value: new THREE.Color('#18181b') }, // darker
-                        color2: { value: new THREE.Color('#374151') },
-                        color3: { value: new THREE.Color('#475569') },
-                        color4: { value: new THREE.Color('#94a3b8') },
-                        color5: { value: new THREE.Color('#e2e8f0') },// lighter
-                        noiseStep: { value: 1.0 },
-                        nbColors: { value: 3 },
-                        lightDirection: { value: this.light.position },
-                        lightDirection2: { value: this.light2.position }
-                    }
-                })
-                mat.init()
-                e.material = mat.get()
-            }
+            }    
+               
 
 
         })
