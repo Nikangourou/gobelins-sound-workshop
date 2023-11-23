@@ -53,7 +53,7 @@ export default class Scene_1 extends Scene {
         })
 
         this.shouldPlayTransition = false
-        this.delayAnimationTransition = 1500
+        this.delayAnimationTransition = 5000
 
         this.namesToBeOutlines = [ "radio",  "desk_lamp" ]
         this.lightPos = new THREE.Vector3(2, 5, 3)
@@ -143,20 +143,6 @@ export default class Scene_1 extends Scene {
         openingDoorAnimation.play()
         openingDoorAnimation.paused = true
 
-        // audio
-        // this.camera.add(this.audioListenner)
-        // const helperRadio = new PositionalAudioHelper(this.radioSound)
-
-        // const audioLoader = new THREE.AudioLoader();
-
-        // audioLoader.load('assets/sounds/RadioSound.mp3', (buffer) => {
-        //     this.radioSound.setBuffer(buffer);
-        //     this.radioSound.setRefDistance(1);
-        // });
-
-        // this.radioSound.add(helperRadio);
-        // this.radio.add(this.radioSound);
-
         // Pin
         this.pinTiroir = new Pin({ x: 0.1, y: 0.67, z: 7.25 }, this.mouse, this.raycaster, this.camera)
         this.pinTiroir.init()
@@ -200,12 +186,6 @@ export default class Scene_1 extends Scene {
         light2Folder.add(this.lampLight.position, 'x').min(-10).max(10).name('light x')
         light2Folder.add(this.lampLight.position, 'y').min(-10).max(10).name('light y')
         light2Folder.add(this.lampLight.position, 'z').min(-10).max(10).name('light z')
-
-        const colors = matFolder.addFolder('colors')
-        colors.addColor(this, 'staticMatDarkColor').name('colorDark').onChange(e => {
-            this.staticMat.updateColor('color1', e )
-        })
-        colors.addColor(this, 'staticMatLightColor').name('colorLight')
 
     }
 
@@ -252,7 +232,7 @@ export default class Scene_1 extends Scene {
             this.radioSounds[0].setBuffer( buffer );
             this.radioSounds[0].setLoop( true );
             this.radioSounds[0].setVolume( 1 );
-            this.radioSounds[0].play()
+            //this.radioSounds[0].play()
         }) 
         
         audioLoader.load('/assets/sounds/scene1/radio2.mp3', (buffer) => {
@@ -399,6 +379,7 @@ export default class Scene_1 extends Scene {
 
             if (modelIntersects[0].object.name === 'door') {
                 this.userStarted = true;
+                this.radioSounds[0].play()
                 this.doorSound.play()
                 this.doorMixer.clipAction(this.doorMovement).paused = false;
                 this.cameraMixer.clipAction(this.cameraMouvement).paused = false;
@@ -437,6 +418,7 @@ export default class Scene_1 extends Scene {
     }
 
     onSceneIsDone() {
+        this.radioSounds[this.radioChannel].pause()
         this.isActive = false
         this.hasBeenCompleted = true
         document.querySelector('.experience').removeEventListener('click', (e) => { this.click(e) })

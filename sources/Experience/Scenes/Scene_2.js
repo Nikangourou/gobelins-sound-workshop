@@ -68,6 +68,8 @@ export default class Scene_2 extends Scene {
         this.light = new THREE.PointLight(0xff0000, 5, 100);
         this.light2 = new THREE.PointLight(0xff0000, 5, 100);
 
+        this.particlesHasBeenInited = false
+
     }
 
     init() {
@@ -200,8 +202,7 @@ export default class Scene_2 extends Scene {
     click(e) {
         if (!this.particles.shouldAnimate) {
             this.scene.add(this.particles.group)
-            this.particles.init()
-            this.particles.shouldAnimate = true
+            
         }
 
         if (!this.cameraControls.defaultCamera || !this.raycaster) return
@@ -211,7 +212,7 @@ export default class Scene_2 extends Scene {
             intersects.shift()
         }
         let filteredByMat = intersects.filter(e => e.object.material.type === "MeshBasicMaterial")
-
+        console.log(filteredByMat[0].object.name)
         if (filteredByMat.length === 0) return
         if (filteredByMat[0].object.name === "box_drag_drop") {
             
@@ -223,7 +224,12 @@ export default class Scene_2 extends Scene {
             this.buttonMixer.clipAction(this.buttonAnimation).play()
             this.buttonSound.play();
             setTimeout(() => { this.shouldPlayTransition = true }, this.delayAnimationTransition);
-        } else if (filteredByMat[0].object) {
+        } else if (filteredByMat[0].object.name.includes('Plane')) {
+            if(!this.particlesHasBeenInited) {
+                this.particlesHasBeenInited = true
+                this.particles.init()
+                this.particles.shouldAnimate = true
+            }
             this.onCardClick(filteredByMat[0].object.material.color, filteredByMat[0].object.position)
         }
 
