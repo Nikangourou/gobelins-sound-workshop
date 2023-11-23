@@ -1,6 +1,5 @@
 import * as THREE from 'three'
 import Scene from './Scene'
-import GUI from 'lil-gui'
 import CustomMat from './CustomMat'
 import Particles from './../Particles.js'
 

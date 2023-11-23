@@ -172,7 +172,10 @@ export default class Scene_4 extends Scene {
                     this.particles.push(particles)
                     
                 } else if (e.name.includes("nid_eggs")) {
-                    e.material = new THREE.MeshBasicMaterial({colo : 0xffffff})
+                    e.material = new THREE.MeshBasicMaterial({ color: 0xffffff})
+                    let mesh = e.clone()
+                    mesh.material = this.outlineMat
+                    toBeAdded.push(mesh)
                 }
 
             
