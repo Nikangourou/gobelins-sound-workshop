@@ -22,7 +22,6 @@ export default class Scene_2 extends Scene {
         this.cameraMixer = new THREE.AnimationMixer(this.camera)
         this.cameraMouvement = scene.animations[4]
         this.particles = new Particles("#ef4444", this.scene)
-
         this.namesToBeOutlines = ["plane_box_1", "plane_box_2", "box_drag_drop"]
         this.lightPos = new THREE.Vector3(2, 5, 3)
 
@@ -54,8 +53,14 @@ export default class Scene_2 extends Scene {
             curr.onButtonPressed()
         })
 
-        // this.movingRug =  this.scene.getObjectByName('box_drag_drop')
+        this.movingRug =  this.scene.getObjectByName('rug_moving')
+        this.rugMixer = new THREE.AnimationMixer(this.movingRug)
         this.rugAnimation = scene.animations[1]
+
+        this.movingThongs = this.scene.getObjectByName('thongs')
+        this.thongsMixer = new THREE.AnimationMixer(this.movingThongs)
+        this.thongsAnimation = scene.animations[0]
+
 
         let curr = this
         this.cameraMixer.addEventListener('finished', function (e) {
@@ -109,6 +114,14 @@ export default class Scene_2 extends Scene {
         const buttonAction = this.buttonMixer.clipAction(this.buttonAnimation)
         buttonAction.clampWhenFinished = true;
         buttonAction.loop = THREE.LoopOnce
+
+        const rugAction = this.rugMixer.clipAction(this.rugAnimation)
+        rugAction.clampWhenFinished = true;
+        rugAction.loop = THREE.LoopOnce
+
+        const thongsAction = this.thongsMixer.clipAction(this.thongsAnimation)
+        thongsAction.clampWhenFinished = true;
+        thongsAction.loop = THREE.LoopOnce
 
         document.querySelector('.experience').addEventListener('click', (e) => { this.click(e) })
 
@@ -216,7 +229,6 @@ export default class Scene_2 extends Scene {
             intersects.shift()
         }
         let filteredByMat = intersects.filter(e => e.object.material.type === "MeshBasicMaterial")
-        console.log(filteredByMat[0].object.name)
         if (filteredByMat.length === 0) return
         if (filteredByMat[0].object.name === "box_drag_drop") {
 
@@ -228,6 +240,7 @@ export default class Scene_2 extends Scene {
             this.buttonMixer.clipAction(this.buttonAnimation).play()
             this.buttonSound.play();
             setTimeout(() => { this.shouldPlayTransition = true }, this.delayAnimationTransition);
+
         } else if (filteredByMat[0].object.name.includes('Plane')) {
             if (!this.particlesHasBeenInited) {
                 this.particlesHasBeenInited = true
@@ -252,6 +265,8 @@ export default class Scene_2 extends Scene {
     onButtonPressed() {
         this.hasBeenCompleted = true
         this.cameraMixer.clipAction(this.cameraMouvement).paused = false;
+        this.rugMixer.clipAction(this.rugAnimation).play()
+        this.thongsMixer.clipAction(this.thongsAnimation).play()
         this.transition.init()
         this.pinButton.remove()
     }
@@ -343,6 +358,12 @@ export default class Scene_2 extends Scene {
 
         if (this.boxMixer && !this.boxMixer.clipAction(this.boxFalling).paused) {
             this.boxMixer.update(this.time.delta * 0.001)
+        }
+        if(this.rugMixer){
+            this.rugMixer.update(this.time.delta * 0.001)
+        }
+        if(this.thongsMixer){
+            this.thongsMixer.update(this.time.delta * 0.001)
         }
 
         if (this.pinBox) {

@@ -26,7 +26,6 @@ export default class Scene_4 extends Scene {
         this.camera = scene.cameras[0]
         this.cameraMixer = new THREE.AnimationMixer(this.camera)
         this.cameraMouvement = scene.animations[0]
-        console.log(this.animations)
         let curr = this
         this.cameraMixer.addEventListener('finished', function (e) {
             console.log("scene 4 finished")
