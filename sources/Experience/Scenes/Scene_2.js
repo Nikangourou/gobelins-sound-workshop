@@ -86,11 +86,11 @@ export default class Scene_2 extends Scene {
 
         //lights
         this.light.position.set(-3.84, 9.4, 5.18);
-        const helper1 = new THREE.PointLightHelper(this.light, 0.1);
-        this.scene.add(this.light, helper1)
+        // const helper1 = new THREE.PointLightHelper(this.light, 0.1);
+        // this.scene.add(this.light, helper1)
         this.light2.position.set(10, 6.4, -3.54);
-        const helper2 = new THREE.PointLightHelper(this.light2, 0.1);
-        this.scene.add(this.light2, helper2)
+        // const helper2 = new THREE.PointLightHelper(this.light2, 0.1);
+        // this.scene.add(this.light2, helper2)
 
         this.setupGui()
         this.setSounds()
@@ -150,7 +150,7 @@ export default class Scene_2 extends Scene {
         audioLoader.load('/assets/sounds/scene2/ambiance.mp3', (buffer) => {
             this.ambientSound.setBuffer(buffer);
             this.ambientSound.setLoop(true);
-            this.ambientSound.setVolume(0.5);
+            this.ambientSound.setVolume(1.5);
             this.ambientSound.play();
         })
 
@@ -163,7 +163,7 @@ export default class Scene_2 extends Scene {
         audioLoader.load('/assets/sounds/scene2/colis.mp3', (buffer) => {
             this.boxFallingSound.setBuffer(buffer);
             this.boxFallingSound.setLoop(false);
-            this.boxFallingSound.setVolume(1);
+            this.boxFallingSound.setVolume(2);
         })
 
         audioLoader.load('/assets/sounds/card/ANGER.mp3', (buffer) => {
@@ -215,10 +215,10 @@ export default class Scene_2 extends Scene {
 
     getSoundFromColor(color) {
         let index = this.cardColors.indexOf("#" + color.getHexString())
-        if (index === 0) return this.angerSound
+        if (index === 0) return this.sadSound
         if (index === 1) return this.loveSound
         if (index === 2) return this.joySound
-        if (index === 3) return this.sadSound
+        if (index === 3) return  this.angerSound
     }
 
     click(e) {

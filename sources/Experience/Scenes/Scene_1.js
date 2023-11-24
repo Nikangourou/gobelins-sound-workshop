@@ -87,6 +87,7 @@ export default class Scene_1 extends Scene {
         this.lampSound = new THREE.Audio( this.cameraControls.audioListener );
         this.tiroirSound = new THREE.Audio( this.cameraControls.audioListener );
         this.ambientSound = new THREE.Audio( this.cameraControls.audioListener);
+        this.loveSound = new THREE.Audio( this.cameraControls.audioListener);
         this.radioSounds = {
             0 : new THREE.Audio( this.cameraControls.audioListener),
             1 : new THREE.Audio( this.cameraControls.audioListener),
@@ -120,11 +121,11 @@ export default class Scene_1 extends Scene {
 
         this.setLights(this.deskLight)
         this.setupGui()
-        const helper1 = new THREE.PointLightHelper(this.light, 0.1);
-        this.scene.add(this.light, helper1)
+        // const helper1 = new THREE.PointLightHelper(this.light, 0.1);
+        this.scene.add(this.light)
 
-        const helper2 = new THREE.PointLightHelper(this.lampLight, 0.1);
-        this.scene.add(this.lampLight, helper2)
+        // const helper2 = new THREE.PointLightHelper(this.lampLight, 0.1);
+        this.scene.add(this.lampLight)
 
         document.querySelector('.experience').addEventListener('click', (e) => { this.click(e) })
         this.setSceneMaterial()
@@ -221,7 +222,7 @@ export default class Scene_1 extends Scene {
 
             this.tiroirSound.setBuffer(buffer);
             this.tiroirSound.setLoop(false);
-            this.tiroirSound.setVolume(3);
+            this.tiroirSound.setVolume(3.5);
         })
 
         audioLoader.load('/assets/sounds/scene1/extérieur.mp3', (buffer) => {
@@ -255,6 +256,13 @@ export default class Scene_1 extends Scene {
             this.radioSounds[3].setLoop( true );
             this.radioSounds[3].setVolume( 1 );
         }) 
+
+        audioLoader.load('/assets/sounds/card/LOVE.mp3', (buffer) => {
+            this.loveSound.setBuffer(buffer);
+            this.loveSound.setLoop(true);
+            this.loveSound.setVolume(1);
+            // this.loveSound
+        })
 
     }
 
@@ -396,7 +404,10 @@ export default class Scene_1 extends Scene {
 
             if (modelIntersects[0].object.name === 'door') {
                 this.userStarted = true;
-                this.radioSounds[0].play()
+                setTimeout(() => { 
+                    this.radioSounds[0].play()
+                    this.loveSound.play()
+                 }, 4000);
                 this.doorSound.play()
                 this.doorMixer.clipAction(this.doorMovement).paused = false;
                 this.cameraMixer.clipAction(this.cameraMouvement).paused = false;
@@ -436,6 +447,7 @@ export default class Scene_1 extends Scene {
 
     onSceneIsDone() {
         this.radioSounds[this.radioChannel].pause()
+        this.loveSound.pause()
         this.isActive = false
         this.hasBeenCompleted = true
         document.querySelector('.experience').removeEventListener('click', (e) => { this.click(e) })

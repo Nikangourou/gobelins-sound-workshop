@@ -106,8 +106,8 @@ export default class Scene_3 extends Scene {
         this.cameraControls.setDefaultCamera(this.camera)
         this.isActive = true
 
-        let cameraHelper = new THREE.CameraHelper(this.camera)
-        this.scene.add(cameraHelper)
+        // let cameraHelper = new THREE.CameraHelper(this.camera)
+        // this.scene.add(cameraHelper)
         this.scene.add(this.particles.group)
         this.particles.init()
         this.particles.shouldAnimate = true
