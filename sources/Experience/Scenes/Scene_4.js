@@ -107,7 +107,7 @@ export default class Scene_4 extends Scene {
         actionCardFall.loop = THREE.LoopOnce
         actionCardFall.play()
        
-        this.light.position.set(-5.06, 2.48, -10);
+        this.light.position.set(-5.06,2.48, -10);
         const helper1 = new THREE.PointLightHelper(this.light, 0.1);
         this.scene.add(this.light, helper1)
 
@@ -225,8 +225,8 @@ export default class Scene_4 extends Scene {
                     let mat = new CustomMat({
                         renderer: this.renderer, uniforms: {
                             color1: { value: new THREE.Color('#B2B09B') }, // darker
-                            color2: { value: e.material.color },
-                            color3: { value: new THREE.Color('#3E3D34') },
+                            color2: { value: new THREE.Color('#3E3D34') },
+                            color3: { value: new THREE.Color('#B2B09B') },
                             color4: { value: new THREE.Color('#B2B09B') },
                             color5: { value: new THREE.Color('#B2B09B') },// lighter
                             noiseStep: { value: 1.0 },

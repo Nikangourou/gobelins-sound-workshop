@@ -26,20 +26,14 @@ export default class Scene_3 extends Scene {
         this.cardsShouldFall = false
         this.mainCardOffset = 1
 
+
         this.shouldPlayTransition = false
-        this.delayAnimationTransition = 1500
+        this.delayAnimationTransition = 1000
 
         // this.cameraMixer = new THREE.AnimationMixer(this.camera)
         // this.cameraMouvement = scene.animations[12]
         let curr = this
-        // this.cameraMixer.addEventListener('finished', function (e) {
-        //     console.log("scene 3 finished")
-        //     // transition UI in 
-        //     curr.onSceneIsDone()
-        //     callback()
-
-        // })
-
+        
         // animations 
         this.plane =  this.scene.getObjectByName('avion')
         this.planeMixer = new THREE.AnimationMixer(this.plane)
@@ -61,6 +55,13 @@ export default class Scene_3 extends Scene {
         this.birdFlying = this.animations[2]
         this.birdMoving = this.animations[10]
         this.birdShouldCatchCard = false
+        this.birdMixer.addEventListener('finished', function (e) {
+            console.log("scene 3 finished")
+            // transition UI in 
+            curr.onSceneIsDone()
+            callback()
+
+        })
 
         this.cloudMesh = this.scene.getObjectByName('cloud')
         this.cloudCount = 40
@@ -297,6 +298,7 @@ export default class Scene_3 extends Scene {
         if(intersects.map(e => e.object.name).includes("main_card")) {
             this.birdShouldCatchCard = true
             this.birdSound.play();
+            setTimeout(() => { this.shouldPlayTransition = true }, this.delayAnimationTransition);
 
             //let birdFlyingAway = ( ) => this.onBirdWentAway(this)
             this.pinCard.remove()
