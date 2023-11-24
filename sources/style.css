@@ -1,3 +1,8 @@
+@font-face {
+    font-family: 'JosefinSans';
+    src: url('../assets/JosefinSans-VariableFont_wght.ttf') format('truetype');
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -56,7 +61,7 @@ ul {
     list-style: none;
 }
 
-#sceneList>li + li {
+#sceneList>li+li {
     margin-top: 50px;
 }
 
@@ -122,7 +127,7 @@ button {
     height: 100%;
 }
 
-.generique{
+.generique {
     position: fixed;
     width: 100vw;
     height: 100vh;
@@ -132,26 +137,42 @@ button {
     z-index: 100;
     display: flex;
     pointer-events: none;
-    transform: translateY(100%);
+    transform: translateY(100%)
 }
 
-.generique.active{
-    transform: translateY(0%); 
-    transition: 5s transform 20s ease-in-out; 
+.generique__title {
+    width: 80%;
+    margin-bottom: 35px;
+    max-width: 500px;
 }
 
-.generique__content{
-    font-size: 2rem;
-    text-transform: uppercase;
-    font-family: Arial, Helvetica, sans-serif;
+.generique__title img {
+    width: 100%;
+}
+
+.generique.active {
+    transform: translateY(0%);
+    transition: 5s transform 20s ease-in-out;
+}
+
+.generique__content {
+    font-size: 32px;
+    font-family: JosefinSans;
+    /* font-family: Arial, Helvetica, sans-serif; */
     margin-bottom: 2rem;
     text-align: center;
 }
 
-.generique__content__item{
+.generique__content__item {
     margin-bottom: 2rem;
 }
 
-.generique__content__item img{
+.generique__content__item h2 {
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    margin-top: 25px;
+}
+
+.generique__content__item img {
     width: 35%;
 }
