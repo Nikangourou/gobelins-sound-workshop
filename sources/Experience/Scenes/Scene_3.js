@@ -374,7 +374,7 @@ export default class Scene_3 extends Scene {
 
                 } else if( e.name ==="main_card") {
                  
-                    e.material = new THREE.MeshBasicMaterial({color: 0xff0000})
+                    e.material = new THREE.MeshBasicMaterial({color: this.cardColors[1]})
                     e.material.side = THREE.DoubleSide
 
                     this.particles.respawnAt(e.material.color, e.position, -1)

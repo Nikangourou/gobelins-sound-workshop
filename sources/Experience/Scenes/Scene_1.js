@@ -4,6 +4,7 @@ import CustomMat from './CustomMat'
 import { PositionalAudioHelper } from 'three/examples/jsm/helpers/PositionalAudioHelper.js'
 import { DragControls } from 'three/examples/jsm/controls/DragControls.js'
 import Pin from '../Pin'
+import Particles from './../Particles.js'
 
 export default class Scene_1 extends Scene {
     constructor(scene, renderer, cameraControls, mainScene, callback) {
@@ -14,6 +15,7 @@ export default class Scene_1 extends Scene {
         this.cameraControls = cameraControls
         this.mainScene = mainScene
         this.scene = scene.scene
+        this.particles = new Particles(this.cardColors[1], this.scene)
 
         // object
         this.radio = this.scene.getObjectByName('radio')
@@ -132,6 +134,15 @@ export default class Scene_1 extends Scene {
         action.loop = THREE.LoopOnce
         action.play()
         action.paused = true
+
+        this.particles.group.position.copy(this.scene.getObjectByName('card').position)
+        this.scene.add(this.particles.group)
+        this.particles.init()
+               
+
+        // this.particles.group.position.x = 10
+        // this.particles.group.position.z = -1
+        // this.particles.group.position.y = 2
 
         // door
         const openingDoorAnimation = this.doorMixer.clipAction(this.doorMovement)
@@ -274,7 +285,8 @@ export default class Scene_1 extends Scene {
                     })
                     mat.init()
                     e.material = mat.get()
-
+                } else if (e.name === "card") {
+                    e.material = new THREE.MeshBasicMaterial({color: this.cardColors[1]})
                 } else if (e.name.includes('timbre')) {
                     e.material = new THREE.MeshBasicMaterial({ color: '#DFC3A7' })
                 } else if (this.namesToBeOutlines.includes(e.name)) {
@@ -351,7 +363,7 @@ export default class Scene_1 extends Scene {
             if (this.card && this.timbre2) {
                 const distance = this.card.position.distanceTo(this.timbre2.position)
                 if (distance < .15) {
-                    this.card.material.color.set(0xff0000)
+                    // this.card.material.color.set(0xff0000)
                     this.tiroir.remove(this.timbre2)
                     this.hasBeenCompleted = true
                     this.cameraMixer.clipAction(this.cameraMouvement).isPaused = false;
@@ -359,7 +371,7 @@ export default class Scene_1 extends Scene {
                     setTimeout(() => { this.shouldPlayTransition = true }, this.delayAnimationTransition);
                 }
                 else {
-                    this.card.material.color.set(0x00ff00)
+                    // this.card.material.color.set(0x00ff00)
                 }
             }
         });
@@ -477,6 +489,8 @@ export default class Scene_1 extends Scene {
             if (this.pinDoor) {
                 this.pinDoor.animate()
             }
+
+            if(this.particles) this.particles.update()
         }
 
         if (this.shouldPlayTransition) this.transition.play()

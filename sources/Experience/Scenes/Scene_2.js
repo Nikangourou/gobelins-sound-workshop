@@ -273,6 +273,12 @@ export default class Scene_2 extends Scene {
 
     onSceneIsDone() {
         this.ambientSound.stop();
+        console.log(this.angerSound)
+        if(this.angerSound.isPlaying) this.angerSound.stop()
+        if(this.loveSound.isPlaying) this.loveSound.stop()
+        if(this.joySound.isPlaying) this.joySound.stop()
+        if(this.sadSound.isPlaying) this.sadSound.stop()
+
         this.isActive = false
         this.hasBeenCompleted = true
 
