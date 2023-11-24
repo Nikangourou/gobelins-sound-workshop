@@ -22,6 +22,7 @@ export default class Scene_2 extends Scene {
         this.cameraMixer = new THREE.AnimationMixer(this.camera)
         this.cameraMouvement = scene.animations[4]
         this.particles = new Particles("#ef4444", this.scene)
+        this.particlesMainCard = new Particles(this.cardColors[1], this.scene)
         this.namesToBeOutlines = ["plane_box_1", "plane_box_2", "box_drag_drop"]
         this.lightPos = new THREE.Vector3(2, 5, 3)
 
@@ -138,6 +139,10 @@ export default class Scene_2 extends Scene {
         this.pinCard = new Pin({ x: 13.5, y: 1.5, z: 1.9 }, this.mouse, this.raycaster, this.camera, 0.1)
         this.pinCard.init()
         this.scene.add(this.pinCard.pin)
+
+        this.particlesMainCard.group.position.copy(this.scene.getObjectByName('carte_postale').position)
+        this.scene.add( this.particlesMainCard.group)
+        this.particlesMainCard.init()
     }
 
     setSounds() {
@@ -273,7 +278,6 @@ export default class Scene_2 extends Scene {
 
     onSceneIsDone() {
         this.ambientSound.stop();
-        console.log(this.angerSound)
         if(this.angerSound.isPlaying) this.angerSound.stop()
         if(this.loveSound.isPlaying) this.loveSound.stop()
         if(this.joySound.isPlaying) this.joySound.stop()
@@ -290,13 +294,13 @@ export default class Scene_2 extends Scene {
             }
         })
         this.mainScene.remove(toBeRemoved)
-
     }
 
     setSceneMaterials() {
         let toBeAdded = []
         this.scene.traverse(e => {
             if (e.isMesh) {
+                console.log(e.name)
                 if (e.name.includes("button")) {
                     e.material = new THREE.MeshBasicMaterial({ color: new THREE.Color("#C2CAA7") })
                     let mesh = e.clone()
@@ -304,6 +308,8 @@ export default class Scene_2 extends Scene {
                     toBeAdded.push(mesh)
                 } else if (e.name === "box_drag_drop") {
                     e.material = new THREE.MeshBasicMaterial({ color: new THREE.Color("#C2CAA7") })
+                } else if (e.name ==="carte_postale") {
+                    e.material = new THREE.MeshBasicMaterial({color: this.cardColors[1]})
                 } else if (e.name.includes("box")) {
                     let mat = new CustomMat({
                         renderer: this.renderer, uniforms: {
@@ -345,13 +351,9 @@ export default class Scene_2 extends Scene {
                 }
             }
 
-
-
         })
         toBeAdded.forEach(e => this.scene.add(e))
-
     }
-
 
     update() {
         if (this.cameraMixer) {
@@ -383,5 +385,6 @@ export default class Scene_2 extends Scene {
         }
         if (this.particles.shouldAnimate) this.particles.update()
         if (this.shouldPlayTransition) this.transition.play()
+        this.particlesMainCard.update()
     }
 }

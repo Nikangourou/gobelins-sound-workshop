@@ -138,11 +138,6 @@ export default class Scene_1 extends Scene {
         this.particles.group.position.copy(this.scene.getObjectByName('card').position)
         this.scene.add(this.particles.group)
         this.particles.init()
-               
-
-        // this.particles.group.position.x = 10
-        // this.particles.group.position.z = -1
-        // this.particles.group.position.y = 2
 
         // door
         const openingDoorAnimation = this.doorMixer.clipAction(this.doorMovement)

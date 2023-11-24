@@ -200,6 +200,7 @@ export default class Scene_4 extends Scene {
         let toBeAdded = []
         this.scene.traverse(e => {
             if (e.isMesh) {
+                console.log(e.name)
                  if(e.name === "sky") {
                     e.material = new THREE.MeshBasicMaterial({transparent: true, color: new THREE.Color('#457357')})
                 } else if (e.name === "ground_mesh") {
@@ -218,6 +219,8 @@ export default class Scene_4 extends Scene {
                     })
                     mat.init()
                     e.material = mat.get()
+                } else if (e.name === "clouds") {
+                    e.material = new THREE.MeshBasicMaterial({color : 0xffffff})
 
                 } else if (e.name === "ground_grass") {
                     e.visible = false
