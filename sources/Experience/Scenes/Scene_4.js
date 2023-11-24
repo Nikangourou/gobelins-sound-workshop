@@ -33,6 +33,8 @@ export default class Scene_4 extends Scene {
             // curr.onSceneIsDone()
             // callback()
         })
+        this.cameraEnterMovementIsDone = false
+
 
         // objects
         this.nid = this.scene.getObjectByName('nid')
@@ -52,10 +54,21 @@ export default class Scene_4 extends Scene {
         this.loveSound = new THREE.Audio(this.cameraControls.audioListener);
         this.angerSound = new THREE.Audio(this.cameraControls.audioListener);
      
+        // animations
         this.bird = this.scene.getObjectByName('Plane')
         this.bird.frustumCulled = false
-        this.birdMoving = this.animations[11]
         this.birdMixer = new THREE.AnimationMixer(this.bird.parent)
+        this.birdMoving = this.animations[11]
+        this.bidFly = this.animations[3]
+
+        this.cardMain = this.scene.getObjectByName('card573')
+        this.cardMainMixer = new THREE.AnimationMixer(this.cardMain)
+        this.cardMainWind = this.animations[13]
+        this.cardMainFall = this.animations[14]
+
+        this.clouds = this.scene.getObjectByName('clouds')
+        this.cloudsMixer = new THREE.AnimationMixer(this.clouds)
+        this.cloudsMoving = this.animations[1]
     }
 
     init() {
@@ -67,16 +80,33 @@ export default class Scene_4 extends Scene {
         action.clampWhenFinished = true;
         action.loop = THREE.LoopOnce
         action.play()
-        action.paused = true
+        // action.paused = true
 
-        // console.log("bird moving", this.birdMoving.uuid, this.birdMixer)
-        // const actionBird = this.birdMixer.clipAction(this.birdMoving);
-        // actionBird.clampWhenFinished = true;
-        // actionBird.loop = THREE.LoopRepeat
-        // actionBird.play()
+        const actionBird = this.birdMixer.clipAction(this.birdMoving);
+        actionBird.clampWhenFinished = true;
+        actionBird.loop = THREE.LoopOnce
+        setTimeout(() => {
+        actionBird.play()
+        }, 2000)
         //action.paused = true
-       
+    
+        this.birdMixer.clipAction(this.bidFly).play()
 
+        const actionClouds = this.cloudsMixer.clipAction(this.cloudsMoving);
+        actionClouds.clampWhenFinished = true;
+        actionClouds.loop = THREE.LoopOnce
+        actionClouds.play()
+        
+        const actionCard = this.cardMainMixer.clipAction(this.cardMainWind);
+        actionCard.clampWhenFinished = true;
+        actionCard.loop = THREE.LoopOnce
+        actionCard.play()
+
+        const actionCardFall = this.cardMainMixer.clipAction(this.cardMainFall);
+        actionCardFall.clampWhenFinished = true;
+        actionCardFall.loop = THREE.LoopOnce
+        actionCardFall.play()
+       
         this.light.position.set(-5.06, 2.48, -10);
         const helper1 = new THREE.PointLightHelper(this.light, 0.1);
         this.scene.add(this.light, helper1)
@@ -210,6 +240,23 @@ export default class Scene_4 extends Scene {
                     let mesh = e.clone()
                     mesh.material = this.outlineMat
                     toBeAdded.push(mesh)
+                }else if( e.name ==="Plane") {
+                    let mat = new CustomMat({
+                        renderer: this.renderer, uniforms: {
+                            color1: { value: new THREE.Color('#9F671D') }, // darker purple
+                            color2: { value: new THREE.Color('#D8C18B') },
+                            color3: { value: e.material.color },
+                            color4: { value: new THREE.Color('#9D3800') },
+                            color5: { value: new THREE.Color('#e2e8f0') },// lighter
+                            noiseStep: { value: 1.0 },
+                            nbColors: { value: 4 },
+                            lightDirection: { value: this.light.position },
+                            lightDirection2: { value: this.light2.position }
+                        }
+                    })
+                    mat.init()
+                    e.material = mat.get()
+
                 }
                 else if (e.name.includes("Maple") || e.name.includes("Pine")) {
                     let mat = new CustomMat({
@@ -264,7 +311,7 @@ export default class Scene_4 extends Scene {
                 this.loveSound.play()
                 this.angerSound.play()
                 this.hasBeenCompleted = true
-                this.cameraMixer.clipAction(this.cameraMouvement).paused = false;
+                this.cameraMixer.clipAction(this.cameraMouvement).isPaused = false;
                 document.querySelector('.generique').classList.add('active')
                 this.pinBox.remove()
             }
@@ -273,8 +320,21 @@ export default class Scene_4 extends Scene {
     }
 
     update() {
-        if (this.cameraMixer) {
+        if (this.cameraMixer && !this.cameraMixer.clipAction(this.cameraMouvement).isPaused) {
             this.cameraMixer.update(this.time.delta * 0.001)
+            if (this.cameraMixer.clipAction(this.cameraMouvement).time > 2 && !this.cameraEnterMovementIsDone) {
+                this.cameraEnterMovementIsDone = true;
+                this.cameraMixer.clipAction(this.cameraMouvement).isPaused = true
+            }
+        }
+        if(this.birdMixer) {
+            this.birdMixer.update(this.time.delta * 0.001)
+        }
+        if(this.cardMainMixer) {
+            this.cardMainMixer.update(this.time.delta * 0.001)
+        }
+        if(this.cloudsMixer) {
+            this.cloudsMixer.update(this.time.delta * 0.001)
         }
         if (this.pinBox) {
             this.pinBox.animate()
