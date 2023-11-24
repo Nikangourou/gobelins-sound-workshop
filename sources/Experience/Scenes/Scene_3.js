@@ -120,12 +120,12 @@ export default class Scene_3 extends Scene {
         this.setSceneMaterials()
         
         this.light.position.set(3.08, -10, 2.6);
-        const helper1 = new THREE.PointLightHelper(this.light, 0.1);
-        this.scene.add(this.light, helper1)
+        // const helper1 = new THREE.PointLightHelper(this.light, 0.1);
+        // this.scene.add(this.light, helper1)
         
         this.light2.position.set(10, 0, 2);
-        const helper2 = new THREE.PointLightHelper(this.light2, 0.1);
-        this.scene.add(this.light2, helper2)
+        // const helper2 = new THREE.PointLightHelper(this.light2, 0.1);
+        // this.scene.add(this.light2, helper2)
 
         this.setupGui()
 
