@@ -4,7 +4,7 @@ export default [
         data: {},
         items:
             [
-                { name: 'noiseTex', source: '/assets/ScaleTexture.png', type: 'texture' },
+                { name: 'noiseTex', source: '/assets/ScaleTextureMap.png', type: 'texture' },
                 { name: 'paperTex', source: '/assets/paperTex.jpg', type: 'texture' },
                 { name: '5mat', source: '/assets/test5Mat.glb' },
                 { name: 'scene_1', source: '/assets/scene_1.glb' },

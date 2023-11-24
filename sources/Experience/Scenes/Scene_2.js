@@ -25,7 +25,7 @@ export default class Scene_2 extends Scene {
 
         this.namesToBeOutlines = ["plane_box_1", "plane_box_2", "box_drag_drop"]
         this.lightPos = new THREE.Vector3(2, 5, 3)
-        
+
         this.delayAnimationTransition = 23100
         this.shouldPlayTransition = false
         // State / UI
@@ -40,14 +40,14 @@ export default class Scene_2 extends Scene {
         this.sadSound = new THREE.Audio(this.cameraControls.audioListener);
         this.loveSound = new THREE.Audio(this.cameraControls.audioListener);
         this.angerSound = new THREE.Audio(this.cameraControls.audioListener);
-        
+
         //objects 
         this.boxToBeRemoved = this.scene.getObjectByName('box_drag_drop')
         this.boxMixer = new THREE.AnimationMixer(this.boxToBeRemoved)
         this.boxFalling = scene.animations[2]
-        
+
         this.buttonToAnimate = this.scene.getObjectByName('button_animation')
-        this.buttonMixer =new THREE.AnimationMixer(this.buttonToAnimate)
+        this.buttonMixer = new THREE.AnimationMixer(this.buttonToAnimate)
         this.buttonAnimation = scene.animations[3]
 
         this.buttonMixer.addEventListener('finished', function (e) {
@@ -77,22 +77,21 @@ export default class Scene_2 extends Scene {
         this.isActive = true
         this.cameraControls.setDefaultCamera(this.camera)
         this.setSceneMaterials()
+
+        //lights
+        this.light.position.set(-3.84, 9.4, 5.18);
+        const helper1 = new THREE.PointLightHelper(this.light, 0.1);
+        this.scene.add(this.light, helper1)
+        this.light2.position.set(10, 6.4, -3.54);
+        const helper2 = new THREE.PointLightHelper(this.light2, 0.1);
+        this.scene.add(this.light2, helper2)
+
         this.setupGui()
         this.setSounds()
 
         this.particles.group.position.x = 10
         this.particles.group.position.z = -1
         this.particles.group.position.y = 2
-
-        //lights
-        this.light.position.set(10, 0.76, 2.6);
-        const helper1 = new THREE.PointLightHelper(this.light, 0.1);
-        this.scene.add(this.light, helper1)
-        this.light2.position.set(1.04, 8.32, 2);
-        const helper2 = new THREE.PointLightHelper(this.light2, 0.1);
-        this.scene.add(this.light2, helper2)
-        let testLight = new THREE.AmbientLight(0xffffff);
-        this.scene.add(testLight)
 
         //animations 
         const action = this.cameraMixer.clipAction(this.cameraMouvement);
@@ -115,15 +114,15 @@ export default class Scene_2 extends Scene {
 
         // Pin
         // this.pinBox = new Pin({ x: 0.2, y: 0, z: -0.1}, this.mouse, this.raycaster, this.camera)
-        this.pinBox = new Pin({ x: 17.5, y: 1, z: 0.5}, this.mouse, this.raycaster, this.camera)
+        this.pinBox = new Pin({ x: 17.5, y: 1, z: 0.5 }, this.mouse, this.raycaster, this.camera)
         this.pinBox.init()
         this.scene.add(this.pinBox.pin)
 
-        this.pinButton = new Pin({ x: 17.3, y: 0.85, z: 0.57}, this.mouse, this.raycaster, this.camera)
+        this.pinButton = new Pin({ x: 17.3, y: 0.85, z: 0.57 }, this.mouse, this.raycaster, this.camera)
         this.pinButton.init()
         this.scene.add(this.pinButton.pin)
 
-        this.pinCard = new Pin({ x: 13.5, y: 1.5, z: 1.9}, this.mouse, this.raycaster, this.camera, 0.1)
+        this.pinCard = new Pin({ x: 13.5, y: 1.5, z: 1.9 }, this.mouse, this.raycaster, this.camera, 0.1)
         this.pinCard.init()
         this.scene.add(this.pinCard.pin)
     }
@@ -131,47 +130,47 @@ export default class Scene_2 extends Scene {
     setSounds() {
         const audioLoader = new THREE.AudioLoader();
         audioLoader.load('/assets/sounds/scene2/ambiance.mp3', (buffer) => {
-            this.ambientSound.setBuffer( buffer );
-            this.ambientSound.setLoop( true );
-            this.ambientSound.setVolume( 0.5 );
+            this.ambientSound.setBuffer(buffer);
+            this.ambientSound.setLoop(true);
+            this.ambientSound.setVolume(0.5);
             this.ambientSound.play();
         })
 
         audioLoader.load('/assets/sounds/scene2/pressure_button.mp3', (buffer) => {
-            this.buttonSound.setBuffer( buffer );
-            this.buttonSound.setLoop( false );
-            this.buttonSound.setVolume( 3 );
+            this.buttonSound.setBuffer(buffer);
+            this.buttonSound.setLoop(false);
+            this.buttonSound.setVolume(3);
         })
-        
+
         audioLoader.load('/assets/sounds/scene2/colis.mp3', (buffer) => {
-            this.boxFallingSound.setBuffer( buffer );
-            this.boxFallingSound.setLoop( false );
-            this.boxFallingSound.setVolume( 1 );
-        })   
+            this.boxFallingSound.setBuffer(buffer);
+            this.boxFallingSound.setLoop(false);
+            this.boxFallingSound.setVolume(1);
+        })
 
         audioLoader.load('/assets/sounds/card/ANGER.mp3', (buffer) => {
-            this.angerSound.setBuffer( buffer );
-            this.angerSound.setLoop( true );
-            this.angerSound.setVolume( 1 );
-        })   
+            this.angerSound.setBuffer(buffer);
+            this.angerSound.setLoop(true);
+            this.angerSound.setVolume(1);
+        })
 
         audioLoader.load('/assets/sounds/card/JOY.mp3', (buffer) => {
-            this.joySound.setBuffer( buffer );
-            this.joySound.setLoop( true );
-            this.joySound.setVolume( 1 );
-        })  
+            this.joySound.setBuffer(buffer);
+            this.joySound.setLoop(true);
+            this.joySound.setVolume(1);
+        })
 
         audioLoader.load('/assets/sounds/card/SAD.mp3', (buffer) => {
-            this.sadSound.setBuffer( buffer );
-            this.sadSound.setLoop( true );
-            this.sadSound.setVolume( 1 );
-        }) 
+            this.sadSound.setBuffer(buffer);
+            this.sadSound.setLoop(true);
+            this.sadSound.setVolume(1);
+        })
 
         audioLoader.load('/assets/sounds/card/LOVE.mp3', (buffer) => {
-            this.loveSound.setBuffer( buffer );
-            this.loveSound.setLoop( true );
-            this.loveSound.setVolume( 1 );
-        }) 
+            this.loveSound.setBuffer(buffer);
+            this.loveSound.setLoop(true);
+            this.loveSound.setVolume(1);
+        })
 
     }
 
@@ -197,30 +196,30 @@ export default class Scene_2 extends Scene {
     }
 
     getSoundFromColor(color) {
-        let index = this.cardColors.indexOf("#"+ color.getHexString())
-        if(index === 0) return this.angerSound
-        if(index === 1) return this.loveSound 
-        if(index === 2) return this.joySound 
-        if(index === 3) return this.sadSound 
+        let index = this.cardColors.indexOf("#" + color.getHexString())
+        if (index === 0) return this.angerSound
+        if (index === 1) return this.loveSound
+        if (index === 2) return this.joySound
+        if (index === 3) return this.sadSound
     }
 
     click(e) {
         if (!this.particles.shouldAnimate) {
             this.scene.add(this.particles.group)
-            
+
         }
 
         if (!this.cameraControls.defaultCamera || !this.raycaster) return
         this.raycaster.setFromCamera(this.mouse, this.camera);
         let intersects = this.raycaster.intersectObject(this.scene, true)
-        if(intersects[0].object.name === 'pin') {
+        if (intersects[0].object.name === 'pin') {
             intersects.shift()
         }
         let filteredByMat = intersects.filter(e => e.object.material.type === "MeshBasicMaterial")
         console.log(filteredByMat[0].object.name)
         if (filteredByMat.length === 0) return
         if (filteredByMat[0].object.name === "box_drag_drop") {
-            
+
             this.boxFallingSound.play()
             this.userClickedBox = true
             this.boxMixer.clipAction(this.boxFalling).paused = false
@@ -230,7 +229,7 @@ export default class Scene_2 extends Scene {
             this.buttonSound.play();
             setTimeout(() => { this.shouldPlayTransition = true }, this.delayAnimationTransition);
         } else if (filteredByMat[0].object.name.includes('Plane')) {
-            if(!this.particlesHasBeenInited) {
+            if (!this.particlesHasBeenInited) {
                 this.particlesHasBeenInited = true
                 this.particles.init()
                 this.particles.shouldAnimate = true
@@ -243,7 +242,7 @@ export default class Scene_2 extends Scene {
     onCardClick(color, position) {
         this.particles.respawnAt(color, position)
         // pause previous sound
-        if(this.currCardSound) this.currCardSound.pause()
+        if (this.currCardSound) this.currCardSound.pause()
         //switch to new sound
         this.currCardSound = this.getSoundFromColor(color)
         this.currCardSound.play()
@@ -256,7 +255,7 @@ export default class Scene_2 extends Scene {
         this.transition.init()
         this.pinButton.remove()
     }
-    
+
     onSceneIsDone() {
         this.ambientSound.stop();
         this.isActive = false
@@ -278,22 +277,22 @@ export default class Scene_2 extends Scene {
         this.scene.traverse(e => {
             if (e.isMesh) {
                 if (e.name.includes("button")) {
-                    e.material = new THREE.MeshBasicMaterial({ color: 0xff0000 })
+                    e.material = new THREE.MeshBasicMaterial({ color: new THREE.Color("#C2CAA7") })
                     let mesh = e.clone()
                     mesh.material = this.outlineMat
                     toBeAdded.push(mesh)
                 } else if (e.name === "box_drag_drop") {
-                    e.material = new THREE.MeshBasicMaterial({ color: e.material.color })
+                    e.material = new THREE.MeshBasicMaterial({ color: new THREE.Color("#C2CAA7") })
                 } else if (e.name.includes("box")) {
                     let mat = new CustomMat({
                         renderer: this.renderer, uniforms: {
-                            color1: { value: new THREE.Color('#18181b') }, // darker
-                            color2: { value: new THREE.Color('#fdba74') },
-                            color3: { value: e.material.color },
+                            color1: { value: new THREE.Color('#3C3558') }, // darker
+                            color2: { value: new THREE.Color('#4F6174') },
+                            color3: { value: new THREE.Color('#4F6174') },
                             color4: { value: new THREE.Color('#94a3b8') },
                             color5: { value: new THREE.Color('#e2e8f0') },// lighter
                             noiseStep: { value: 1.0 },
-                            nbColors: { value: 3 },
+                            nbColors: { value: 4 },
                             lightDirection: { value: this.light.position },
                             lightDirection2: { value: this.light2.position }
                         }
@@ -309,13 +308,13 @@ export default class Scene_2 extends Scene {
                 } else {
                     let mat = new CustomMat({
                         renderer: this.renderer, uniforms: {
-                            color1: { value: new THREE.Color('#18181b') }, // darker
-                            color2: { value: new THREE.Color('#374151') },
+                            color1: { value: new THREE.Color('#3C3558') }, // darker
+                            color2: { value: new THREE.Color('#4F6174') },
                             color3: { value: new THREE.Color('#475569') },
                             color4: { value: new THREE.Color('#94a3b8') },
                             color5: { value: new THREE.Color('#e2e8f0') },// lighter
                             noiseStep: { value: 1.0 },
-                            nbColors: { value: 3 },
+                            nbColors: { value: 4 },
                             lightDirection: { value: this.light.position },
                             lightDirection2: { value: this.light2.position }
                         }
@@ -323,8 +322,8 @@ export default class Scene_2 extends Scene {
                     mat.init()
                     e.material = mat.get()
                 }
-            }    
-               
+            }
+
 
 
         })
@@ -346,16 +345,16 @@ export default class Scene_2 extends Scene {
             this.boxMixer.update(this.time.delta * 0.001)
         }
 
-        if(this.pinBox){
+        if (this.pinBox) {
             this.pinBox.animate()
         }
-        if(this.pinButton){
+        if (this.pinButton) {
             this.pinButton.animate()
         }
-        if(this.pinCard){
+        if (this.pinCard) {
             this.pinCard.animate()
         }
         if (this.particles.shouldAnimate) this.particles.update()
-        if(this.shouldPlayTransition)  this.transition.play()
+        if (this.shouldPlayTransition) this.transition.play()
     }
 }

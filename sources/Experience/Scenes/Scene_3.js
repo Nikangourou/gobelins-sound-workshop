@@ -56,6 +56,7 @@ export default class Scene_3 extends Scene {
         this.planeMovement = this.animations[0]
         
         this.bird = this.scene.getObjectByName('bird')
+        this.bird.frustumCulled = false;
         this.birdMixer = new THREE.AnimationMixer(this.bird)
         this.birdMixer2 = new THREE.AnimationMixer(this.bird.parent)
         
@@ -85,7 +86,9 @@ export default class Scene_3 extends Scene {
         this.thresholdYEnd = -40
         this.thresholdYStart = 15
         this.thresholdZEnd = -3
+        this.thresholdZEndCloud = 14
         this.thresholdZStart = 14
+        this.thresholdZStartCloud = -3
         this.birdPosOffset = 3
 
         //sounds 
@@ -266,12 +269,12 @@ export default class Scene_3 extends Scene {
         this.cloudsData.forEach((e, i) => {
             let currCloud = this.cloudsData[i]
             this.obj.matrix.identity()
-            currCloud.position.z -= 0.05*currCloud.speed
+            currCloud.position.z += 0.05*currCloud.speed
             this.obj.position.copy(currCloud.position)
             this.obj.scale.set(currCloud.scale, currCloud.scale, currCloud.scale)
             // if beyond threshold, respawn start threshold aka at the left of the camera
-            if(currCloud.position.z < this.thresholdZEnd) {
-                currCloud.position.z = this.thresholdZStart
+            if(currCloud.position.z > this.thresholdZEndCloud) {
+                currCloud.position.z = this.thresholdZStartCloud
             }
             this.obj.updateMatrix()
             this.clouds.setMatrixAt(i, this.obj.matrix);
@@ -336,7 +339,7 @@ export default class Scene_3 extends Scene {
                 if(e.name === "avion") {
                     let mat = new CustomMat({
                         renderer: this.renderer, uniforms: {
-                            color1: { value: new THREE.Color('#18181b') }, // darker
+                            color1: { value: new THREE.Color('#761818') }, // darker
                             color2: { value: e.material.color },
                             color3: { value: new THREE.Color('#fdba74') },
                             color4: { value: new THREE.Color('#94a3b8') },
@@ -353,26 +356,23 @@ export default class Scene_3 extends Scene {
                     // mesh.material = this.outlineMat
                     // toBeAdded.push(mesh)
                 } else if(e.name === "sky") {
-                    e.material = new THREE.MeshBasicMaterial({transparent: true, color: e.material.color})
+                    e.material = new THREE.MeshBasicMaterial({transparent: true, color: new THREE.Color('#457357')})
                 } else if( e.name ==="bird") {
-                    e.material = new THREE.MeshNormalMaterial({color: 0xff0000})
-                    e.material.side = THREE.DoubleSide
-
-                    // let mat = new CustomMat({
-                    //     renderer: this.renderer, uniforms: {
-                    //         color1: { value: new THREE.Color('#6060bd') }, // darker purple
-                    //         color2: { value: new THREE.Color(e.material.color) },
-                    //         color3: { value: e.material.color },
-                    //         color4: { value: new THREE.Color('#94a3b8') },
-                    //         color5: { value: new THREE.Color('#e2e8f0') },// lighter
-                    //         noiseStep: { value: 1.0 },
-                    //         nbColors: { value: 4 },
-                    //         lightDirection: { value: this.light.position },
-                    //         lightDirection2: { value: this.light2.position }
-                    //     }
-                    // })
-                    // mat.init()
-                    // e.material = mat.get()
+                    let mat = new CustomMat({
+                        renderer: this.renderer, uniforms: {
+                            color1: { value: new THREE.Color('#9F671D') }, // darker purple
+                            color2: { value: new THREE.Color('#D8C18B') },
+                            color3: { value: e.material.color },
+                            color4: { value: new THREE.Color('#9D3800') },
+                            color5: { value: new THREE.Color('#e2e8f0') },// lighter
+                            noiseStep: { value: 1.0 },
+                            nbColors: { value: 4 },
+                            lightDirection: { value: this.light.position },
+                            lightDirection2: { value: this.light2.position }
+                        }
+                    })
+                    mat.init()
+                    e.material = mat.get()
 
                 } else if( e.name ==="main_card") {
                  

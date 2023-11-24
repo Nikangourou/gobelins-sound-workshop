@@ -127,9 +127,6 @@ export default class Scene_1 extends Scene {
         document.querySelector('.experience').addEventListener('click', (e) => { this.click(e) })
         this.setSceneMaterial()
 
-        let testLight = new THREE.AmbientLight(0xffffff);
-        this.scene.add(testLight)
-
         const action = this.cameraMixer.clipAction(this.cameraMouvement);
         action.clampWhenFinished = true;
         action.loop = THREE.LoopOnce
@@ -264,12 +261,12 @@ export default class Scene_1 extends Scene {
                     let mat = new CustomMat({
                         renderer: this.renderer, uniforms: {
                             color1: { value: e.material.color },
-                            color2: { value: new THREE.Color('#991b1b') },
-                            color3: { value: new THREE.Color('#18181b') },
-                            color4: { value: new THREE.Color('#ffff00') },
-                            color5: { value: new THREE.Color('#00ffff') },
+                            color2: { value: new THREE.Color('#270000') },
+                            color3: { value: new THREE.Color('#270000') },
+                            color4: { value: new THREE.Color('#E69262') },
+                            color5: { value: new THREE.Color('#D8C17B') },
                             noiseStep: { value: 1.0 },
-                            nbColors: { value: 3 },
+                            nbColors: { value: 4 },
                             lightDirection: { value: this.light.position },
                             lightDirection2: { value: this.lampLight.position },
 
@@ -279,17 +276,17 @@ export default class Scene_1 extends Scene {
                     e.material = mat.get()
 
                 } else if (e.name.includes('timbre')) {
-                    e.material = new THREE.MeshBasicMaterial({ color: '#699DF7' })
+                    e.material = new THREE.MeshBasicMaterial({ color: '#DFC3A7' })
                 } else if (this.namesToBeOutlines.includes(e.name)) {
                     let mat = new CustomMat({
                         renderer: this.renderer, uniforms: {
-                            color1: { value: new THREE.Color('#699DF7') }, // darker
-                            color2: { value: new THREE.Color('#5E9EE8') },
-                            color3: { value: new THREE.Color('#50A5D7') },
-                            color4: { value: new THREE.Color('#45A6C9') },
-                            color5: { value: new THREE.Color('#3CA4B9') },// lighter
+                            color1: { value: e.material.color }, // darker
+                            color2: { value: new THREE.Color('#DFC3A7') },
+                            color3: { value: new THREE.Color('#DFC3A7') },
+                            color4: { value: new THREE.Color('#DFC3A7') },
+                            color5: { value: new THREE.Color('#DFC3A7') },// lighter
                             noiseStep: { value: 1.0 },
-                            nbColors: { value: 3 },
+                            nbColors: { value: 4 },
                             lightDirection: { value: this.light.position },
                             lightDirection2: { value: this.lampLight.position },
                         }
@@ -305,11 +302,11 @@ export default class Scene_1 extends Scene {
                 } else if (e.name === "radio") {
                     let mat = new CustomMat({
                         renderer: this.renderer, uniforms: {
-                            color1: { value: new THREE.Color('#1e293b') }, // darker
-                            color2: { value: new THREE.Color('E69262') },
-                            color3: { value: new THREE.Color('#9f1239') },
-                            color4: { value: new THREE.Color('#e11d48') },
-                            color5: { value: new THREE.Color('#1d4ed8') },// lighter
+                            color1: { value: new THREE.Color('#DFC3A7') }, // darker
+                            color2: { value: new THREE.Color('#DFC3A7') },
+                            color3: { value: new THREE.Color('#DFC3A7') },
+                            color4: { value: new THREE.Color('#DFC3A7') },
+                            color5: { value: new THREE.Color('#DFC3A7') },// lighter
                             noiseStep: { value: 1.0 },
                             nbColors: { value: 5 },
                             lightDirection: { value: this.light.position },
@@ -319,8 +316,21 @@ export default class Scene_1 extends Scene {
 
 
                 } else {
-                    this.staticMat.init()
-                    e.material = this.staticMat.get()
+                    let mat = new CustomMat({
+                        renderer: this.renderer, uniforms: {
+                            color1: { value: new THREE.Color('#270000') }, // darker
+                            color2: { value: new THREE.Color('#9A4733') },
+                            color3: { value: new THREE.Color('#E69262') },
+                            color4: { value: new THREE.Color('#D8C17B') },
+                            color5: { value: new THREE.Color('#1d4ed8') },// lighter
+                            noiseStep: { value: 1.0 },
+                            nbColors: { value: 3 },
+                            lightDirection: { value: this.light.position },
+                            lightDirection2: { value: this.lampLight.position },
+                        }
+                    })
+                    mat.init()
+                    e.material = mat.get()
 
                 }
             }
@@ -331,7 +341,7 @@ export default class Scene_1 extends Scene {
     }
 
     dragSetup() {
-        this.controls = new DragControls([this.card, this.timbre2], this.camera, this.mainRenderer.instance.domElement);
+        this.controls = new DragControls([this.timbre2], this.camera, this.mainRenderer.instance.domElement);
         this.controls.addEventListener('dragstart', () => {
             this.cameraControls.modes.debug.orbitControls.enabled = false
         });

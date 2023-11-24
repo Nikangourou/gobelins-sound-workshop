@@ -14,7 +14,7 @@ function getRandomInt(max) {
 export default class Scene_4 extends Scene {
     constructor(scene, renderer, cameraControls, mainScene, callback) {
         super()
-        this.name = "scene3"
+        this.name = "scene4"
         this.renderer = renderer
         this.gui = this.renderer.debug
         this.cameraControls = cameraControls
@@ -26,9 +26,10 @@ export default class Scene_4 extends Scene {
         this.camera = scene.cameras[0]
         this.cameraMixer = new THREE.AnimationMixer(this.camera)
         this.cameraMouvement = scene.animations[0]
+        console.log(this.animations)
         let curr = this
         this.cameraMixer.addEventListener('finished', function (e) {
-            console.log("scene 3 finished")
+            console.log("scene 4 finished")
             // transition UI in 
             // curr.onSceneIsDone()
             // callback()
@@ -53,7 +54,7 @@ export default class Scene_4 extends Scene {
         this.angerSound = new THREE.Audio(this.cameraControls.audioListener);
      
         this.bird = this.scene.getObjectByName('Plane')
-        console.log(this.bird)
+        this.bird.frustumCulled = false
         this.birdMoving = this.animations[11]
         this.birdMixer = new THREE.AnimationMixer(this.bird.parent)
     }
@@ -171,15 +172,15 @@ export default class Scene_4 extends Scene {
         this.scene.traverse(e => {
             if (e.isMesh) {
                  if(e.name === "sky") {
-                    e.material = new THREE.MeshBasicMaterial({transparent: true, color: e.material.color})
+                    e.material = new THREE.MeshBasicMaterial({transparent: true, color: new THREE.Color('#457357')})
                 } else if (e.name === "ground_mesh") {
                     let mat = new CustomMat({
                         renderer: this.renderer, uniforms: {
-                            color1: { value: new THREE.Color('#064e3b') }, // darker
-                            color2: { value: new THREE.Color('#064e3b') },
-                            color3: { value: new THREE.Color('#064e3b') },
-                            color4: { value: new THREE.Color('#94a3b8') },
-                            color5: { value: new THREE.Color('#e2e8f0') },// lighter
+                            color1: { value: new THREE.Color('#254441') }, // darker
+                            color2: { value: new THREE.Color('#254441') },
+                            color3: { value: new THREE.Color('#254441') },
+                            color4: { value: new THREE.Color('#254441') },
+                            color5: { value: new THREE.Color('#254441') },// lighter
                             noiseStep: { value: 0.8 },
                             nbColors: { value: 2 },
                             lightDirection: { value: this.light.position },
@@ -194,11 +195,11 @@ export default class Scene_4 extends Scene {
                 } else if (e.name.includes("ground_boxes") || e.name === "nid") {
                     let mat = new CustomMat({
                         renderer: this.renderer, uniforms: {
-                            color1: { value: new THREE.Color('#18181b') }, // darker
+                            color1: { value: new THREE.Color('#B2B09B') }, // darker
                             color2: { value: e.material.color },
-                            color3: { value: new THREE.Color('#fdba74') },
-                            color4: { value: new THREE.Color('#94a3b8') },
-                            color5: { value: new THREE.Color('#e2e8f0') },// lighter
+                            color3: { value: new THREE.Color('#3E3D34') },
+                            color4: { value: new THREE.Color('#B2B09B') },
+                            color5: { value: new THREE.Color('#B2B09B') },// lighter
                             noiseStep: { value: 1.0 },
                             nbColors: { value: 3 },
                             lightDirection: { value: this.light.position },
@@ -214,10 +215,10 @@ export default class Scene_4 extends Scene {
                 else if (e.name.includes("Maple") || e.name.includes("Pine")) {
                     let mat = new CustomMat({
                         renderer: this.renderer, uniforms: {
-                            color1: { value: new THREE.Color('#064100') }, // darker
-                            color2: { value: new THREE.Color('#0B7600') },
+                            color1: { value: new THREE.Color('#254441') }, // darker
+                            color2: { value: new THREE.Color('#42AA8B') },
                             color3: { value: e.material.color },
-                            color4: { value: new THREE.Color('#94a3b8') },
+                            color4: { value: new THREE.Color('#3E3D34') },
                             color5: { value: new THREE.Color('#e2e8f0') },// lighter
                             noiseStep: { value: 1.0 },
                             nbColors: { value: 3 },
