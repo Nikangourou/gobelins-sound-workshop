@@ -47,6 +47,10 @@ ul {
     max-height: 500px;
 }
 
+.root {
+    display: none
+}
+
 .timeline {
     position: fixed;
     right: 50px;
