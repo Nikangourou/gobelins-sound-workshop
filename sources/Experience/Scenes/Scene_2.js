@@ -22,7 +22,7 @@ export default class Scene_2 extends Scene {
         this.cameraMixer = new THREE.AnimationMixer(this.camera)
         this.cameraMouvement = scene.animations[4]
         this.particles = new Particles("#ef4444", this.scene)
-        this.particlesMainCard = new Particles(this.cardColors[1], this.scene)
+        // this.particlesMainCard = new Particles(this.cardColors[1], this.scene)
         this.namesToBeOutlines = ["plane_box_1", "plane_box_2", "box_drag_drop"]
         this.lightPos = new THREE.Vector3(2, 5, 3)
 
@@ -140,9 +140,9 @@ export default class Scene_2 extends Scene {
         this.pinCard.init()
         this.scene.add(this.pinCard.pin)
 
-        this.particlesMainCard.group.position.copy(this.scene.getObjectByName('carte_postale').position)
-        this.scene.add( this.particlesMainCard.group)
-        this.particlesMainCard.init()
+        // this.particlesMainCard.group.position.copy(this.scene.getObjectByName('carte_postale').position)
+        // this.scene.add( this.particlesMainCard.group)
+        // this.particlesMainCard.init()
     }
 
     setSounds() {
@@ -385,6 +385,6 @@ export default class Scene_2 extends Scene {
         }
         if (this.particles.shouldAnimate) this.particles.update()
         if (this.shouldPlayTransition) this.transition.play()
-        this.particlesMainCard.update()
+        // this.particlesMainCard.update()
     }
 }
