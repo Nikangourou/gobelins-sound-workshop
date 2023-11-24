@@ -57,9 +57,7 @@ export default class Scene_3 extends Scene {
         
         this.bird = this.scene.getObjectByName('bird')
         this.bird.frustumCulled = false;
-        this.birdMixer = new THREE.AnimationMixer(this.bird)
-        this.birdMixer2 = new THREE.AnimationMixer(this.bird.parent)
-        
+        this.birdMixer = new THREE.AnimationMixer(this.bird.parent)
         this.birdFlying = this.animations[2]
         this.birdMoving = this.animations[10]
         this.birdShouldCatchCard = false
@@ -136,21 +134,18 @@ export default class Scene_3 extends Scene {
         // cameraAction.play()
         // cameraAction.paused = true
         
-        const action = this.birdMixer.clipAction(this.birdFlying);
-        //action.clampWhenFinished = true;
-        action.loop = THREE.LoopRepeat
-        action.play()
-        // action.paused = true
-        
-        const birdMovingAction =  this.birdMixer2.clipAction(this.birdMoving);
-        birdMovingAction.loop = THREE.LoopRepeat
-        //birdMovingAction.play()
+        const actionBird = this.birdMixer.clipAction(this.birdMoving);
+        actionBird.clampWhenFinished = true;
+        actionBird.loop = THREE.LoopOnce
+        //action.paused = true
+    
+        this.birdMixer.clipAction(this.birdFlying).play()
         
         const planeAction = this.planeMixer.clipAction(this.planeMovement)
         planeAction.clampWhenFinished = true;
         planeAction.loop = THREE.LoopOnce
         planeAction.play()
-        // boxAction.paused = true
+
         this.makeClouds()
         this.makeCards()
 
@@ -306,7 +301,8 @@ export default class Scene_3 extends Scene {
             //let birdFlyingAway = ( ) => this.onBirdWentAway(this)
             this.pinCard.remove()
 
-            this.birdMixer2.clipAction(this.birdMoving).play()
+            this.birdMixer.clipAction(this.birdMoving).play()
+
             // setTimeout(birdFlyingAway, 1200)
         }
        
@@ -444,12 +440,8 @@ export default class Scene_3 extends Scene {
             this.cameraMixer.update(this.time.delta * 0.001)
         }
         
-        // if(this.birdMixer) {
-        //     this.birdMixer.update(this.time.delta * 0.001)
-        // }
-
-        if(this.birdMixer2 && this.birdShouldCatchCard) {
-            this.birdMixer2.update(this.time.delta * 0.001)
+        if(this.birdMixer) {
+            this.birdMixer.update(this.time.delta * 0.001)
         }
 
         if(this.planeMixer) {
